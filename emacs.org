@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       f7f270b1-3090-4c5f-a8eb-b425165a78ab
+:END:
+#+TITLE: emacs
+
+
+

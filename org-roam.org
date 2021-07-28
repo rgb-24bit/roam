@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       267cb964-8de7-4542-bc49-c1ebe5f0340b
+:END:
+#+TITLE: org roam
+
+* org roam server
+  :PROPERTIES:
+  :ID:       767be8dc-ddb9-44cb-9ba3-0952eb0e6bc7
+  :END:
+

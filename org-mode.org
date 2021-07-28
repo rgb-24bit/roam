@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       14aa3e1e-4ff2-45fd-a57e-6a5cfe80d726
+:END:
+#+TITLE: org mode
+
+
+
