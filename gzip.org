@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       41D63C1E-570D-421D-8775-A7FA7F9A9275
+:END:
+#+TITLE: gzip
+
+gzip 是一种使用的比较广泛的压缩格式，在 [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]] 协议中，我们可以通过 =Accept-Encoding: gzip= 请求告诉服务端客户端支持 gzip 格式的数据，
+服务端可以通过 =Content-Encoding: gzip= 响应有告诉客户端当前返回数据的编码格式为 gzip。
+
+在 [[id:99E97512-0FA8-4780-99F1-89C686094F28][RESTful]] 接口中，我们可以通过如下方式标识返回的 gzip 响应：
+#+begin_example
+Content-Type: application/json; charset=UTF-8
+Content-Encoding: gzip
+#+end_example
+

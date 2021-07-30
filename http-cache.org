@@ -1,10 +1,9 @@
 :PROPERTIES:
 :ID:       93F1C6C8-CDF1-498C-85CD-8BB646311D7F
 :END:
-#+TITLE: HTTP cache
+#+TITLE: HTTP Cache
 
-
-HTTP 通过请求的方法和请求的资源 URI 来进行缓存，通常只有 GET 方法的响应能够被缓存，主要有：
+[[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]] 通过请求的方法和请求的资源 URI 来进行缓存，通常只有 GET 方法的响应能够被缓存，主要有：
 + 响应状态码为 200 的 GET 请求
 + 响应状态码为 301 的永久重定向
 + 响应状态码为 404 的错误响应
