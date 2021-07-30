@@ -1,0 +1,73 @@
+:PROPERTIES:
+:ID:       93F1C6C8-CDF1-498C-85CD-8BB646311D7F
+:END:
+#+TITLE: HTTP cache
+
+
+HTTP 通过请求的方法和请求的资源 URI 来进行缓存，通常只有 GET 方法的响应能够被缓存，主要有：
++ 响应状态码为 200 的 GET 请求
++ 响应状态码为 301 的永久重定向
++ 响应状态码为 404 的错误响应
++ 响应状态码为 206 的不完全响应
+
+可以通过一些 HTTP Header 对缓存行为进行控制，可以根据是否需要重新向服务器发起请求来将缓存分为 *强制缓存* 和 *对比缓存* 两类：
++ 强制缓存 - 存在缓存时就直接使用缓存数据，不存在时才请求服务器
++ 对比缓存 - 存在缓存时需要将缓存的一些信息发送到服务器来判断缓存是否有效，有效时服务器返回状态码 304，否则返回相应的数据
+
+强制缓存和对比缓存都需要使用 ~Cache-Control~ 头，该头常见的取值有：
+|-------------+--------------------------------+-----------------------------------------|
+| 取值        | 含义                           | 备注                                    |
+|-------------+--------------------------------+-----------------------------------------|
+| private     | 只有客户端可以缓存             |                                         |
+| public      | 客户端和代理服务器都可缓存     | 前端可以认为 public 和 private 是一样的 |
+| max-age=xxx | 缓存的内容将在 xxx 秒后失效    |                                         |
+| no-cache    | 需要使用对比缓存来验证缓存数据 |                                         |
+| no-store    | 所有内容都不会缓存             |                                         |
+|-------------+--------------------------------+-----------------------------------------|
+
+对于强制缓存来说，可以通过只指定 ~max-age~ 取值的方式来实现，这时缓存类型默认为 ~private~ 的，存在缓存时就不会发起请求。
+
+对于对比缓存来说，除了通过 ~Cache-Control~ 头指定缓存类型以外，还需要通过一些其他头部传递 *缓存标识* 来判断缓存是否已经失效：
++ ~Last-Modified/If-Modified-Since~ - 服务器在响应请求时，可以通过 ~Last-Modified~ 告诉浏览器资源的最后修改时间，然后客户端通过 ~If-Modified-Since~ 头携带该值，
+  服务器收到请求后就根据该时间判断资源是否存在变动，无变动就返回 304 状态码，变动就返回新的数据
++ ~Etag/If-None-Match~ - 和 ~Last-Modified/If-Modified-Since~ 的方式类似，但是优先级更高，服务器通过 ~Etag~ 唯一标识资源，收到客户端的请求时，便可以根据该标识判断资源是否存在
+
+例子：
+#+begin_example
+  强制缓存：
+
+  Response Header:
+  Cache-Control: max-age=86400
+
+  对比缓存：
+  Response Header:
+  Cache-Control: max-age=86400
+  Etag: 3749d0ed06ba32553a8171b56af549a0
+
+  Request Header:
+  If-None-Match: 3749d0ed06ba32553a8171b56af549a0
+#+end_example
+
+理论上来讲，当一个资源被缓存存储后，该资源应该可以被永久存储在缓存中。由于缓存只有有限的空间用于存储资源副本，所以缓存会定期地将一些副本删除，这个过程叫做缓存驱逐。
+
+另一方面，当服务器上面的资源进行了更新，那么缓存中的对应资源也应该被更新，由于 HTTP 是 C/S 模式的协议，服务器更新一个资源时，不可能直接通知客户端更新缓存，
+所以双方必须为该资源约定一个过期时间，在该过期时间之前，该资源（缓存副本）就是 *新鲜* 的，当 *过了过期时间* 后，该资源（缓存副本）则变为 *陈旧* 的。
+
+驱逐算法用于将陈旧的资源替换为新鲜的，注意，一个陈旧的资源是不会直接被清除或忽略的，当客户端发起一个请求时，缓存检索到已有一个对应的陈旧资源，则缓存会先将此请求附加一个 ~If-None-Match~ 头，
+然后发给目标服务器，以此来检查该资源副本是否是依然还是算新鲜的，若服务器返回了 304 (Not Modified)，则表示此资源副本是新鲜的，这样一来，可以节省一些带宽。
+若服务器通过 ~If-None-Match~ 或 ~If-Modified-Since~ 判断后发现已过期，那么会带有该资源的实体内容返回。
+
+PS: 在没有 Cache-Control 头的情况下浏览器貌似不会进行缓存……
+
+参考：
++ [[https://developer.mozilla.org/en-US/docs/Glossary/Cacheable][Cacheable - MDN Web Docs Glossary: Definitions of Web-related terms | MDN]]
++ [[https://www.cnblogs.com/chenqf/p/6386163.html][彻底弄懂 HTTP 缓存机制及原理 - 云中桥 - 博客园]]
++ [[https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching][HTTP caching - HTTP | MDN]]
+
+* 相关问题
+** XHR see 304 responses as 200?
+   Ref: [[https://stackoverflow.com/questions/62378379/do-the-fetch-api-and-axios-see-304-responses-as-200][Do the Fetch API and Axios see 304 responses as 200? - Stack Overflow]]
+   #+begin_quote
+   When a browser does a GET request with a If-Match or If-Modified-Since header, and the server responds with 304 Not Modified, the client will just see this as 200 OK.
+   #+end_quote
+
