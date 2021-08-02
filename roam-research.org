@@ -3,5 +3,9 @@
 :END:
 #+TITLE: roam research
 
+理解：
+1. 在 Roam Research 中，分类方式从层级结构转变为节点之间的联系，新建笔记时不应该老是想着按照层级关系来，而是看当前笔记的主题是什么，
+   和哪些节点相关。
 
-
+参考：
++ [[https://sspai.com/post/60588][Roam Research Report ——理念与功能 - 少数派]]

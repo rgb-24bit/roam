@@ -9,9 +9,6 @@
   :END:
 
 * org roam export
-  :PROPERTIES:
-  :ID:       04608CA7-5C80-4B14-A2ED-61EE77FBFC0D
-  :END:
   + [[https://hugocisneros.com/notes/][Notes - Hugo Cisneros - Personal page]]
   + [[https://commonplace.doubleloop.net/][Neil's Digital Garden]]
 

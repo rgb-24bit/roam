@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       077F412E-B1A6-441C-91AC-A39C7AD3523A
+:END:
+#+TITLE: python json
+
+* load json data to python object
+  在 [[id:4F6D630D-B09A-4987-B755-81D9F78656CE][Python]] 中 load [[id:6578F130-38AB-4432-A10A-2B5D00121CC6][json]] 数据时，可以通过  object_hook 和 SimpleNamespace 达到类似 object 的效果：
+  #+begin_src python
+    import json
+    from types import SimpleNamespace
+
+    data = '{"name": "John Smith", "hometown": {"name": "New York", "id": 123}}'
+
+    # Parse JSON into an object with attributes corresponding to dict keys.
+    x = json.loads(data, object_hook=lambda d: SimpleNamespace(**d))
+    print(x.name, x.hometown.name, x.hometown.id)
+  #+end_src
+
+  SimpleNamespace 实现：
+  #+begin_src python
+    class SimpleNamespace:
+        def __init__(self, **kwargs):
+            self.__dict__.update(kwargs)
+
+        def __repr__(self):
+            keys = sorted(self.__dict__)
+            items = ("{}={!r}".format(k, self.__dict__[k]) for k in keys)
+            return "{}({})".format(type(self).__name__, ", ".join(items))
+
+        def __eq__(self, other):
+            return self.__dict__ == other.__dict__
+  #+end_src
+
+* dump json without whitespace
+  #+begin_quote
+  If specified, separators should be an (item_separator, key_separator) tuple. The default is (', ', ': ') if indent is None and (',', ': ') otherwise.
+  To get the most compact JSON representation, you should specify (',', ':') to eliminate whitespace.
+  #+end_quote
+
+  So:
+  #+begin_src python
+    json.dumps(separators=(',', ':'))
+  #+end_src
+

@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       76F63561-A00D-40F1-998B-59E4DDEF9DE8
+:END:
+#+TITLE: python on windows
+
+由于 [[id:A0EA9036-044E-4938-859B-584C2062B333][Windows]] 系统环境的特殊性，[[id:4F6D630D-B09A-4987-B755-81D9F78656CE][Python]] 在 Windows 上存在一些特有的问题。
+
+* Python not working in the command line of git bash
+  #+begin_src sh
+    alias python='winpty python.exe'
+  #+end_src
+
+  参考：
+  + [[https://stackoverflow.com/questions/32597209/python-not-working-in-the-command-line-of-git-bash][windows - Python not working in the command line of git bash - Stack Overflow]]
+
