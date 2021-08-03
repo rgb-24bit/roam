@@ -1,0 +1,84 @@
+:PROPERTIES:
+:ID:       98D80295-D2C7-4712-AB14-D6A6B6725257
+:END:
+#+TITLE: rust error handling
+
+* String or &str into Error
+  [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] 为 Box<dyn std::error::Error> 实现了 From<String> 和 From<&str> 这两个 trait，方便直接使用 String 作为 Err 返回：
+  #+begin_src rust
+    #[stable(feature = "rust1", since = "1.0.0")]
+    impl From<String> for Box<dyn Error + Send + Sync> {
+        #[inline]
+        fn from(err: String) -> Box<dyn Error + Send + Sync> {
+            struct StringError(String);
+
+            impl Error for StringError {
+                #[allow(deprecated)]
+                fn description(&self) -> &str {
+                    &self.0
+                }
+            }
+
+            impl Display for StringError {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    Display::fmt(&self.0, f)
+                }
+            }
+
+            // Purposefully skip printing "StringError(..)"
+            impl Debug for StringError {
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    Debug::fmt(&self.0, f)
+                }
+            }
+
+            Box::new(StringError(err))
+        }
+    }
+
+    #[stable(feature = "rust1", since = "1.0.0")]
+    impl<'a> From<&str> for Box<dyn Error + Send + Sync + 'a> {
+        #[inline]
+        fn from(err: &str) -> Box<dyn Error + Send + Sync + 'a> {
+            From::from(String::from(err))
+        }
+    }
+  #+end_src
+
+  Ref https://github.com/rust-lang/rust/blob/master/library/std/src/error.rs#L239
+
+  使用：
+  #+begin_src rust
+    let r: Result<(), Err<Box<dyn Error>>> = Err("err".into());
+  #+end_src
+
+* Rust Try trait
+  :PROPERTIES:
+  :ID:       D36AC5FD-6E39-4069-906D-C3AF278B9356
+  :END:
+  [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] RFC 1859 允许用 Try trait 来自定义可以使用 ? 操作的类型，目前可以使用 ? 操作的类型有：
+  #+begin_src rust
+    impl<B, C> Try for ControlFlow<B, C>;
+    impl<T> Try for Option<T>;
+    impl<T, E> Try for Result<T, E>;
+    impl<T, E> Try for Poll<Option<Result<T, E>>>;
+    impl<T, E> Try for Poll<Result<T, E>>;
+  #+end_src
+
+  比如：
+  #+begin_src rust
+    fn try_it() -> Option<String> {
+        Some(foo()?)
+    }
+
+    fn foo() -> Option<String> {
+        Some("13".into())
+    }
+  #+end_src
+  
+  目前 Try trait 还是 experimental API，可以期待 stable 的一天。
+
+  参考：
+  + [[https://github.com/rust-lang/rfcs/blob/master/text/1859-try-trait.md][rfcs/1859-try-trait.md at master · rust-lang/rfcs]]
+  + [[https://doc.rust-lang.org/std/ops/trait.Try.html][Try in std::ops - Rust]]
+

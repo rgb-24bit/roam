@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       43FA198D-C667-4723-8A44-67AF5D743A83
+:ROAM_REFS: https://github.com/rust-lang/rust/blob/master/src/test/ui/bastion-of-the-turbofish.rs
+:END:
+#+TITLE: rust bastion of the turbofish
+
+
+在 [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] 中，当编译无法自动推断泛型参数时，可以使用 =::<...>= 语法来显式指定类型，这种语法叫做 Turbofish。
+
+但也有人觉得这样写不好看，就想去掉 =::= 直接写 =<...>=, 但是去掉 =::= 后下面的写法就会存在歧义：
+#+begin_src rust
+  fn main() {
+      let (oh, woe, is, me) = ("the", "Turbofish", "remains", "undefeated");
+      let _: (bool, bool) = (oh<woe, is>(me));
+  }
+#+end_src
+
+如果没有 ::，这里可能是 =oh<woe, is>(me)= 的函数调用，也可以是 =oh < woe= 和 =is > (me)= 两个布尔判断。
+
+这就是 Bastion of the Turbofish。
+

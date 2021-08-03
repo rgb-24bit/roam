@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       78953EDC-D72C-4C8C-A9D5-2F21FD11A46B
+:END:
+#+TITLE: rust Option-like enums
+
+在 [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] 中，当一个枚举只有一个单元枚举值和一个非空指针枚举时，编译器可以针对这种情况做优化，省略需要用于存储 tag 的空间：
+#+begin_quote
+The classic case of this is Rust's "null pointer optimization": an enum consisting of a single outer unit variant (e.g. None) and a (potentially nested) non- nullable pointer variant (e.g. Some(&T)) makes the tag unnecessary.
+A null pointer can safely be interpreted as the unit (None) variant. The net result is that, for example, size_of::<Option<&T>>() == size_of::<&T>().
+#+end_quote
+
+#+begin_src rust
+  use std::mem::size_of;
+
+  fn main() {
+      println!("{}, {}", size_of::<&i32>(), size_of::<Option<&i32>>());  // 8, 8
+      println!("{}, {}", size_of::<i32>(), size_of::<Option<i32>>());    // 4, 8
+  }
+#+end_src
+
+参考：
++ [[https://rust-lang.github.io/unsafe-code-guidelines/layout/enums.html#layout-of-a-data-carrying-enums-without-a-repr-annotation][Enums - Unsafe Code Guidelines Reference]]
++ [[https://doc.rust-lang.org/nomicon/repr-rust.html][repr(Rust) - The Rustonomicon]]
++ [[https://doc.rust-lang.org/std/option/index.html#representation][std::option - Rust]]
+
