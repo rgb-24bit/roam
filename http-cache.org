@@ -70,3 +70,6 @@ PS: 在没有 Cache-Control 头的情况下浏览器貌似不会进行缓存…�
    When a browser does a GET request with a If-Match or If-Modified-Since header, and the server responds with 304 Not Modified, the client will just see this as 200 OK.
    #+end_quote
 
+** AJAX not send request
+   当响应头中 max-age 大于零时，浏览器可能不会发起请求，如果缓存是否有效是通过 Etag 标识的，那么可以考虑将 max-age 设小一点。
+

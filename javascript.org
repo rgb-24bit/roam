@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       E74FE7A7-3797-4CAF-92C5-1537426DE35B
+:END:
+#+TITLE: javascript
+
+
+

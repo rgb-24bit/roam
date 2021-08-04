@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       21355F85-D221-47EF-9DD9-225D44A0F87B
+:ROAM_REFS: https://github.com/axios/axios
+:END:
+#+TITLE: axios
+
+axios 是 [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]] 中具有统治地位的 [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][http]] client。
+
+* how to pass array query params?
+  axios 对数据进行格式化时通过 qs 完成的，可以显示指定 qs 的调用方式：
+  #+begin_src js
+    axios.get(url, {
+        params:{
+            arr: [1,2,3]
+        },
+        paramsSerializer: function(params) {
+            return Qs.stringify(params, {arrayFormat: 'repeat'})
+        }
+    })
+  #+end_src
+
