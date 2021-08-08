@@ -3,12 +3,9 @@
 :END:
 #+TITLE: org roam
 
-* org roam server
-  :PROPERTIES:
-  :ID:       767be8dc-ddb9-44cb-9ba3-0952eb0e6bc7
-  :END:
-
 * org roam export
+  + [[https://org-roam.discourse.group/t/export-one-multiple-org-roam-file-with-backlinks/973/4][Export one/multiple Org-Roam file with backlinks? - How To - Org-roam]]
   + [[https://hugocisneros.com/notes/][Notes - Hugo Cisneros - Personal page]]
   + [[https://commonplace.doubleloop.net/][Neil's Digital Garden]]
+  + [[https://braindump.jethro.dev/][Jethro's Braindump]]
 
