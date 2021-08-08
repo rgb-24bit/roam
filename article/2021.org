@@ -1,8 +1,7 @@
 :PROPERTIES:
 :ID:       A2A5EC78-6860-4118-AED8-8297DCFFCEBB
 :END:
-#+TITLE: Article 2021
-#+FILETAGS: :Read:
+#+TITLE: article 2021
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#m01][M01]]
