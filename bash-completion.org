@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       DDF8EF0C-DC51-421F-9A66-4A6AA475B74C
+:END:
+#+TITLE: bash completion
+
+* completion
+  [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]] 可以通过 complete 命令来定义补全项，方便命令的使用，可以参考：
+  + [[https://www.gnu.org/software/bash/manual/html_node/Programmable-Completion-Builtins.html#Programmable-Completion-Builtins][Programmable Completion Builtins (Bash Reference Manual)]]
+  + [[https://iridakos.com/programming/2018/03/01/bash-programmable-completion-tutorial][Creating a bash completion script]]
+

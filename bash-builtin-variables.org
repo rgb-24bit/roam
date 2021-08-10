@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       ADDB9A08-9D71-4546-8621-4A2089EA62C7
+:ROAM_REFS: https://tldp.org/LDP/abs/html/internalvariables.html
+:END:
+#+TITLE: bash builtin variables
+
+[[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]] 中会影响 bash 脚本行为的变量：
+
++ $PROMPT_COMMAND ::
+  PROMPT_COMMAND 是一个 bash 环境变量，这个变量的中内容是作为一个普通的 bash 命令执行的，而且执行时间是在 bash 显示 prompt 之前，可以通过这个变量来记录执行日志：
+  #+begin_src sh
+    LOGIN_IP=$(who am i | awk '{print $NF}')
+    export PROMPT_COMMAND='{ msg=$(history 1 | { read x y; echo $y; });echo $(date +"%Y-%m-%d %H:%M:%S") [$(whoami)@$SSH_USER$LOGIN_IP `pwd` ]" $msg" >> /var/log/.history; }'
+  #+end_src
+

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       E538727A-70E8-48C2-BE49-CD73C07C5135
+:END:
+#+TITLE: rust async
+
+
+

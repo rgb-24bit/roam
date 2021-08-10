@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       4FDD8C6A-5656-4473-B708-AFDE3502009B
+:ROAM_REFS: https://redis.io/topics/transactions
+:END:
+#+TITLE: redis transaction
+
+[[id:93AEA8F0-56ED-4B22-897F-310B1A94E229][redis]] 中事务并没有提供完备的 [[id:0DC3D3E1-674F-4B57-9A72-3CC611F64D69][ACID]] 能力，与其说是事务，不如说只是提供了一个批量执行 redis 命令的能力。在官方文档中也提到了这一点：
+#+begin_quote
+It's important to note that even when a command fails, all the other commands in the queue are processed – Redis will not stop the processing of commands.
+#+end_quote
+
+和 [[id:F0F576A4-800F-4424-856D-1EE255270990][redis pipelining]] 的区别在于：
++ pipelining 同样支持客户端一次提交多个命令执行，只不过不能保证原子性，提交的命令可能在不同的机器中执行
++ transaction 提交的命令可以保证在同一台机器上执行，同时在执行这一批命令时不会插入其他命令
+
+提供类似能力的还有 [[id:A70BE19D-C2E3-4969-B6CA-6AFCC3E099B2][redis lua scripting]]，redis 中执行 lua 脚本时也会保证整个脚本的执行是原子的。
+

@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       E9623ACF-9371-4C1B-84A5-7220AF7544F7
+:END:
+#+TITLE: rust web
+
+通过文章 [[https://dev.to/zhanghandong/two-diagrams-showing-the-current-rust-network-ecosystem-39hi][Two diagrams showing the current Rust network ecosystem - DEV Community]] 可以了解到 [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][rust]] web 生态的大致现状。
+
+整个生态圈基本建立在 [[id:B42E496C-B889-4714-B3C8-EA90898C7461][tokio]] 的基础上，[[id:E538727A-70E8-48C2-BE49-CD73C07C5135][rust async]] 的事实标准 ๑乛◡乛๑
+

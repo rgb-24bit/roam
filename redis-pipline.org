@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       F0F576A4-800F-4424-856D-1EE255270990
+:END:
+#+TITLE: redis pipelining
+
+
+
