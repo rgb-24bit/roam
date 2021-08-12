@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       F213A72A-5F2B-4D9A-A8E4-35E256ECA104
+:END:
+#+TITLE: Rule-Engine
+
+在实际的软件开发中，经常会遇到在某些环节中，需要针对不同的条件执行不同逻辑的情况，当条件比较少时，我们可以通过硬编码完成相应的判断，
+但是当条件很多，变化频繁甚至需要支持用户自定义时，硬编码就难以完成这样工作。
+
+而规则引擎或类似的工具，支持我们通过 [[id:97CF55A0-A5CF-4121-9D6B-AB7398E1F812][DSL]] 来指定条件和满足条件后需要执行的动作，将规则和代码解耦。
+
+参考：
++ [[https://medium.com/@er.rameshkatiyar/what-is-rule-engine-86ea759ad97d][What is Rule-Engine?. Here I’m trying to explain rule-engine… | by Ramesh Katiyar | Medium]]
+

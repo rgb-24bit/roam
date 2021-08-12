@@ -1,0 +1,42 @@
+:PROPERTIES:
+:ID:       92326AB0-C9B0-455A-ACEA-15D21611B417
+:END:
+#+TITLE: ReDoS
+
+ReDOS 是一种 [[id:F27A3628-4FE7-43A9-952E-026A843575A2][DoS/DDoS]] 攻击方式，由于正则表达式基于 [[id:A6AD8B7F-1DEB-47A8-BB4B-69782AAC0382][NFA]] 自动机实现，所以，当编写的正则表达式存在某些缺陷时，攻击者可以通过构造特定的字符串，让正则表达式执行匹配时不断执行回退逻辑，消耗服务器资源。
+
+比如，正则 =^(([a-z])+.)+[A-Z]([a-z])+$= 在匹配特定字符串时的耗时：
+#+begin_example
+  >   console.time('benchmark');
+      /^(([a-z])+.)+[A-Z]([a-z])+$/.test('aaaaaaaaaaaaaaa');
+      console.timeEnd('benchmark');
+  < benchmark: 0.060ms
+  
+  >   console.time('benchmark');
+      /^(([a-z])+.)+[A-Z]([a-z])+$/.test('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.timeEnd('benchmark');
+  < benchmark: 308.656ms
+  
+  >   console.time('benchmark');
+      /^(([a-z])+.)+[A-Z]([a-z])+$/.test('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.timeEnd('benchmark');
+  < benchmark: 3179.829ms
+  
+  
+  >   console.time('benchmark');
+      /^(([a-z])+.)+[A-Z]([a-z])+$/.test('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+      console.timeEnd('benchmark');
+  < benchmark: 22159.769ms  // 22 seconds
+  
+  >   // You can guess what would happen if you test the RegEx with 100 repeating characters.
+      console.time('benchmark');
+      /^(([a-z])+.)+[A-Z]([a-z])+$/.test( 'a'.repeat(100) );
+      console.timeEnd('benchmark');
+  < benchmark: lol.....no.
+#+end_example
+
+参考：
++ [[https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS][Regular expression Denial of Service - ReDoS Software Attack | OWASP]]
++ [[https://github.com/jagracey/RegEx-DoS][jagracey/RegEx-DoS: RegEx Denial of Service (ReDos) Scanner]]
++ [[http://www.lmxspace.com/2019/02/16/ReDOS%E5%88%9D%E6%8E%A2/][ReDOS初探]]
+

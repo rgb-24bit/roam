@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       2996EDB1-2956-49DA-B1C5-12D2695BB58B
+:END:
+#+TITLE: Hash Collision DoS
+
+Hash Collision DoS 是 [[id:F27A3628-4FE7-43A9-952E-026A843575A2][DoS/DDoS]] 攻击方式的一种，这个安全弱点利用了各语言的 [[id:B567ABB1-8DA2-46EE-B8B5-FD1AD0192FE6][Hash]] 算法的 “非随机性” 可以制造出 N 多的 value 不一样，但是 key 一样的数据，然后让你的 Hash 表成为一张单向链表，
+从而导致你的整个网站或是程序的运行性能以级数下降。
+
+这个问题在很多语言中都存在，参考：
++ [[http://ocert.org/advisories/ocert-2011-003.html][oCERT-2011-003 multiple implementations denial-of-service via hash algorithm collision]]
++ [[https://coolshell.cn/articles/6424.html][Hash Collision DoS 问题 | 酷 壳 - CoolShell]]
+

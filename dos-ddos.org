@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       F27A3628-4FE7-43A9-952E-026A843575A2
+:ROAM_REFS: https://en.wikipedia.org/wiki/Denial-of-service_attack
+:END:
+#+TITLE: DoS/DDoS
+
+DoS 攻击通常会利用某种手段来消耗服务器资源，使得服务器处理正常流量的访问，而 DDoS 就是分布式的 DoS 攻击：
+#+begin_quote
+A denial-of-service (DoS) attack floods a server with traffic, making a website or resource unavailable. A distributed denial-of-service (DDoS) attack is a DoS attack that uses multiple computers or machines to flood
+a targeted resource. Both types of attacks overload a server or web application with the goal of interrupting services. 
+#+end_quote
+
+参考：
++ [[https://www.fortinet.com/resources/cyberglossary/dos-vs-ddos][DoS vs. DDoS: What Is the Difference? | Fortinet]]
+

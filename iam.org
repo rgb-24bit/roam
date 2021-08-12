@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       C80203C1-275E-4C31-81D6-E9D612630DC6
+:END:
+#+TITLE: IAM
+
+Identity and Access Management (IAM) 是一种 [[id:83A33205-5E5F-4C00-BC26-BC4CEF4C82CE][Access Control]] 模型，由 AWS 首发，各家云厂商通常也会有自己实现，提供了灵活的权限管理能力。
+
+

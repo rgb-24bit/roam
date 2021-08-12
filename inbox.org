@@ -3,5 +3,7 @@
 :END:
 #+TITLE: inbox
 
-
++ [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] generic_associated_types
+  + [[https://github.com/rust-lang/rfcs/blob/master/text/1598-generic_associated_types.md][rfcs/1598-generic_associated_types.md at master · rust-lang/rfcs]]
+  + [[https://zhuanlan.zhihu.com/p/29021140][高阶类型 Higher Kinded Type - 知乎]]
 

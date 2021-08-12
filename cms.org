@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       08905B9C-A76E-4D96-A495-3359FB99E944
+:ROAM_REFS: https://en.wikipedia.org/wiki/Content_management_system
+:END:
+#+TITLE: CMS
+
+内容管理系统 Content Management System(CMS) 是一种用于管理数字内容的创建和修改的计算机软件，一些企业的官网可能不是技术人员开发的，
+而是产品借助 CMS 设计得到。
+

@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       30FEFA50-22CC-430E-B4E4-A68A0F2C424D
+:END:
+#+TITLE: RBAC
+
+基于角色的访问控制（Role-based access control，RBAC）是一种极为经典的 [[id:83A33205-5E5F-4C00-BC26-BC4CEF4C82CE][Access Control]] 模型，在这个模型中，通过 *角色* 来管理 *用户* 和 *权限* 的关联关系。
+
+角色是用户和权限的载体，当用户属于某个角色时，就自动拥有该角色下的所有权限。
+

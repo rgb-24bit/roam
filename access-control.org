@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       83A33205-5E5F-4C00-BC26-BC4CEF4C82CE
+:END:
+#+TITLE: Access Control
+
+访问控制（Access control）是指对访问者向受保护资源进行访问操作的控制管理。该控制管理保证被授权者可访问受保护资源，未被授权者不能访问受保护资源。
+
+

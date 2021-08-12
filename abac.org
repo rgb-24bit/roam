@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       BAA2AC3C-C359-49B3-88A3-5A84E34D61CB
+:END:
+#+TITLE: ABAC
+
+基于属性的访问控制（Attribute-Based Access Control，ABAC）是一种灵活的 [[id:83A33205-5E5F-4C00-BC26-BC4CEF4C82CE][Access Control]] 模型，通过实体的属性、操作类型、相关的环境来控制是否有对操作对象的权限。
+
+
