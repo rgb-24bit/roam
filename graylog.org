@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       357A06B1-B9EB-4E02-A8DF-F10D110C707A
+:END:
+#+TITLE: Graylog
+
+Graylog 是一个开源的[[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][日志管理]]软件，可以从客户端接收结构化的日志存储查询，在使用体验上感觉比 [[id:16EB37C3-D43A-47CB-96ED-537F27560276][ELK]] 更好。
+
+支持 [[id:6737B012-DB4A-469A-A1E1-C26446A7FF4B][syslog]] 协议。
+

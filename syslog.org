@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       6737B012-DB4A-469A-A1E1-C26446A7FF4B
+:ROAM_REFS: https://datatracker.ietf.org/doc/html/rfc5424
+:END:
+#+TITLE: syslog
+
+syslog 是一种协议，定义了一种客户端想日志服务传输日志消息的格式。
+
