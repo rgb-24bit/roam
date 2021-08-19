@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       0D0E64A5-2D54-4987-B5B2-24914F5394EE
+:END:
+#+TITLE: socks5
+
+socks5 和 socks 都是代理协议，用于代理客户端和代理服务端认证通讯，和 [[id:69BC2DC5-714B-4F8E-B518-8F13367F0761][socket]] 是两个东西。
+

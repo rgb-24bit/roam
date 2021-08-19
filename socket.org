@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       69BC2DC5-714B-4F8E-B518-8F13367F0761
+:END:
+#+TITLE: socket
+
+socket 是一种操作系统提供的进程间通信机制。
+

@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       62E89CAB-8BCF-48FC-8554-3AE8CD7B153D
+:ROAM_REFS: https://en.wikipedia.org/wiki/Data_structure_alignment
+:END:
+#+TITLE: Data structure alignment
+
+数据对齐是为了提高 [[id:19A738AD-015A-4E6E-9B66-5F22BC926546][CPU]] 读取数据的效率，CPU 每次访问内存只能通过单个 memory word 来访问，比如对于 int32 大小的数据，在数据对齐的情况下，CPU 可以通过单次访问完成数据读取，
+但如果数据没对齐，数据的一部分在这个 memory word，一部分在另一个 memory word，CPU 就需要访问两次内存。
+
+所以，编译器通常会在没有对齐的字段前面 padding 几个字节来对齐。
+
+padding 字节数的计算公式为：
+#+begin_example
+  padding = (align - (offset mod align)) mod align
+  aligned = offset + padding
+          = offset + ((align - (offset mod align)) mod align)
+#+end_example
+
