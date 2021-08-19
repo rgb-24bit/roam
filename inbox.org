@@ -7,3 +7,6 @@
   + [[https://github.com/rust-lang/rfcs/blob/master/text/1598-generic_associated_types.md][rfcs/1598-generic_associated_types.md at master · rust-lang/rfcs]]
   + [[https://zhuanlan.zhihu.com/p/29021140][高阶类型 Higher Kinded Type - 知乎]]
 
++ [[id:D62ECC5B-7457-4187-911D-1A2F4B3A2438][rpc]]
+  + [[https://github.com/mini-lust/tutorials][mini-lust/tutorials: An RPC framework developing tutorial]]
+

@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       4FDDBC2D-7416-477A-9C28-4EF6DBAEFF59
+:END:
+#+TITLE: IIFE
+
+IIFE（立即调用函数表达式）是一个在定义时就会立即执行的 [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][JavaScript]] 函数。
+
+比如：
+#+begin_src js
+  (function () {
+      statements
+  })();
+#+end_src
+

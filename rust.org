@@ -3,6 +3,8 @@
 :END:
 #+TITLE: Rust
 
++ Ref :: [[id:DA84DF93-2D0B-4F5F-AF0B-29E1A379CB46][programming language]]
+
 * Is `return 5;` a statement or expression in Rust?
   在 Rust 中，类似 =expression;= 的代码叫做表达式语句，返回 ()，在部分说法中，return 被认为是 expression，
   但是在 return 后面跟 ; 时并不影响返回值。
