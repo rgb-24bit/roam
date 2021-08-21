@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       5346EB07-3169-416A-BA2B-42398547E0FF
+:END:
+#+TITLE: higher ordered function
+
+简单来说，高阶函数（higher ordered function）就是指可以接受函数作为参数或者返回值的函数。
+

@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       1DF6613F-DCB2-46D7-95A8-4130F4C851F3
+:ROAM_REFS: https://github.com/rust-lang/rfcs/blob/master/text/1598-generic_associated_types.md
+:END:
+#+TITLE: rust generic associated types
+
++ Ref :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]、[[id:5346EB07-3169-416A-BA2B-42398547E0FF][higher ordered function]]
+

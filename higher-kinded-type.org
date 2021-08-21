@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       FB14A530-A621-40B7-BEB5-1B8CA939AF09
+:END:
+#+TITLE: higher kinded type
+
+在支持泛型的语言比如 [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]] 中，类型 =Vec<T>= 并不是一个具体的类型，只有接受具体的类型参数后才能成为一个真正的类型。
+
+我们可以把 Vec 视为针对类型的“函数”，称作“类型构造器”，给它输入一个类型，它会返回一个类型出来。
+
+我们定义一个概念“阶(kind)” 来描述这种现象。
+
+比如最基本的类型 i32 bool ，它们的 kind 就是 type。而 Vec 的 kind 就是 type -> type。
+
+#+begin_example
+  expression |  kind
+  -------------------
+  i32        |  type
+  i32 -> i32 |  type
+  Vec<i32>   |  type
+  Vec        |  type -> type
+#+end_example
+
+和[[id:5346EB07-3169-416A-BA2B-42398547E0FF][高阶函数]]的定义类似，假如我们有一个类型构造器，它本身可以接受类型构造器作为参数，那它就是高阶类型（higher kinded type）。
+
+参考：
++ [[https://zhuanlan.zhihu.com/p/29021140][高阶类型 Higher Kinded Type - 知乎]]
+
