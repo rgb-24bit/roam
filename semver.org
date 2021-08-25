@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       7D26CD4D-2A39-48AF-8189-B2C4541E25AC
+:END:
+#+TITLE: semver
+
+语义化版本概要：
+#+begin_quote
+Given a version number MAJOR.MINOR.PATCH, increment the:
+1. MAJOR version when you make incompatible API changes,
+2. MINOR version when you add functionality in a backwards compatible manner, and
+3. PATCH version when you make backwards compatible bug fixes.
+
+Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+#+end_quote
+
+参考：[[https://semver.org/][Semantic Versioning 2.0.0 | Semantic Versioning]]
+

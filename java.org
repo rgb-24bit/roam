@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       1A0467A7-7CD5-4F3D-8BF3-7CDAE39C30FB
+:END:
+#+TITLE: java
+
++ Ref :: [[id:DA84DF93-2D0B-4F5F-AF0B-29E1A379CB46][programming language]]
+

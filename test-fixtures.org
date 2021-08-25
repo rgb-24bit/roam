@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       A72244A3-2830-421F-BD45-DE6C9FF5163C
+:END:
+#+TITLE: test fixtures
+
++ Ref :: [[id:5025292A-AFC0-47C7-BD6B-B9464506F937][test]]
+
+在实际的测试用例中，常常存在依赖前置数据或条件的情况，而 test fixtures 就是指将这样的前置依赖固定下来，使得测试用例可以重复执行。
+
+#+begin_quote
+The purpose of a test fixture is to ensure that there is a well known and fixed environment in which tests are run so that results are repeatable. Some people call this the test context.
+
+Examples of fixtures:
++ Loading a database with a specific, known set of data
++ Erasing a hard disk and installing a known clean operating system installation
++ Copying a specific known set of files
++ Preparation of input data and set-up/creation of fake or mock objects
+#+end_quote
+

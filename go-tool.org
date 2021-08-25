@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       982AFE8D-3846-410C-B4AD-D657E48F68B5
+:END:
+#+TITLE: go tool
+
++ Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+
+* Inject build-time variables
+  go build 命令的 =-ldflags= 选项支持在编译时指定变量的值：
+  #+begin_example
+    $ go build -ldflags "-X importpath.name=value"
+  #+end_example
+
+  本质上使用的是 go link 的 =-X= 选项：
+  #+begin_example
+    -X importpath.name=value
+      Set the value of the string variable in importpath named name to value.
+      This is only effective if the variable is declared in the source code either uninitialized
+      or initialized to a constant string expression. -X will not work if the initializer makes
+      a function call or refers to other variables.
+      Note that before Go 1.5 this option took two separate arguments.
+  #+end_example
+

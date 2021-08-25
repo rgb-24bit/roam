@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       A871F3ED-86B9-41BA-8C7B-D4D21B40709E
+:END:
+#+TITLE: spring transactional
+
++ Ref :: [[id:1A0467A7-7CD5-4F3D-8BF3-7CDAE39C30FB][java]]
+
+在利用类似 @Transactional 的工具自动管理事务时，可以根据事务传播行为来控制内部事务方式的执行：
+|---------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+| TransactionDefinition.PROPAGATION_REQUIRED：      | 如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是默认值。                                                          |
+| TransactionDefinition.PROPAGATION_REQUIRES_NEW：  | 创建一个新的事务，如果当前存在事务，则把当前事务挂起。                                                                                      |
+| TransactionDefinition.PROPAGATION_SUPPORTS：      | 如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行。                                                                |
+| TransactionDefinition.PROPAGATION_NOT_SUPPORTED： | 以非事务方式运行，如果当前存在事务，则把当前事务挂起。                                                                                      |
+| TransactionDefinition.PROPAGATION_NEVER：         | 以非事务方式运行，如果当前存在事务，则抛出异常。                                                                                            |
+| TransactionDefinition.PROPAGATION_MANDATORY：     | 如果当前存在事务，则加入该事务；如果当前没有事务，则抛出异常。                                                                              |
+| TransactionDefinition.PROPAGATION_NESTED：        | 如果当前存在事务，则创建一个事务作为当前事务的嵌套事务来运行；如果当前没有事务，则该取值等价于 TransactionDefinition.PROPAGATION_REQUIRED。 |
+|---------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------|
+
+其中，挂起的意思就是不结束当前事务，但也不继续使用当前事务，直到内部事务结束。
+
++ 感想 ::
+  spring transactional 之前有使用过，但是当时对事务传播性没啥感受，直到这两天使用 golang [[https://entgo.io/docs/transactions/#best-practices][ent]] 时遇到嵌套事务的问题，自己先实现了类似 PROPAGATION_REQUIRED 的策略后才想起来它，然后一看，
+  好全面策略，不愧是工业级框架。
+

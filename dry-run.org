@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       5EB9250D-7365-422F-84B6-BAE2B83C298C
+:END:
+#+TITLE: Dry run
+
++ Ref :: [[id:5025292A-AFC0-47C7-BD6B-B9464506F937][test]]
+
+Dry run 是一种模拟执行的方式，模拟实际需要执行的操作，但不真的执行。通常在需要执行某些危险操作时，比如删除数据库的数据，可以通过 dry run 来观察要删除的数据是否符合预期。
+
+比如 [[id:38d0f81b-d223-4a4c-b2c9-05e608685660][git]] 的 clean 命令就提供了 dry run 模式：
+#+begin_example
+  $ git clean -h
+  usage: git clean [-d] [-f] [-i] [-n] [-q] [-e <pattern>] [-x | -X] [--] <paths>...
+  
+      -q, --quiet           do not print names of files removed
+      -n, --dry-run         dry run
+      -f, --force           force
+      -i, --interactive     interactive cleaning
+      -d                    remove whole directories
+      -e, --exclude <pattern>
+                            add <pattern> to ignore rules
+      -x                    remove ignored files, too
+      -X                    remove only ignored files
+#+end_example
+
