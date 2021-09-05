@@ -46,3 +46,9 @@
 
   参考：[[https://dev.mysql.com/doc/refman/8.0/en/constant-folding-optimization.html][MySQL :: MySQL 8.0 Reference Manual :: 8.2.1.14 Constant-Folding Optimization]]
 
+* IS NULL Optimization
+  MySQL 可以对 =col_name IS NULL= 进行优化，所以当 col 上存在索引时，IS NULL 是可以走索引的。但是需要注意， IS NOT NULL 是没法走索引的。
+
+  参考：[[https://dev.mysql.com/doc/refman/8.0/en/is-null-optimization.html][MySQL :: MySQL 8.0 Reference Manual :: 8.2.1.15 IS NULL Optimization]]
+
+
