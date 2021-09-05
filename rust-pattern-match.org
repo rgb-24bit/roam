@@ -53,3 +53,14 @@
 + [[https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/default-match-bindings.html][Default match bindings - The Edition Guide]]
 + [[https://doc.rust-lang.org/rust-by-example/scope/borrow/ref.html][The ref pattern - Rust By Example]]
 
+* use in poem
+  Web 框架 [[https://github.com/poem-web/poem][Poem]] 中 Path 通过泛型和模式匹配来解构 Path 参数，非常巧妙的做法：
+  #+begin_src rust
+    #[handler]
+    async fn users_teams_show(Path((user_id, team_id)): Path<(String, String)>) {
+        // ...
+    }
+  #+end_src
+
+  泛型参数指定类型为 (String, String)，然后模式匹配接收两个 String 类型的值。
+

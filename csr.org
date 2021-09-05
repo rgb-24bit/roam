@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       28721E36-6BEF-4ED0-9F9E-8D1A3B613004
+:END:
+#+TITLE: CSR
+
++ Ref :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
+
+client-side rendering 的缩写，指由客户端渲染网页的方式。
+

@@ -1,7 +1,7 @@
 :PROPERTIES:
 :ID:       982AFE8D-3846-410C-B4AD-D657E48F68B5
 :END:
-#+TITLE: go tool
+#+TITLE: go build
 
 + Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
 
@@ -21,3 +21,39 @@
       Note that before Go 1.5 this option took two separate arguments.
   #+end_example
 
+* Customizing Go Binaries with Build Tags
+  go build 命令的 =-tags= 选项可以指定若干 tag，通过在文件头加入对应注释来进行条件编译：
+  #+begin_example
+    -tags tag,list
+            a comma-separated list of build tags to consider satisfied during the
+            build. For more information about build tags, see the description of
+            build constraints in the documentation for the go/build package.
+            (Earlier versions of Go used a space-separated list, and that form
+            is deprecated but still recognized.)
+  #+end_example
+
+  #+begin_src go
+    // +build dev
+
+    package config
+
+    const (
+      Redis = "redis://127.0.0.1:6379/0"
+    )
+  #+end_src
+
+  #+begin_src go
+    // +build prod
+
+    package config
+
+    const (
+      Redis = "redis://192.168.0.1:6379"
+    )
+  #+end_src
+
+  存在多个 tag 时，tag 间用空格分开表示 “或”，用逗号表示 “且”：
+  #+begin_src go
+    // +build ta,tb  ta && tb
+    // +build ta tb  ta || tb
+  #+end_src

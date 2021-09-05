@@ -1,0 +1,26 @@
+:PROPERTIES:
+:ID:       E313C1CD-64E8-4EA0-8403-AF3FC7D676C0
+:END:
+#+TITLE: service worker
+
++ Ref :: [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]]、[[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
+
+Service Worker 是浏览器在后台独立于网页运行的脚本，支持拦截和处理网络请求，可以用来丰富的离线体验、定期的后台同步以及推送通知。
+
+可以通过 =navigator.serviceWorker= 对象注册 service worker 脚本：
+#+begin_src js
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+#+end_src
+
+参考：[[https://developers.google.cn/web/fundamentals/primers/service-workers?hl=zh-cn][Service Worker: 简介]]
+

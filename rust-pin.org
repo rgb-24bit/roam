@@ -1,6 +1,5 @@
 :PROPERTIES:
 :ID:       3CA36972-FCF5-4E0B-BF8E-258896AB7F20
-:ROAM_REFS: https://rust-lang.github.io/async-book/04_pinning/01_chapter.html
 :END:
 #+TITLE: rust pin
 
@@ -26,4 +25,7 @@
 #+end_src
 
 而这类操作通常都需要用的 &mut T，因此，Rust 引入了 Pin 类型，让 &mut T 的获取隐藏，达到保护自引用结构的目的。
+
+参考：
++ [[https://rust-lang.github.io/async-book/04_pinning/01_chapter.html][Pinning - Asynchronous Programming in Rust]]
 

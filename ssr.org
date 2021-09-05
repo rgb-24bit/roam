@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       02C98759-EF33-41E1-8177-DEA8CB91D566
+:END:
+#+TITLE: SSR
+
++ Ref :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
+
+server-side rendering 的缩写，指有服务端渲染网页的方式。但现在前后端分离是大趋势，通过 php、jsp、ejs 编写模板的方式也难以享受 [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]] 本身的能力。
+
+因此，现在的 SSR 更多的是指利用框架（如React、Vue）提供的能力，新增 [[id:C5EF3C85-5714-4065-B3E1-2E582047349F][node.js]] 服务在服务端调用相应接口完成模板的输出。
+
