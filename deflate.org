@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       aeb9b313-ec76-41cc-a844-f8a678a5ecdd
+:END:
+#+TITLE: deflate
+
+deflate 和 [[id:41D63C1E-570D-421D-8775-A7FA7F9A9275][gzip]] 类似，是一种常用于 [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]] 传输过程中的压缩格式，gzip 和 deflate 同出一源，但 gzip 相对更可靠。
+
+gzip 在出 deflate 的基础上多了一些额外的 header 和 check sum，因此，实际使用中，gzip 的出场次数更多。
+

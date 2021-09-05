@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       6dc576b2-aa1c-47ce-98bd-fd11a146c236
+:END:
+#+TITLE: Brotli
+
+Brotli 是由 Google 在 2015 年开源的用于 [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]] 压缩的算法，拥有比 [[id:41D63C1E-570D-421D-8775-A7FA7F9A9275][gzip]] 更好的性能。目前已经被大部分浏览器支持。
+
