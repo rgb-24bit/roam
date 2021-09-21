@@ -1,0 +1,41 @@
+:PROPERTIES:
+:ID:       1B3D8120-685F-4E60-9746-F459A159E79B
+:END:
+#+TITLE: cors
+
++ Ref :: [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]]
+
+#+begin_quote
+跨域行为是浏览器行为，一个跨域请求实际已经发送到服务端，服务端也返回了消息，然而浏览器在接收到返回信息的时候，发现该信息不是同源请求且没有允许跨域的限制，所以在解析消息的将该条消息屏蔽同时在控制台报错。
+#+end_quote
+
+CORS 是一种标准的跨域问题解决方案，客户端和服务端通过特定的 Header 来指定资源共享的范围，一般流程为：
+1. 客户端发送跨域请求到服务端，Header 中通过 Origin 字段标识来源域
+2. 服务端根据 Origin 判断是否允许该跨域请求，并在响应中通过 Access-Control-Allow-Origin Header 标识允许的来源域
+3. 客户端收到响应后，根据 Access-Control-Allow-Origin 确定响应是否对用户脚本可见
+
+在实际的使用中，大部分服务端并没有做跨域的检查，客户端发起跨域请求时，简单请求如 GET 会直接发送到服务端，
+而 POST 会通过 OPTIONS 方法发起一个预检请求。
+
+如果服务端返回的响应中没有跨域策略相关的 Header，那么客户端会返回请求失败，不会将响应的接口返回给用户脚本。
+
+CORS 是客户端和服务端的一种约定：
+1. 服务端根据客户端的 Origin 和其他 Header 判断这个请求是否合法
+2. 客户端根据服务端的 Access-Control-Allow-Origin 和其他 Header 判断这个响应对用户是否可见
+
+对于服务端来说，Origin 的效验可以在 LB 完成，也可以在网关，在 Server 端完成。对于客户端来说，
+通常也只有浏览器会控制响应对用户脚本的可见性。
+
+参考：
++ [[https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS][跨源资源共享（CORS） - HTTP | MDN]]
+
+* Cookie
+  在跨域请求中，客户端通过 withCredentials 携带目标域 Cookie，而服务端在响应中 Set Cookie 时，是相对于来源域的。
+
+  如果服务端响应中 Cookie 限定了 Domain，如果这个 Domain 和来源域不一样，那么这个 Cookie 就不会生效。
+
+  不会存在服务端在跨域请求中设置自己域名下 Cookie 的情况。
+
+  参考：
+  + [[https://stackoverflow.com/questions/46288437/set-cookies-for-cross-origin-requests][authentication - Set cookies for cross origin requests - Stack Overflow]]
+
