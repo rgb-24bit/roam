@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       e5988458-e4a3-4aa6-8d03-89d687b422b2
+:END:
+#+TITLE: sqlite
+
++ Ref :: [[id:F97D2614-A1E5-48BF-9D58-36F3B93417A2][database]]
+
+* In-Memory Databases
+  The most common way to force an SQLite database to exist purely in memory is to open the database using the special filename ":memory:".
+  #+begin_src c
+    rc = sqlite3_open(":memory:", &db);
+  #+end_src
+
+  The database ceases to exist as soon as the database connection is closed. Every :memory: database is distinct from every other.
+  So, _opening two database connections each with the filename ":memory:" will create two independent in-memory databases_.
+
+  However, the same in-memory database can be opened by two or more database connections as follows:
+  #+begin_src c
+    rc = sqlite3_open("file::memory:?cache=shared", &db);
+  #+end_src
+
+  ☞ [[https://www.sqlite.org/inmemorydb.html][In-Memory Databases]]
+
