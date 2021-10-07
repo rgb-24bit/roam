@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       e242430b-238e-45c1-9c00-d4f1a8852424
+:END:
+#+TITLE: cookbook
+
++ Tag :: [[id:5fd51068-43c5-4e22-a029-576dfea553c5][Food]]
+
+* 汤菜类/炖菜
+  + [[https://home.meishichina.com/recipe-392039.html][酸汤肉片]]
+  + [[https://home.meishichina.com/recipe-395468.html][黄花菜排骨汤]]
+  + [[https://www.youtube.com/watch?v=fPDYTVobl-w][黄花菜炖木耳]]
+  + [[https://m.meishij.net/html5/zuofa/douyafensitang.html][豆芽粉丝汤]]
+  + [[https://m.meishij.net/html5/zuofa/jiachangdunroupian.html][家常炖肉片]]
+
+* 凉菜
+  + [[https://www.youtube.com/watch?v=ZKkFoqb63E0][小白菜]]
+
+* 面食
+  + [[https://www.youtube.com/watch?v=bGzbJpLExDM][16 种实用饺子包法]]
+    
+* 肉馅
+  + [[https://www.youtube.com/watch?v=kS3H_4iMbO0][萬能肉餡]]
+
+
