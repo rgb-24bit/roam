@@ -12,6 +12,9 @@
   + [[https://m.meishij.net/html5/zuofa/douyafensitang.html][豆芽粉丝汤]]
   + [[https://m.meishij.net/html5/zuofa/jiachangdunroupian.html][家常炖肉片]]
 
+* 川菜
+  + [[https://m.meishij.net/html5/zuofa/shuizhuroupian_37.html][水煮肉片]]
+
 * 凉菜
   + [[https://www.youtube.com/watch?v=ZKkFoqb63E0][小白菜]]
 

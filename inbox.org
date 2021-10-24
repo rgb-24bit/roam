@@ -8,3 +8,11 @@
 
 + [[id:267cb964-8de7-4542-bc49-c1ebe5f0340b][org roam]]
   + https://commonplace.doubleloop.net/20200821142536-how_i_publish_my_wiki_with_org_publish
+
++ [[id:1A0467A7-7CD5-4F3D-8BF3-7CDAE39C30FB][java]]
+  + [[https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html][Java 线程池实现原理及其在美团业务中的实践 - 美团技术团队]]
+
++ [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+  + [[https://learnku.com/articles/41728][[典藏版] Golang 调度器 GMP 原理与调度全分析 | Go 技术论坛]]
+
+
