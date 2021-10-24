@@ -23,14 +23,13 @@ CORS 是客户端和服务端的一种约定：
 1. 服务端根据客户端的 Origin 和其他 Header 判断这个请求是否合法
 2. 客户端根据服务端的 Access-Control-Allow-Origin 和其他 Header 判断这个响应对用户是否可见
 
-对于服务端来说，Origin 的效验可以在 LB 完成，也可以在网关，在 Server 端完成。对于客户端来说，
-通常也只有浏览器会控制响应对用户脚本的可见性。
+对于服务端来说，Origin 的效验可以在 LB 完成，也可以在网关，在 Server 端完成。对于客户端来说，通常也只有浏览器会控制响应对用户脚本的可见性。
 
 参考：
 + [[https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS][跨源资源共享（CORS） - HTTP | MDN]]
 
 * Cookie
-  在跨域请求中，客户端通过 withCredentials 携带目标域 Cookie，而服务端在响应中 Set Cookie 时，是相对于来源域的。
+  在跨域请求中，客户端通过 withCredentials 携带目标域 [[id:A3B255F3-6EB4-404E-BEEE-CB5D5A7A5C77][Cookie]]，而服务端在响应中 Set Cookie 时，是相对于来源域的。
 
   如果服务端响应中 Cookie 限定了 Domain，如果这个 Domain 和来源域不一样，那么这个 Cookie 就不会生效。
 

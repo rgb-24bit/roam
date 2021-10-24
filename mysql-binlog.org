@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       418BA856-5F8C-41AB-A8F5-9AA5A51D6DF6
+:END:
+#+TITLE: mysql binlog
+
+
+

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       C8D12612-F8B0-4847-810A-B74BB10B4FD2
+:END:
+#+TITLE: mongodb oplog
+
+
+

@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       A3B255F3-6EB4-404E-BEEE-CB5D5A7A5C77
+:END:
+#+TITLE: HTTP Cookie
+
++ Ref :: [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]]
+
+* 生命周期
+  Cookie 的生命周期可以通过两种方式定义：
+  + 会话期 Cookie（默认）：浏览器关闭之后它会被自动删除，也就是说它仅在会话期内有效。会话期 Cookie 不需要指定过期时间（Expires）或者有效期（Max-Age）
+  + 持久性 Cookie ：通过过期时间（Expires）或者有效期（Max-Age）指定了有效期的 Cookie
+
+  例子：
+  #+begin_example
+    Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;
+  #+end_example
+
+* 限制访问
+  标记为 Secure 的 Cookie 只应通过被 HTTPS 协议加密过的请求发送给服务端，标记为 HttpOnly 的 Cookie 无法被 JavaScript API 访问。
+
+  例子：
+  #+begin_example
+    Set-Cookie: id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly
+  #+end_example
+
+* 作用域
+  可以通过 Domain 和 Path 属性标识 Cookie 的生效范围，其中 Domain 默认值和 origin 相同。
+
+* 相关问题
+** Correct way to delete cookies server-side
+   #+begin_example
+     Set-Cookie: token=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT
+   #+end_example
+
+   参考：[[https://stackoverflow.com/questions/5285940/correct-way-to-delete-cookies-server-side][http - Correct way to delete cookies server-side - Stack Overflow]]
+
