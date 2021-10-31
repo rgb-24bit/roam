@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       8DD0DC11-2233-4157-9141-FFC120AAF33D
+:END:
+#+TITLE: Single Label Domains
+
+通常，域名都是 xxx.[[id:5ED6C52A-6CC7-44AB-9586-E7552179FA64][tld]] 的形式，但相对的，也存在一类特殊的域名 SLD，例如 https://py 这样的，整个域名中没有顶级域名的存在，只有 py 这个 Label。
+
+参考：[[https://docs.microsoft.com/en-us/troubleshoot/windows-server/networking/single-label-domains-support-policy][Microsoft support for Single Label Domains - Windows Server | Microsoft Docs]]
+

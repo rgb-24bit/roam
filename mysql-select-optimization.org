@@ -52,3 +52,10 @@
   参考：[[https://dev.mysql.com/doc/refman/8.0/en/is-null-optimization.html][MySQL :: MySQL 8.0 Reference Manual :: 8.2.1.15 IS NULL Optimization]]
 
 
+
+* FORCE INDEX
+  某些时候，MySQL 查询引擎可能会在多个可能的索引中选择了性能较差的那一个，为查询性能带来较大的负担，这时，可以通过 =FORCE INDEX= 指定索引执行查询：
+  #+begin_src sql
+    SELECT * FROM tbl_name FORCE INDEX(`idx_name`) WHERE cond...;
+  #+end_src
+

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       5ED6C52A-6CC7-44AB-9586-E7552179FA64
+:END:
+#+TITLE: Top-level Domain
+
+顶级域名（Top-level Domain），缩写 TLD 是互联网 DNS 等级中最高级的域，是域名的最后一个部分，比如 .com，大小写不敏感。
+

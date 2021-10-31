@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       EB5C6963-9646-4C6A-9CBF-4996959DCF74
+:END:
+#+TITLE: rust unit type
+
++ Ref :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
+
+在 Rust 中类型 =()= 被称为 unit type，该类型只有一个实例 ()，同时也是 [[id:6532060E-4CA9-4F90-AB00-7C9CF21F3BDF][Zero-Sized Types]]。
+

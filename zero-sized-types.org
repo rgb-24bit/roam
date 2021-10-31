@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       6532060E-4CA9-4F90-AB00-7C9CF21F3BDF
+:END:
+#+TITLE: rust Zero-Sized Types
+
++ Ref :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
+
+顾名思义，Zero-Sized Types 的意思就是大小为零的类型，在 Rust 中，如下类型占用的内存空间为零：
+#+begin_src rust
+  struct Zst;
+  struct Zst1 ();
+  struct Zst2 {}
+  struct AnotherZst (Zst);
+  struct WoaZst {
+    one: Zst1,
+    two: Zst2,
+  }
+#+end_src
+
+同时，如果我们为 0 大小的类型申请动态分配内存，我们可以得到，指针指向的地址是 1，这是因为当碰到 0 大小类型需要动态分配空间的时候，
+在标准库里面会直接返回一个 EMPTY 出去。这个 EMPTY 定义在 liballoc/heap.rs 模块中：
+#+begin_src rust
+  /// An arbitrary non-null address to represent
+  
+  /// zero-size allocations.
+  
+  /// This preserves the non-null invariant for
+  
+  /// types like Box. The address may overlap
+  
+  /// with non-zero-size memory allocations.
+  
+  pub const EMPTY: *mut () = 0x1 as *mut ();
+#+end_src
+
+参考：
++ [[https://www.hardmo.de/article/2021-03-14-zst-proof-types.md][The magical applications of Zero-Sized Types in Rust - Hardmo.de]]
++ [[https://ld246.com/article/1539826769170][rust 中的 DST 和 ZST - 链滴]]

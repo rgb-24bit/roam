@@ -1,0 +1,47 @@
+:PROPERTIES:
+:ID:       620324F1-A1C6-4260-ABCB-1EC935605FBC
+:END:
+#+TITLE: golang empty struct
+
++ Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+
+和 [[id:EB5C6963-9646-4C6A-9CBF-4996959DCF74][rust unit type]] 类似，golang 中的空结构体具有以下性质：
+1. 单个空结构体实例占用的内存空间大小为 0
+   #+begin_src go
+     var x struct{}
+     fmt.Println(unsafe.Sizeof(x))  // => 0
+   #+end_src
+2. 空结构体数组的大小自然也是 0
+   #+begin_src go
+     var x [100000000]struct{}
+     fmt.Println(unsafe.Sizeof(x))  // => 0
+   #+end_src
+3. 空结构体 slice 大小固定为 slice header 的大小，32 位机器上为 12 字节，64 位机器上为 24 字节
+   #+begin_src go
+     var x = make([]struct{}, 100)
+     fmt.Println(unsafe.Sizeof(x)) // => 12 | 24
+   #+end_src
+4. 空结构体实例只有一个，地址一样，值也一样
+   #+begin_src go
+     var a, b struct{}
+     fmt.Println(&a == &b) // true
+     
+     a := make([]struct{}, 10)
+     b := make([]struct{}, 20)
+     fmt.Println(&a == &b)       // false, a and b are different slices
+     fmt.Println(&a[0] == &b[0]) // true, their backing arrays are the same
+   #+end_src
+5. 字段只有空结构体的结构体大小也是 0
+   #+begin_src go
+     type S struct {
+             A struct{}
+             B struct{}
+     }
+     var s S
+     fmt.Println(unsafe.Sizeof(s)) // prints 0
+   #+end_src
+
+利用空结构体的特性，我们可以使用其作为 set 的值（因为没有自带 set 只好用 map） 模拟，这样依赖，值部分的消耗就减少了。
+
+参考：[[https://dave.cheney.net/2014/03/25/the-empty-struct][The empty struct – The acme of foolishness]]
+
