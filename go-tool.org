@@ -3,7 +3,7 @@
 :END:
 #+TITLE: go tool
 
-+ Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
 
 * Inject build-time variables
   go build 命令的 =-ldflags= 选项支持在编译时指定变量的值：

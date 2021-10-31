@@ -3,7 +3,7 @@
 :END:
 #+TITLE: golang code style
 
-+ Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#effective-go][Effective Go]]

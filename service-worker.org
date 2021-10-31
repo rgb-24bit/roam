@@ -3,7 +3,7 @@
 :END:
 #+TITLE: service worker
 
-+ Ref :: [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]]、[[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
++ Tag :: [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]]、[[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
 
 Service Worker 是浏览器在后台独立于网页运行的脚本，支持拦截和处理网络请求，可以用来丰富的离线体验、定期的后台同步以及推送通知。
 

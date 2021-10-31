@@ -3,7 +3,7 @@
 :END:
 #+TITLE: Prolog
 
-+ Ref :: [[id:DA84DF93-2D0B-4F5F-AF0B-29E1A379CB46][programming language]]
++ Tag :: [[id:DA84DF93-2D0B-4F5F-AF0B-29E1A379CB46][programming language]]
 
 Prolog 是一款逻辑编程语言，它创建在逻辑学的理论基础之上，最初被运用于自然语言等研究领域。现在它已广泛的应用在人工智能的研究中，它可以用来建造专家系统、自然语言理解、智能知识库等。
 

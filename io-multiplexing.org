@@ -10,7 +10,7 @@ I/O 多路复用指 select/poll/epoll 这一系列的多路选择器，支持单
   :PROPERTIES:
   :ID:       A0404F38-6185-40FC-8358-92AB2BE9BA1C
   :END:
-  + Ref :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
+  + Tag :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
 
   select 和 poll 是 linux 较早使用的 I/O 事件驱动技术，可以同时监听多个文件描述符的 I/O 事件，但也有较为明显的缺点：
   + 存在最大并发数限制，poll 解决了最大文件描述符数量限制的问题
@@ -21,7 +21,7 @@ I/O 多路复用指 select/poll/epoll 这一系列的多路选择器，支持单
   :PROPERTIES:
   :ID:       6B0198DB-E52F-491C-94AB-3C8569192A26
   :END:
-  + Ref :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
+  + Tag :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
 
   epoll 是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] kernel 2.6 之后引入的新 I/O 事件驱动技术，select & epoll 在面对大量文件描述符的监听需求时，性能会线性下降，
   而在实际的使用场景中，存在大量的文件描述符需要监听，只有少量描述符是活跃的情况是比较常见的。
@@ -40,7 +40,7 @@ I/O 多路复用指 select/poll/epoll 这一系列的多路选择器，支持单
   :PROPERTIES:
   :ID:       A3A22A5B-ADE1-45E1-8519-0D5E48175810
   :END:
-  + Ref :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
+  + Tag :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
 
   io_uring 是 Linux 内核 5.1 支持的新的异步 IO 框架，由 Block IO 大神也即 Fio 作者 Jens Axboe 开发，意在提供一套公用的网络和磁盘异步 IO。
 
@@ -48,7 +48,7 @@ I/O 多路复用指 select/poll/epoll 这一系列的多路选择器，支持单
   :PROPERTIES:
   :ID:       1E8E9B97-8EFD-4B2B-BC04-5DB69A7B8E22
   :END:
-  + Ref :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
+  + Tag :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
     
   kqueue 是在 [[id:9C52A073-1E74-43DE-9EFC-D5C577B097E3][FreeBSD/MacOS]] 等系统中类似 [[id:6B0198DB-E52F-491C-94AB-3C8569192A26][epoll]] 的工具。
 
@@ -56,7 +56,7 @@ I/O 多路复用指 select/poll/epoll 这一系列的多路选择器，支持单
   :PROPERTIES:
   :ID:       5F5D43D0-1B61-429C-A7A4-FC5499922AE1
   :END:
-  + Ref :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
+  + Tag :: [[id:D6B6B4B9-515D-497F-BAD5-8206CFE6D6DE][I/O multiplexing]]
 
   IOCP 是 [[id:A0EA9036-044E-4938-859B-584C2062B333][Windows]] 系统中类似 [[id:6B0198DB-E52F-491C-94AB-3C8569192A26][epoll]] 的工具。
 

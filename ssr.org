@@ -3,7 +3,7 @@
 :END:
 #+TITLE: SSR
 
-+ Ref :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
++ Tag :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
 
 server-side rendering 的缩写，指有服务端渲染网页的方式。但现在前后端分离是大趋势，通过 php、jsp、ejs 编写模板的方式也难以享受 [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]] 本身的能力。
 

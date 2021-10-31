@@ -3,7 +3,7 @@
 :END:
 #+TITLE: golang empty struct
 
-+ Ref :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
 
 和 [[id:EB5C6963-9646-4C6A-9CBF-4996959DCF74][rust unit type]] 类似，golang 中的空结构体具有以下性质：
 1. 单个空结构体实例占用的内存空间大小为 0

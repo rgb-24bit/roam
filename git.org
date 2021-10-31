@@ -3,5 +3,5 @@
 :END:
 #+TITLE: git
 
-+ Ref :: [[id:0E7371A8-0238-46C3-AB65-102022402BDA][version control]]
++ Tag :: [[id:0E7371A8-0238-46C3-AB65-102022402BDA][version control]]
 

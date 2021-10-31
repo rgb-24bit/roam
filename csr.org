@@ -3,7 +3,7 @@
 :END:
 #+TITLE: CSR
 
-+ Ref :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
++ Tag :: [[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
 
 client-side rendering 的缩写，指由客户端渲染网页的方式。
 

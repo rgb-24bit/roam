@@ -3,7 +3,7 @@
 :END:
 #+TITLE: rust Zero-Sized Types
 
-+ Ref :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
++ Tag :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
 
 顾名思义，Zero-Sized Types 的意思就是大小为零的类型，在 Rust 中，如下类型占用的内存空间为零：
 #+begin_src rust

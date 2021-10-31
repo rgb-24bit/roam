@@ -3,7 +3,7 @@
 :END:
 #+TITLE: database version control
 
-+ Ref :: [[id:F97D2614-A1E5-48BF-9D58-36F3B93417A2][database]]、[[id:0E7371A8-0238-46C3-AB65-102022402BDA][version control]]
++ Tag :: [[id:F97D2614-A1E5-48BF-9D58-36F3B93417A2][database]]、[[id:0E7371A8-0238-46C3-AB65-102022402BDA][version control]]
 
 在产品的迭代过程中，数据库表的设计往往会跟随着不断变化，我们可以借助一些外部工具来记录这些变化，实现对数据库表的版本控制。
 

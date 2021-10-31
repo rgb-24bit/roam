@@ -3,7 +3,7 @@
 :END:
 #+TITLE: mysql select optimization
 
-+ Ref :: [[id:CEA916CC-2871-4D97-BC56-E8A414278E52][MySQL]]
++ Tag :: [[id:CEA916CC-2871-4D97-BC56-E8A414278E52][MySQL]]
 
 * Constant-Folding Optimization
   在 MySQL 查询中，当查询参数为 *常量* 时，MySQL 会在 Prepare 阶段对常量进行优化，解决常量值超出范围或类型不匹配的问题。

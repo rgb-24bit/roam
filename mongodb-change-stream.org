@@ -3,7 +3,7 @@
 :END:
 #+TITLE: mongodb change stream
 
-+ Ref :: [[id:B289F82F-84CF-42E3-BBBF-720448304700][mongodb]]
++ Tag :: [[id:B289F82F-84CF-42E3-BBBF-720448304700][mongodb]]
 
 mongodb 从 3.2 开始提供了 change stream 的能力，类似 [[id:418BA856-5F8C-41AB-A8F5-9AA5A51D6DF6][mysql binlog]]，提供了比 [[id:C8D12612-F8B0-4847-810A-B74BB10B4FD2][oplog]] 更加完善、易用的获取 MongoDB 增量修改的功能。
 

@@ -3,7 +3,7 @@
 :END:
 #+TITLE: csrf
 
-+ Ref :: [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]]
++ Tag :: [[id:3E52FC31-A573-4064-A2CB-DB62A7FB5DB7][HTTP]]
 
 CSRF 利用了 Web 中用户身份验证的一个漏洞：简单的身份验证只能保证请求发自某个用户的浏览器，却不能保证请求本身是用户自愿发出的。
 
