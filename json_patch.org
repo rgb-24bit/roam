@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       80033B41-1429-4521-89EA-8EDD65E21245
+:END:
+#+TITLE: JSON Patch
+
++ Tag :: [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]]
+
+[[https://datatracker.ietf.org/doc/html/rfc6902][RFC6902]] 定义了一种文档结构来描述 JSON Patch 变化，文档结构为：
+#+begin_src json
+  [
+      { "op": "test", "path": "/a/b/c", "value": "foo" },
+      { "op": "remove", "path": "/a/b/c" },
+      { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] },
+      { "op": "replace", "path": "/a/b/c", "value": 42 },
+      { "op": "move", "from": "/a/b/c", "path": "/a/b/d" },
+      { "op": "copy", "from": "/a/b/d", "path": "/a/b/e" }
+  ]
+#+end_src
+
+想法：对于 Audit 需求需要上报对象前后变化的字段和值时，就可以考虑通过 JSON Patch 的方式进行上报。
+

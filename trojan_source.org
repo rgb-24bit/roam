@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       28B8EC90-01D2-4891-9343-F7467AE1881A
+:END:
+#+TITLE: Trojan Source
+
++ Tag :: [[id:798D3806-4A97-48A4-8ABD-3455F370A575][security]]
+
+Trojan Sourcde 利用字符编码标准 Unicode 中的微妙之处，利用方向覆盖、同形异义等创造出对编译器和人类代码审查员视觉上存在差异的源代码，人眼看不出漏洞，
+但对编译器来说逻辑编码顺序和显示的顺序是不同的。
+
+比如，对于如下代码来说，单从肉眼看可能认为不会执行 println 语句，但实际上由于存在特殊的 Unicode 字符，会导致编译器认为 =if is_admin= 被注释了：
+#+begin_src rust
+  fn main() {
+      let is_admin = false;
+      /*‮ } ⁦if is_admin⁩ ⁦ begin admins only */
+          println!("You are an admin.");
+      /* end admins only ‮ { ⁦*/
+  }
+#+end_src
+
+
+参考：[[https://trojansource.codes/][Trojan Source Attacks]]
+

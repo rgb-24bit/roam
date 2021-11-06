@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       98C15E47-23FD-4F33-A20C-DB5D7448CD71
+:END:
+#+TITLE: pass-through
+
+透传，即透明传输（pass-through），指的是在通讯中不管传输的业务内容如何，只负责将传输的内容由源地址传输到目的地址，而不对业务数据内容做任何改变。
+
