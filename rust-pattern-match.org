@@ -53,6 +53,23 @@
 + [[https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/default-match-bindings.html][Default match bindings - The Edition Guide]]
 + [[https://doc.rust-lang.org/rust-by-example/scope/borrow/ref.html][The ref pattern - Rust By Example]]
 
+-----
+
+找到了对应的 RFC 文件 [[https://github.com/rust-lang/rfcs/blob/master/text/2005-match-ergonomics.md][rfcs/2005-match-ergonomics.md at master · rust-lang/rfcs]]，感觉到了 Rust 的一大特点，
+语法上的变化都有对应的 RFC 文件，方便你阅读 RFC 来理解这个特性。
+   
+在 RFC 中也称这个特性为 /default binding modes/, 允许在模式匹配中进行自动解引用，
+并将值绑定到对应的 =ref= 或 =ref mut= 模式上。
+
+#+begin_src rust
+  struct Foo(i32);
+     
+  let foo = Foo(6);
+  let foo_ref = &foo;
+  // `foo_ref` is dereferenced, and `x` is bound like `ref x`.
+  let Foo(x) = foo_ref;
+#+end_src
+   
 * use in poem
   Web 框架 [[https://github.com/poem-web/poem][Poem]] 中 Path 通过泛型和模式匹配来解构 Path 参数，非常巧妙的做法：
   #+begin_src rust

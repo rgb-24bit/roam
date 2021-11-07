@@ -15,4 +15,6 @@
 + [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
   + [[https://learnku.com/articles/41728][[典藏版] Golang 调度器 GMP 原理与调度全分析 | Go 技术论坛]]
 
-
++ 设计
+  + [[https://tech.meituan.com/2017/12/22/ddd-in-practice.html][领域驱动设计在互联网业务开发中的实践 - 美团技术团队]]
+  + [[https://www.cnblogs.com/jiyukai/p/14830869.html][DDD—分层架构、洋葱架构、六边形架构 - 纪煜楷 - 博客园]]

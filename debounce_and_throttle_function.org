@@ -1,0 +1,64 @@
+:PROPERTIES:
+:ID:       8d43fb76-9382-49ec-ba7a-404dbd74fe04
+:END:
+#+TITLE: debounce and throttle function
+
++ Tag :: [[id:E74FE7A7-3797-4CAF-92C5-1537426DE35B][javascript]]、[[id:F0D460A7-70F4-4B45-BB2B-F34D1033AC0A][web]]
+
+在 Web 开发中，时常存在根据用户行为执行某些操作的需求，比如搜索框输入文本后调用接口返回搜索侯选项。这时，
+如果用户操作很频繁可能就会为后端服务带来较大压力。
+
+对于这种情况，可以通过函数防抖和函数节流来减少用户行为触发操作的次数：
++ 函数防抖 debounce :: 就是指触发事件后，在 n 秒后只能执行一次，如果在 n 秒内又触发了事件，则会重新计算函数的执行时间
++ 函数节流 throttle :: 限制一个函数在一定时间内只能执行一次
+
+各自常见的应用场景：
++ 函数防抖：
+  1. 搜索框搜索输入，只需要用户最后一次输入完再发送请求
+  2. 手机号、邮箱格式的输入验证检测
+  3. 窗口大小的 resize ，只需窗口调整完成后，计算窗口的大小，防止重复渲染
++ 函数节流
+  1. 滚动加载，加载更多或滚动到底部监听
+  2. 谷歌搜索框，搜索联想功能
+  3. 高频点击提交，表单重复提交
+
+实现：
+#+begin_src js
+  function debounce(fn, delay = 500) {
+      let timer = null;
+  
+      return function() {
+          if (timer) {
+              clearTimeout(timer)
+          }
+          timer = setTimeout(() => {
+              fn.apply(this, arguments)
+              timer = null
+          }, delay)
+      }
+  }
+  
+  function throttle(fn, delay) {
+      let timer = null
+  
+      return function() {
+          if (timer) {
+              return
+          }
+          timer = setTimeout(() => {
+              fn.apply(this, arguments)
+              timer = null
+          })
+      }
+  }
+#+end_src
+
+参考：[[https://www.cnblogs.com/aurora-ql/p/13757733.html][详解防抖函数（debounce）和节流函数（throttle） - 公瑾当年 - 博客园]]
+
+* 思考
+  面对的业务场景不同，还是会用到不一样的技巧的，写了好久后端，但其实没有遇到需要防抖和节流的情况，限流可能是有的，
+  但也不是通过闭包来实现。
+
+  单个前端页面面对的就是当前这个用户，同时每次处理用户事件回调的地方都是同一个运行时环境，这时，
+  可以通过闭包来缓存重置 timer 对象。
+

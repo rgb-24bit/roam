@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       65cd1cf7-a037-44cf-be29-08834a7a7357
+:END:
+#+TITLE: rust mut keyword
+
++ Tag :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
+
+Rust 中通过关键字 =mut= 来声明一个变量或引用是可变的，当 mut 位于变量名前时说明这个变量可变：
+#+begin_src rust
+  // A mutable variable in the parameter list of a function.
+  fn foo(mut x: u8, y: u8) -> u8 {
+      x += y;
+      x
+  }
+#+end_src
+
+当 mut 位于 =&= 后面时说明这个引用是一个可变引用：
+#+begin_src rust
+  // Taking a mutable reference.
+  fn push_two(v: &mut Vec<u8>) {
+      v.push(2);
+  }
+#+end_src
+
+容易混乱的地方是和 [[id:6C423A76-5C4B-4E0E-A402-18E58F448292][pattern match]] 一起使用时，如下代码中 v 不是一个可变引用：
+#+begin_src rust
+  let mut v: &Vec<i32> = &Vec::<i32>::new();
+#+end_src
+
+下面几种情况下的类型中比较容易让人迷惑的就是 =mut v: &Vec<i32>= 并不是 =&mut Vec<i32>=:
+#+begin_src rust
+  let mut v = &Vec::<i32>::new();      // &Vec<i32>
+  let mut v = Vec::<i32>::new();       // Vec<i32>
+  let ref v = Vec::<i32>::new();       // &Vec<i32>
+  let ref mut v = Vec::<i32>::new();   // &mut Vec<i32>
+#+end_src
+
+简单来说就是 =ref mut= 才匹配 =&mut=, 单纯的 =mut= 不能得到 =&mut=.
+
+参考：
++ [[https://stackoverflow.com/questions/28587698/whats-the-difference-between-placing-mut-before-a-variable-name-and-after-the][syntax - What's the difference between placing "mut" before a variable name and after the ":"? - Stack Overflow]]
++ [[https://doc.rust-lang.org/std/keyword.mut.html][mut - Rust]]
+
