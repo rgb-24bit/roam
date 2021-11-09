@@ -3,7 +3,9 @@
 :END:
 #+TITLE: ELK
 
-ELK 指由 Elasticsearch、Logstash 和 Kibana 组成的一套开源[[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][日志管理]]方案，各部分的作用：
++ Tag :: [[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][logging]]
+
+ELK 指由 Elasticsearch、Logstash 和 Kibana 组成的一套开源日志管理方案，各部分的作用：
 + Logstash：负责日志的收集，处理和储存
 + Elasticsearch：负责日志检索和分析
 + Kibana：负责日志的可视化

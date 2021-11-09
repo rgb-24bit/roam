@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       1fc529d5-8f98-47b1-b466-89485019fcc8
+:ROAM_REFS: https://www.w3.org/TR/trace-context/
+:END:
+#+TITLE: Trace Context
+
++ Tag :: [[id:f5495c4c-ecc8-43ad-9956-814dbca242b5][tracing]]
+

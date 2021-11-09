@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       f8c9b2f4-08f7-43ed-be02-8ae9c1fd4f88
+:ROAM_REFS: https://opentracing.io/specification/
+:END:
+#+TITLE: OpenTracing
+
++ Tag :: [[id:f5495c4c-ecc8-43ad-9956-814dbca242b5][tracing]]
+

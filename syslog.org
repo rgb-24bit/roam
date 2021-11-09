@@ -4,5 +4,7 @@
 :END:
 #+TITLE: syslog
 
++ Tag :: [[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][logging]]
+
 syslog 是一种协议，定义了一种客户端想日志服务传输日志消息的格式。
 

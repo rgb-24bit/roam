@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       9162ea8e-4301-4a45-9349-7c2f3965016c
+:END:
+#+TITLE: Metrics, tracing, and logging
+
++ Tag :: [[id:ce3b3ab6-3136-4005-88fa-a1841a43bdff][metrics]]、[[id:f5495c4c-ecc8-43ad-9956-814dbca242b5][tracing]]、[[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][logging]]
+
+metrics、tracing 和 logging 三者都有监控应用状态的作用，但各自的作用又不尽相同：
++ metrics 主要通过应用上报的打点信息进行聚合分析
++ tracing 主要在各个服务的出入口构建链路追踪日志
++ logging 主要通过具体的事件日志记录信息排查问题
+
+#+HTML: <img src="https://i.loli.net/2021/11/09/OMKENmWcTYIAbCD.png">
+
+参考：[[https://peter.bourgon.org/blog/2017/02/21/metrics-tracing-and-logging.html][Peter Bourgon · Metrics, tracing, and logging]]
+
