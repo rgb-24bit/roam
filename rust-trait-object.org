@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       ace1c48e-3b85-4d75-9927-b6490e2145b1
+:END:
+#+TITLE: rust trait object
+
++ Tag :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
+
+* &Trait & &dyn Trait & Box<Trait> & Box<dyn Trait>
+  这些写法都是 trait object 的表示方式，其中，&Trait 和 Box<Trait> 都是 Rust 2015 的写法，而 &dyn Trait 和 Box<dyn Trait> 是 Rust 2018 的写法。
+
+  这些写法本质上没有区别，需要注意区分的是：
+  + Box<&dyn Trait> 是一个智能指针，有所有权
+  + &dyn Trait 是一个引用，没有所有权
+
+  参考：
+  + [[https://cotigao.medium.com/dyn-impl-and-trait-objects-rust-fd7280521bea][dyn , impl and Trait Objects — Rust | by vikram fugro | Medium]]
+  + [[https://zhuanlan.zhihu.com/p/109990547][捋捋 Rust 中的 impl Trait 和 dyn Trait - 知乎]]
+
+
+
+
