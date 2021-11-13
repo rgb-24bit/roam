@@ -1,0 +1,26 @@
+:PROPERTIES:
+:ID:       FCE7376A-AD38-4200-BCB0-9B6177A2BA6D
+:END:
+#+TITLE: cors and cookie and same site
+
++ Tag :: [[id:1B3D8120-685F-4E60-9746-F459A159E79B][cors]]、[[id:A3B255F3-6EB4-404E-BEEE-CB5D5A7A5C77][HTTP Cookie]]
+
+针对 CORS 和第三方 Cookie 的问题：
+1. Chrome DevTools / Application / Storage / Cookies 对 Cookie 的展示规则：
+   + 默认会展示当前域的 Cookie
+   + 请求第三方资源同时第三方域响应头成功设置 Cookie 时，会记录本次会话中设置了的第三方 Cookie，
+     这里需要请求第三方域同时第三方域设置 Cookie，因为 Chrome 不可能列举所有域的 Cookie，
+     只能列举请求了的  
+2. CORS 请求时可以通过 credentials 属性指明需要携带第三方域 Cookie，要求 Cookie SameSite 属性为 None
+3. CORS 响应可以设置第三方域的 Cookie 值，该值在第三方域下共享，也就是只有一个实例
+4. SameSite 值为 None 时要求有 Secure 属性
+5. Chrome 匿名模式会禁用第三方 Cookie，第三方 Cookie 的设置不会生效，同时跨域请求也无法携带第三方 Cookie
+6. 用户自己禁用第三方 Cookie 效果和匿名模式一样
+
+PS: a.com 不能设置 b.com 的 Cookie，Domain 属性可以那样写，但是不会生效，Domain 属性值要求匹配服务端的 URL。
+
+参考：
++ [[https://stackoverflow.com/questions/23770432/why-are-there-multiple-sets-of-cookies-under-resources-cookies-in-chrome-dev][javascript - Why are there multiple sets of cookies under Resources -> Cookies in Chrome Dev-tools? - Stack Overflow]]
++ [[https://www.rfc-editor.org/rfc/rfc2965][RFC 2965: HTTP State Management Mechanism]]
++ [[https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS][跨源资源共享（CORS） - HTTP | MDN]]
++ [[https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Cookies][HTTP cookies - HTTP | MDN]]

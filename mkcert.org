@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       296753F5-1872-4689-A958-DF56A6651191
+:END:
+#+TITLE: mkcert
+
++ Tag :: [[id:D5F042BC-723C-487B-84D9-DBCB5648507B][HTTPS]]
+
+可以使用 [[https://github.com/FiloSottile/mkcert][mkcert]] 快速搭建本地 https 环境用于开发测试，以 MacOS 环境为例，首先安装 mkcert 并安装对应 CA 证书：
+#+begin_example
+  $ brew install mkcert
+  $ mkcert -install
+#+end_example
+
+修改 hosts 文件将任意域名如 =a.dev= 的 IP 地址指定为 127.0.0.1：
+#+begin_src conf
+  127.0.0.1 a.dev
+  127.0.0.1 b.dev
+#+end_src
+
+使用命令 =mkcert domain= 生成对应域名的证书，可以得到 =domain-key.pem= 和 =domain.pem= 两个文件：
+#+begin_example
+  $ mkcert domain
+#+end_example
+
+然后，使用这两个文件启动一个 HTTPs 服务就可以了，以 node.js 为例：
+#+begin_src js
+  const express = require('express');
+  const https = require('https');
+  
+  const app = express();
+  
+  const domain = 'a.dev';
+  const port = 3000;
+  
+  app.get('/', (req, res) => {
+    res.send('Hello World!')
+  });
+  
+  const fs = require('fs');
+  
+  const server = https.createServer({
+    key: fs.readFileSync(`${__dirname}/${domain}-key.pem`, 'utf8'),
+    cert: fs.readFileSync(`${__dirname}/${domain}.pem`, 'utf8')
+  }, app);
+  
+  server.listen(port);  
+#+end_src
+
