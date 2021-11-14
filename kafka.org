@@ -1,0 +1,76 @@
+:PROPERTIES:
+:ID:       37b4e39e-1f8b-4e61-beab-5cea9f2f784c
+:END:
+#+TITLE: Kafka
+
++ Tag :: [[id:eceddbcd-fbd5-4c0d-a422-48fc65c2a7d3][MQ]]
+
+Kafka 是最初由 Linkedin 公司开发，分布式、分区的、多副本的、多订阅者，基于 [[id:bcb3ebff-0bc1-413e-9f4e-f490f0a2e83f][Zookeeper]] 协调的分布式日志系统（也可以当做 MQ 系统），
+常见可以用于 web/nginx 日志、访问日志，消息服务等等，Linkedin于 2010 年贡献给了 Apache 基金会并成为顶级开源项目。
+
+* Overview
+  作为 MQ 系统，Kafka 大致可以分为 Broker、Producer 和 Consumer 三部分，其中，Broker 通过 Partition 来存储 Message，
+  并引入了副本 Replica 机制，每个 Partition 可以分为一个 Leader 和多个 Follower 副本。
+
+  多个 Broker 构成 Broker Cluster，并通过 zookeeper 进行协调，不同 Partition 的 Leader 副本可能位于不同的 Broker 中。
+
+  Message 的写入和消费发生在 Leader 副本上，Follower 同步 Leader 副本的内容，类似主从，可以在 Leader 副本异常后从 Follower 中选举出新的 Leader 副本，
+  提供可靠性保障。
+
+  不同 Partition 中的消息不同，每个 Partition 通过写入的消息的 Offset 来作为消息的唯一标识。
+
+  此时，对于 Producer 来说：
+  + 一条消息需要写入到多个 Partition 中的一个，我们可以根据消息的内容进行分区，Java 中的 [[https://kafka.apache.org/23/javadoc/org/apache/kafka/clients/producer/ProducerRecord.html][ProducerRecord]] 类便提供了 Key 属性用于计算分区
+  + 需要知道当前 Topic 拥有多少个 Partition，这就需要从 Broker 获取 Topic 元数据，选择哪个 Broker 获取元数据呢？
+
+    Java Kafka Producer Client 维护了一个 leastLoadedNode[fn:1] 集合，Producer 发出写入请求后 Broker 会返回对应的 ACK 响应，其中，
+    未确认请求最少的 Node 便会加入 leastLoadedNode 集合。
+
+    元数据类的请求便会发生在 leastLoadedNode 集合中的 Node 上。
+
+  而对于 Consumer 来说，Kafka 通过 Consumer Group 来划分同一个 Topic 的不同消费者，同一个消息会同时发送给不同的 Consumer Group，
+  但 Consumer Group 中的只有一个 Consumer 会收到该消息。
+
+  通常，会根据 Partition 的数量来设定 Consumer Group 下 Consumer 的数量，每个 Consumer 会分配到固定的 Partition，
+  当 Consumer 数量变化时会进行 Partition 的再分配 Reblance，Reblance 期间 Consumer 无法进行消费。
+
+  同时，Consumer 需要根据自身的需要选择从什么 Offset 开始消费，比如开始、结束、固定时间等，可以精确到某个 Partition。
+
+* Partition Replicas
+  |---------------------------+--------------------------------------------------------------------------------------------|
+  | 分区集合                  | 含义                                                                                       |
+  |---------------------------+--------------------------------------------------------------------------------------------|
+  | AR(Assigned Replicas)     | 分区的所有副本                                                                             |
+  | ISR(In-Sync Replicas)     | 所有与 leader 副本保持一定同步的副本，当 Leader 副本发生异常后，会从 ISR 中选取新的 Leader |
+  | OSR(Out-of-Sync Replicas) | 所有与 leader 副本同步滞后过多的副本                                                       |
+  |---------------------------+--------------------------------------------------------------------------------------------|
+
+  其中，ISR 和 HW 和 LEO 有着精密的关系：
+  + HW 是 High Watermark 的缩写，是一个特定的 Offset 值，消费者只能拉=取到 HW 之前的消息
+  + LEO 是 LogStartOffset 的缩写，表示下一条要写入的消息的 Offset 值
+
+  分区 ISR 集合中的每个副本都会维护自身的 LEO，而 ISR 集合中最小的 LEO 即为分区的 HW。
+
+  这样一来，消息写入不需要等待同步到所有的副本，只需要 ISR 完成同步消费者就可以消费，有效权衡了数据可靠性和性能之间的关系。
+
+* Consumer Commited Offset
+  Kafka Consumer 消费消息是拉模式，消费时会记录已经消费到的消息位置，即某个 Partition 的 Offset，这个记录会在本地维护，
+  同时定时或主动提交到 Broker 服务端。
+
+  已提交的 Offset 就是 committed offset，当 consumer 重启后便会从 committed offset + 1 开始消费。
+
+  当本地维护的 offset 和 committed offset 不一致时，便有可能导致重复消费或事件丢失。
+
+* Question & Answer
+  + Current offset behavior when set by kafka-consumer-groups to earliest?
+
+    Kafka 不会一直保留 Offset 为 0 的数据，因此，新加入的 Consumer Group 即使从 earliest 开始消费，起始 offset 有可能不是 0。
+
+  + Kafka Consumer behaviour when trying to commit after a rebalance has happened due to some other consumer failure?
+
+    在 rebalance 后提交之前的 offset 会发生异常。因此，rebalance 容易造成重复消费。
+
+* Footnotes
+
+[fn:1] Producer 会为每个 Partition Leader 所在 Broker 维护一个 Node 对象
+

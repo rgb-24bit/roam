@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       09187c62-fd99-4738-8176-9905fa7bcc2d
+:END:
+#+TITLE: Publish-and-subscribe model
+
++ Tag :: [[id:eceddbcd-fbd5-4c0d-a422-48fc65c2a7d3][MQ]]
+
+在发布/订阅模式中，生产者往某个 Topic 发送消息，而不同的消费者订阅该 Topic 并同时消费发送的消息。
+
+将消费者数量缩减为 1 时便成为了 [[id:7781d078-b504-459a-af0b-f99df1ef919b][Point-to-point model]]。
+

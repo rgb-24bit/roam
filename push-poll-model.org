@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       107212ea-7bcd-43fc-8586-45d784471c22
+:END:
+#+TITLE: Push / Poll Model
+
++ Tag :: [[id:eceddbcd-fbd5-4c0d-a422-48fc65c2a7d3][MQ]]
+
+消息消费的模式一般有两种：
++ Push 推模式，服务端主动将消息推送给消费者
++ Poll 拉模式。消费者主动轮询拉去最新消息
+

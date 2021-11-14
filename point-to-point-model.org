@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       7781d078-b504-459a-af0b-f99df1ef919b
+:END:
+#+TITLE: Point-to-point model
+
++ Tag :: [[id:eceddbcd-fbd5-4c0d-a422-48fc65c2a7d3][MQ]]
+
+在 P2P 模式中，通常只有一个消息的接收者，同时维护了一个对应的队列，消息的发送者发送消息到队列，消费者从队列中取出消息。
+
+相当于 [[id:09187c62-fd99-4738-8176-9905fa7bcc2d][Publish-and-subscribe model]] 中消费者只有一个的情况。
+
