@@ -61,6 +61,14 @@ Kafka 是最初由 Linkedin 公司开发，分布式、分区的、多副本的�
 
   当本地维护的 offset 和 committed offset 不一致时，便有可能导致重复消费或事件丢失。
 
+* Partition replicas distribution
+  主题分区分布规则：
+  1. 分区的每个副本需要分布在不同的 broker 上
+  2. 每个分区的副本数需要保持一致
+
+  同时，Kafka 可以为每个 broker 增加 rack 配置，标识 broker 所处的机器/机房，分配时可以尽量均匀分布在不同的 rack 的 broker 上，
+  这样能够得到更好的容灾能力。
+  
 * Question & Answer
   + Current offset behavior when set by kafka-consumer-groups to earliest?
 

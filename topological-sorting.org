@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       5f1c1298-5941-466f-a4fe-769827f21528
+:END:
+#+TITLE: Topological sorting
+
++ Tag :: [[id:fb9ade3b-283f-40b6-8628-f9b313301b61][graph]]
+
+拓扑排序用于为一个 DAG（有向无环图）排序，使得对于任何的顶点 u 到 v 的有向边 (u, v)，都可以有 u 在 v 的前面。同时也可以用于环路的检测。
+
+在 MySQL 死锁检测中就有用到环路检测：
++ 加设线程 A 等待线程 B 的锁释放，则可以认为存在一条 A -> B 的边
++ 当多个线程之间的等待成环时，比如 A -> B -> C -> A，就出现了死锁
+
+* Kahn 算法
+  #+begin_example
+    L ← Empty list that will contain the sorted elements
+    S ← Set of all nodes with no incoming edge
+    
+    while S is not empty do
+        remove a node n from S
+        add n to L
+        for each node m with an edge e from n to m do
+            remove edge e from the graph
+            if m has no other incoming edges then
+                insert m into S
+    
+    if graph has edges then
+        return error   (graph has at least one cycle)
+    else 
+        return L   (a topologically sorted order)
+  #+end_example
+

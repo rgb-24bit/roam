@@ -1,0 +1,103 @@
+:PROPERTIES:
+:ID:       b805f8b3-17cd-45fa-81fb-558c1517dd78
+:END:
+#+TITLE: Varint and Zigzag
+
++ Tag :: [[id:27ca84b0-bd71-4c42-a026-8a04b8d53fd3][Protobuf]]
+
+在 Protobuf 中使用 Varint 和 Zigzag 来为 *整数* 进行编码，其中：
++ Varint 是一种变长整数编码方式，小整数使用 Varint 编码时可以占用更少的空间
++ Zigzag 对有符号数进行处理，单独使用 Varint 编码负数时依然会占用较大的空间，通过 Zigzag 处理后会得到改善
+
+* Varint
+  Varint 编码和 UTF-8 类似，编码后的每个字节的前 1 位表示下一个字节是否也是该数字的一部分，后 7 位表示实际的值，比如对于 int32 类型的数字来说：
+  #+begin_example
+    0000 0000 0000 0000 0000 0000 0000 0001  // fixed int 1
+    0000 0001  // varint 1
+    
+    0000 0000 0000 0000 0000 0001 0010 1100  // fixed int 300
+    1010 1100 0000 0010  // varint 300
+  #+end_example
+
+  这样一来，Varint 每个字节只有 7 位用来存储值，1 位用来标识还有没有更多的字节。所以在数字较大时反而会占用更多的空间，不过，
+  日常的使用中大数字的情况比较少，所以还是能够起到节省空间的作用。
+  
+  编码实现：
+  #+begin_src go
+    // PutUvarint encodes a uint64 into buf and returns the number of bytes written.
+    // If the buffer is too small, PutUvarint will panic.
+    func PutUvarint(buf []byte, x uint64) int {
+      i := 0
+      for x >= 0x80 {
+        buf[i] = byte(x) | 0x80
+        x >>= 7
+        i++
+      }
+      buf[i] = byte(x)
+      return i + 1
+    }
+  #+end_src
+
+  可以看到，实现原理其实是比较简单的：
+  1. 通过和 =0x80= 比较，发现高位还有值就将值放入 buf，和 0x80 或运算后这个字节的前 1 位也会是 1， 表示还有更多字节
+  2. 然后将值右移 7 位，进行下一轮判断
+  3. 当值小于 0x80 时，说明高位没值了，将剩下的放入 buf 返回
+
+  解码：
+  #+begin_src go
+    // Uvarint decodes a uint64 from buf and returns that value and the
+    // number of bytes read (> 0). If an error occurred, the value is 0
+    // and the number of bytes n is <= 0 meaning:
+    //
+    // 	n == 0: buf too small
+    // 	n  < 0: value larger than 64 bits (overflow)
+    // 	        and -n is the number of bytes read
+    //
+    func Uvarint(buf []byte) (uint64, int) {
+      var x uint64
+      var s uint
+      for i, b := range buf {
+        if i == MaxVarintLen64 {
+          // Catch byte reads past MaxVarintLen64.
+          // See issue https://golang.org/issues/41185
+          return 0, -(i + 1) // overflow
+        }
+        if b < 0x80 {
+          if i == MaxVarintLen64-1 && b > 1 {
+            return 0, -(i + 1) // overflow
+          }
+          return x | uint64(b)<<s, i + 1
+        }
+        x |= uint64(b&0x7f) << s
+        s += 7
+      }
+      return 0, 0
+    }
+  #+end_src
+
+* Zigzag
+  观察 Varint 编码的实现可以发现，Varint 依赖高位是否还有值来进行编码，对于负数来说，其符号位始终为 1，这时如果直接使用 Varint 反而需要更多的空间。
+
+  因此，Zigzag 边用于对整数进行一次预处理，让 *绝对值* 较小的整数使用 Varint 编码时都可以占用较小的空间：
+  |-----------------+------------|
+  | Signed Original | Encoded As |
+  |-----------------+------------|
+  |               0 |          0 |
+  |              -1 |          1 |
+  |               1 |          2 |
+  |              -2 |          3 |
+  |      2147483647 | 4294967294 |
+  |     -2147483648 | 4294967295 |
+  |-----------------+------------|
+
+  可以看到，对于整数 -1、-2 来说，Zigzag 编码后再使用 Varint 就可以只用一个字节表示了。
+
+
+  + 为什么不直接使用绝对值 :: 需要解码后还原原来的符号位信息，直接用绝对值这个信息就丢了
+
+  实现：
+  #+begin_src go
+    (n << 1) ^ (n >> 31)  // encoding
+    (n >>> 1) ^ -(n & 1)  // decoding
+  #+end_src
+

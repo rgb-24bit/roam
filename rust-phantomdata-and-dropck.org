@@ -1,0 +1,89 @@
+:PROPERTIES:
+:ID:       67698acd-d746-4c57-9e0f-662b019f1078
+:END:
+#+TITLE: rust PhantomData and dropck
+
++ Tag :: [[id:01CE5AAF-81ED-45AE-9667-930E9F0B04BC][Rust]]
+
+在 Rust 标准库中，类似 Rc<T>、LinkedList<T> 的结构体都持有一个 PhantomData 类型的字段，当我们自己去实现一个类似的结构体的时候，会发现即使没有这个字段好像也没有问题，编译器能够正常编译通过（[[https://github.com/rgb-24bit/rua/blob/master/src/data_structure/linked_list.rs#L3][linked_list impl]]）。
+
+标准库中的结构体会持有一个类型为 PhantomData 的字段是因为它们用特殊的方式实现了 Drop 这个 trait，以 std::collections::LinkedList 为例：
+#+begin_src rust
+  #[stable(feature = "rust1", since = "1.0.0")]
+  #[cfg_attr(not(test), rustc_diagnostic_item = "LinkedList")]
+  #[rustc_insignificant_dtor]
+  pub struct LinkedList<T> {
+      head: Option<NonNull<Node<T>>>,
+      tail: Option<NonNull<Node<T>>>,
+      len: usize,
+      marker: PhantomData<Box<Node<T>>>,
+  }
+  
+  struct Node<T> {
+      next: Option<NonNull<Node<T>>>,
+      prev: Option<NonNull<Node<T>>>,
+      element: T,
+  }
+  
+  #[stable(feature = "rust1", since = "1.0.0")]
+  unsafe impl<#[may_dangle] T> Drop for LinkedList<T> {
+      fn drop(&mut self) {
+          struct DropGuard<'a, T>(&'a mut LinkedList<T>);
+  
+          impl<'a, T> Drop for DropGuard<'a, T> {
+              fn drop(&mut self) {
+                  // Continue the same loop we do below. This only runs when a destructor has
+                  // panicked. If another one panics this will abort.
+                  while self.0.pop_front_node().is_some() {}
+              }
+          }
+  
+          while let Some(node) = self.pop_front_node() {
+              let guard = DropGuard(self);
+              drop(node);
+              mem::forget(guard);
+          }
+      }
+  }
+#+end_src
+
+可以看到，LinkedList 实现 Drop 时带有 =unsafe impl<#[may_dangle] T>= 的标记，这个标记告诉编译器 LinkedList 可能持有指向已 drop 对象的指针，但不会使用。
+
+这可以让下面的代码通过编译：
+#+begin_src rust
+  use std::collections::LinkedList;
+  
+  fn main() {
+      let mut list = LinkedList::new();
+      let s = String::from("Hello World!");
+      list.push_back(&s);
+  }
+#+end_src
+
+但如果实现的是普通的 Drop 方法，就会报错（当然不实现 Drop 就没问题）：
+#+begin_src rust
+  struct Container<T>(T);
+  
+  impl<T> Drop for Container<T> {
+      fn drop(&mut self) {
+          // ...
+      }
+  }
+  
+  fn main() {
+      let mut container = Container(None);
+      let s = String::from("Hello World!");
+      container.0 = Some(&s);  // borrowed value does not live long enough
+  }
+#+end_src
+
+这里是因为我们自己实现了 Drop 这个 trait 后，编译器就将这个结构的 drop 交给我们自己的实现了，这时 s 会比 Container 先 drop，
+编译器不确定我们自己的 drop 方法里面会不会使用 &s 这个引用，就直接编译失败了。
+
+而 =unsafe impl<#[may_dangle] T>= 便告诉了编译器，我们会处理好这种情况。
+
+那么为什么还需要持有 PhantomData 类型的字段呢？这是因为 =T= 也有可能实现自己的 Drop，LinkedList 没法保证 T 的实现是安全的，
+所以使用 PhantomData 字段告诉编译器，如果 =T: Drop= 就需要做相关的检查，确保安全。
+
+参考：[[https://users.rust-lang.org/t/phantomdata-and-dropck-confusion/26624/2][PhantomData and dropck confusion - help - The Rust Programming Language Forum]]
+

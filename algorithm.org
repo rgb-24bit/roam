@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       409f3d8f-5a5f-442d-925f-ac9ca50d072b
+:END:
+#+TITLE: algorithm
+
+
+
