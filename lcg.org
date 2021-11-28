@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       8f6d5c92-74cb-4164-b1f0-3542e927b61e
+:END:
+#+TITLE: LCG
+
++ Tag :: [[id:b97a4ebe-43a4-4fad-8ef3-252f84ea4376][rand]]
+
+线性同余方法（Linear Congruential Generator，LCG）可以用于生成伪随机数，简易实现为：
+#+begin_example
+  val = ((state * 1103515245) + 12345) & 0x7fffffff
+#+end_example
+
+参考：
++ [[https://stackoverflow.com/questions/18634079/glibc-rand-function-implementation][c - glibc rand function implementation - Stack Overflow]]
++ [[https://en.wikipedia.org/wiki/Linear_congruential_generator][Linear congruential generator - Wikipedia]]
+

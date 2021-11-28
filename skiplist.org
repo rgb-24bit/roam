@@ -1,0 +1,137 @@
+:PROPERTIES:
+:ID:       96bb7afa-8970-4ad8-b80d-5c824c71b3c8
+:END:
+#+TITLE: skiplist
+
++ Tag :: [[id:409f3d8f-5a5f-442d-925f-ac9ca50d072b][algorithm]]
+
+skiplist 是由 [[https://en.wikipedia.org/wiki/William_Pugh][William Pugh]] 发明一种数据结构，通过在内部维护多层顺序链表来减少 search 操作的时间复杂度，同时不像平衡树需要在插入或删除节点时旋转树维持平衡。
+
+实现思路：
+1. 对于单个顺序链表来说，因为不支持随机读取，查找时只能从头开始查找，因此其查找时间复杂度为 O(n)
+   #+begin_example
+     1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+   #+end_example
+2. 我们可以在单链表上增加冗余的索引层，查找时从最上面的索引层开始，逐层向下查找
+   #+begin_example
+     level(2): 1    ->   3    ->   5    ->   7    ->   9
+     level(1): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+   #+end_example
+3. skiplist 基于这种思路，内部维护了 N 个顺序链表，插入节点时随机得到节点的层数 l(1 <= l <= N)，并将节点插入 [1, l] 范围内的链表上
+   #+begin_example
+     level(3): 1    ->   3              ->             9
+     level(2): 1    ->   3    ->   5         ->        9
+     level(1): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+   #+end_example
+
+参考：
++ [[ftp://ftp.cs.umd.edu/pub/skipLists/skiplists.pdf][Skip Lists: A Probabilistic Alternative to Balanced Trees]]
++ [[http://zhangtielei.com/posts/blog-redis-skiplist.html][Redis内部数据结构详解(6)——skiplist - 铁蕾的个人博客]]
++ [[https://zhuanlan.zhihu.com/p/33674267][SkipList 的原理与实现 - 知乎]]
++ [[https://en.wikipedia.org/wiki/Skip_list][Skip list - Wikipedia]]
+
+* Python 实现
+  #+begin_src python
+    import random
+    
+    class Node:
+        def __init__(self, level, key):
+            self.level = level
+            self.key = key
+            self.forward = [None] * level
+    
+        def __repr__(self):
+            return '(l: %d, k: %s)' % (self.level, self.key)
+    
+    class SkipList:
+        def __init__(self, max_key, max_level=32, p=0.25):
+            self.max_level = max_level
+            self.max_key = max_key
+            self.p = p
+    
+            nil = Node(max_level, max_key)
+    
+            self.head = Node(max_level, 0)
+            for i in range(self.max_level):
+                self.head.forward[i] = nil
+    
+            self.level = 1
+    
+        def random_level(self):
+            level = 1
+            while random.random() < self.p and level < self.max_level:
+                level += 1
+            return level
+    
+        def insert(self, key):
+            update = [None] * self.max_level
+            node = self.head
+    
+            for i in range(self.level - 1, -1, -1):
+                while node.forward[i].key < key:
+                    node = node.forward[i]
+                update[i] = node  # 当前 level 上最后一个小于 key 的 node
+    
+            node = node.forward[0]
+            if node.key == key:
+                return False
+    
+            level = self.random_level()
+            if level > self.level:  # 增加链表层数
+                for i in range(self.level, level):
+                    update[i] = self.head
+                self.level = level
+    
+            new_node = Node(level, key)
+            for i in range(0, level):
+                new_node.forward[i] = update[i].forward[i]
+                update[i].forward[i] = new_node
+    
+        def find(self, key):
+            node = self.head
+    
+            for i in range(self.level - 1, -1, -1):
+                while node.forward[i].key < key:
+                    node = node.forward[i]
+    
+            node = node.forward[0]
+    
+            if node.key == key:
+                return node
+            return None
+    
+        def delete(self, key):
+            update = [None] * self.max_level
+            node = self.head
+    
+            for i in range(self.level - 1, -1, -1):
+                while node.forward[i].key < key:
+                    node = node.forward[i]
+                update[i] = node  # 当前 level 上最后一个小于 key 的 node
+    
+            node = node.forward[0]
+            if not node.key == key:
+                return False
+    
+            for i in range(self.level):
+                if update[i].forward[i].key == key:
+                    update[i].forward[i] = node.forward[i]
+    
+            while self.level > 0 and self.head.forward[self.level - 1].key == self.max_key:  # 过滤空链表，减小链表层数
+                self.level -= 1
+    
+        def debug(self):
+            for i in range(self.max_level, 0, -1):
+                self.debug_node(self.head.forward[i - 1], i)
+    
+        def debug_node(self, node, level):
+            if node.key < self.max_key:
+                if node.level >= level:
+                    print('%d -> ' % node.key, end='')
+                    self.debug_node(node.forward[level - 1], level)
+                else:
+                    self.debug_node(node.forward[node.level - 1], level)
+            else:
+                print('nil \n', end='')
+  #+end_src
+
