@@ -1,0 +1,26 @@
+:PROPERTIES:
+:ID:       2F37A6CE-1F32-4075-B38F-FCD13735E261
+:END:
+#+TITLE: golang for range
+
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+
+golang 提供了 for range 循环来遍历 Array、Slice、Map 和 Chan，使用时需要注意：
+1. for range 左值是一个临时变量，每次循环该值的地址是一样的，如果需要指针值，应该声明新的变量来承载：
+   #+begin_src go
+     for _, v := range slice {
+       nv := v
+       &nv
+     }
+   #+end_src
+2. for range 时会拷贝原 Slice 遍历，因此在循环体中修改 Slice 是没有效果的：
+   #+begin_src go
+     for _, v := range slice {
+       slice = append(slice, v)
+     }
+   #+end_src
+
+   同时，也意味着对于大 Slice 来说，使用 for range 循环会带来额外的消耗。
+
+参考：[[https://draveness.me/golang/docs/part2-foundation/ch05-keyword/golang-for-range/#%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87][Go 语言 for 和 range 的实现 | Go 语言设计与实现]]
+

@@ -17,7 +17,7 @@
     |  1 | SIMPLE      | test  | NULL       | ALL  | PRIMARY       | NULL | NULL    | NULL |    2 |   100.00 | Using where |
     +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
     1 row in set, 1 warning (0.00 sec)
-    
+
     mysql> show warnings;
     +-------+------+------------------------------------------------------------------------------------------------------------------------------------------+
     | Level | Code | Message                                                                                                                                  |
@@ -25,7 +25,7 @@
     | Note  | 1003 | /* select#1 */ select `test`.`test`.`id` AS `id`,`test`.`test`.`name` AS `name` from `test`.`test` where (`test`.`test`.`id` in (1,2,3)) |
     +-------+------+------------------------------------------------------------------------------------------------------------------------------------------+
     1 row in set (0.00 sec)
-    
+
     mysql> explain select * from test where  id  IN ('1', '2', 'x');
     +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
     | id | select_type | table | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
@@ -33,7 +33,7 @@
     |  1 | SIMPLE      | test  | NULL       | ALL  | PRIMARY       | NULL | NULL    | NULL |    2 |   100.00 | Using where |
     +----+-------------+-------+------------+------+---------------+------+---------+------+------+----------+-------------+
     1 row in set, 2 warnings (0.00 sec)
-    
+
     mysql> show warnings;
     +---------+------+------------------------------------------------------------------------------------------------------------------------------------------+
     | Level   | Code | Message                                                                                                                                  |
@@ -41,7 +41,7 @@
     | Warning | 1292 | Truncated incorrect DOUBLE value: 'x'                                                                                                    |
     | Note    | 1003 | /* select#1 */ select `test`.`test`.`id` AS `id`,`test`.`test`.`name` AS `name` from `test`.`test` where (`test`.`test`.`id` in (1,2,0)) |
     +---------+------+------------------------------------------------------------------------------------------------------------------------------------------+
-    2 rows in set (0.00 sec)    
+    2 rows in set (0.00 sec)
   #+end_example
 
   参考：[[https://dev.mysql.com/doc/refman/8.0/en/constant-folding-optimization.html][MySQL :: MySQL 8.0 Reference Manual :: 8.2.1.14 Constant-Folding Optimization]]
@@ -51,11 +51,13 @@
 
   参考：[[https://dev.mysql.com/doc/refman/8.0/en/is-null-optimization.html][MySQL :: MySQL 8.0 Reference Manual :: 8.2.1.15 IS NULL Optimization]]
 
-
-
 * FORCE INDEX
   某些时候，MySQL 查询引擎可能会在多个可能的索引中选择了性能较差的那一个，为查询性能带来较大的负担，这时，可以通过 =FORCE INDEX= 指定索引执行查询：
   #+begin_src sql
     SELECT * FROM tbl_name FORCE INDEX(`idx_name`) WHERE cond...;
   #+end_src
+
+* 最左前缀匹配原则
+  MySQL 在通过索引匹配数据时，会从左到右匹配直到遇到范围查询（>、<、between、like）就停止匹配，比如 a = 1 and b = 2 and c > 3 and d = 4 如果建立 (a, b, c, d) 顺序的索引，
+  d 是用不到索引的，如果建立 (a, b, d, c) 的索引则都可以用到，a, b, d的顺序可以任意调整。
 
