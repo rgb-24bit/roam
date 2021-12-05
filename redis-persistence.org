@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       9f6fed5f-cb81-4feb-b3f7-8cc55a7e7bda
+:END:
+#+TITLE: redis persistence
+
++ Tag :: [[id:93AEA8F0-56ED-4B22-897F-310B1A94E229][redis]]
+
+Redis 是一个键值对内存数据库，数据都存储在内存当中，在处理客户端请求时，所有操作都在内存当中进行。如果服务器关机，那么内存中的数据就都丢失了。
+
+Redis 提供了两种持久化方式来支持将数据保存到磁盘：
++ *RDB* - 通过保存内存快照的方式来持久化数据，对性能存在损耗，也存在数据丢失的可能
++ *AOF* - 保存执行的命令，启动时重新执行来恢复数据，对运行时性能损耗低
+
+参考：[[https://redis.io/topics/persistence][Redis Persistence – Redis]]
+

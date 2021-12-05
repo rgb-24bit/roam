@@ -18,3 +18,7 @@
 + 设计
   + [[https://tech.meituan.com/2017/12/22/ddd-in-practice.html][领域驱动设计在互联网业务开发中的实践 - 美团技术团队]]
   + [[https://www.cnblogs.com/jiyukai/p/14830869.html][DDD—分层架构、洋葱架构、六边形架构 - 纪煜楷 - 博客园]]
+
++ io
+  + https://zhuanlan.zhihu.com/p/96391501
+

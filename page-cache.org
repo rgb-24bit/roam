@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       9782648f-544a-4c1f-a21b-9b305289b120
+:END:
+#+TITLE: page cache
+
++ Tag :: [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]]
+
+页面缓存（Page Cache）是 Linux 内核中针对文件 I/O 的一项优化，Linux 从内存中划出了一块区域来缓存文件页，如果要访问外部磁盘上的文件页，首先将这些页面拷贝到内存中，再进行读写。
+由于硬件结构限制，磁盘的 I/O 速度比内存慢很多，因此使用 Page cache 能够大大加速文件的读写速度。
+
+#+HTML: <img src="https://s2.loli.net/2021/12/05/1bd3pRzumjyVexB.png">
+
++ read-ahead ::
+  应用程序读文件时，系统先检查读取的文件页是否在缓存中。如果在，直接读出即可；如果不在，就将其从磁盘中读入缓存，再读出。此时如果内存有足够的内存空间，该页可以在 Page Cache 中驻留，
+  其他进程再访问该部分数据时，就不需要访问磁盘了。
+
++ write-behind ::
+  在写文件之前，系统先检查对应的页是否已经在缓存中。如果在，就直接将数据写入 Page Cache，使其成为脏页（drity page）等待刷盘；如果不在，就在缓存中新增一个页面并写入数据。
+  真正的磁盘 I/O 会由操作系统调用 fsync 等方法来实现，这一调用可以是异步的，保证磁盘 I/O 不影响文件读写的效率。
+
+Page Cache 的能力对于顺序读写来说是一种很有效的优化方式，比如日志的读写场景。但是，在随机读写比较多时，Page Cache 能够产生的作用就很有限了，甚至会占用额外的内存空间，
+因此此时可能需要绕过 Page Cache 直接读写磁盘。
+
+参考：
++ [[http://mysql.taobao.org/monthly/2020/09/01/][MySQL · 性能优化 · PageCache优化管理]]
++ [[https://man7.org/linux/man-pages/man2/posix_fadvise.2.html][posix_fadvise(2) - Linux manual page]]
+

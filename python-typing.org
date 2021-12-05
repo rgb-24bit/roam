@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       edf4ec01-923b-4c1e-ae38-984c42cf8c16
+:END:
+#+TITLE: python typing
+
++ Tag :: [[id:4F6D630D-B09A-4987-B755-81D9F78656CE][Python]]
+
+Python 从 3.5 版本开始引入了 typing 模块用于增强 *type annotation* 能力，在不影响代码的运行的前提下，可以通过 type annotation 方便 IDE 和开发人员理解代码，
+增强可维护性。
+
+参考：
++ [[https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html][Type hints cheat sheet (Python 3) — Mypy 0.910 documentation]]
++ [[https://mypy.readthedocs.io/en/stable/generics.html][Generics — Mypy 0.910 documentation]]
+
