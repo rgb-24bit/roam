@@ -1,0 +1,185 @@
+:PROPERTIES:
+:ID:       70419078-c528-4b63-a932-12f6ed532d28
+:END:
+#+TITLE: golang escape analysis
+#+OPTIONS: broken-links:t 
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]、[[id:1fc8ee6a-f062-4711-bb10-4f1bd8f53d5e][Escape analysis]]、[[id:fb9ade3b-283f-40b6-8628-f9b313301b61][graph]]
+
+Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树（Abstract syntax tree，AST）后，会进行「逃逸分析」判断变量是否应该分配到堆上。
+
+逃逸分析的原理在 [[https://github.com/golang/go/blob/master/src/cmd/compile/internal/escape/escape.go][escape.go]] 有大致的描述，整体基于两个基本原则：
+1. 指向栈对象的指针不能存储在堆中（pointers to stack objects cannot be stored in the heap）
+2. 指向栈对象的指针不能超过该栈对象的存活期（即指针不能在栈对象被销毁后依旧存活）（pointers to a stack object cannot outlive that object）
+
+具体的分析流程为：
+1. 首先构建一个顶点为程序中所有变量的有向加权图，图的边表示变量之间的赋值关系，边的权重为「取址/解应用」的次数
+2. 然后遍历这个图，从被标记为逃逸的顶点出发，找到最短路径权重和为 -1 的顶点，标记为逃逸，重复这个过程，直到图中被标记为逃逸的顶点数为 0
+
+其中，边的权重计算方式可以简单归纳为：单次取址为 -1，单次解引用为 1，直接赋值为 0，按此规则求和：
+#+begin_example
+  p = &q       // -1
+  p = q        //  0
+  p = *q       //  1
+  p = **q      //  2
+  
+  p = **&**&q  // 2
+#+end_example
+
+对于复杂对象的权重计算会进行简化，对于下面的赋值操作来说：
+#+begin_example
+  var x struct { f, g *int }
+  var u []*int
+  
+  x.f = u[0]
+#+end_example
+
+会简化为：
+#+begin_example
+  x = *u
+#+end_example
+
+另外，会被直接标记为逃逸的变量：
+1. 显式声明的变量的大小超过 10MB 时
+   #+begin_src go
+     arr := [3 * 1000 * 1000]int32
+   #+end_src
+2. 通过 new 或 make 构造的对象大小超过 64KB 时
+   #+begin_src go
+     make([]int32, 0, 15 * 1000)
+   #+end_src
+3. 构造 slice 时指定的 capacity 不是常量
+   #+begin_src go
+     make([]int32, 0, capacity)
+   #+end_src
+4. 变量被 map 的 key 或 value 引用
+   #+begin_src go
+     m2 := make(map[*int]*int)
+     k2 := 0
+     v2 := 1
+     m2[&k2] = &v2
+   #+end_src
+5. 返回值是指针同时变量被引用/取值
+   #+begin_src go
+     func foo() *int {
+       v := 0
+       return &v
+     }
+   #+end_src
+6. 返回值是 slice 或 map
+7. 函数入参逃逸时，传入的函数参数也跟着逃逸
+   #+begin_src go
+     func leak(x *int) **int  {
+       return &x  // *int 被引用成为 **int，逃逸
+     }
+     
+     func notleak(x *int) *int {
+       return x  // 这里 x 原类型为 *int，返回值为 *int，没有被引用，不会逃逸
+     }
+     
+     leak(&v)    // v 逃逸
+     notleak(&v) // v 不逃逸
+   #+end_src
+8. 存在被闭包捕获的变量到自己的权重为 -1 的边
+   #+begin_src go
+     var x *int
+     func() {
+       y := 1
+       x = &y  // x 被闭包捕获，边 x -> y 权重为 -1，因此 y 会逃逸
+     }
+     
+     func(x *int) {
+       y := 1
+       x = &y  // x 不是被闭包捕获的变量，因此 y 不会逃逸
+     }(x)
+   #+end_src
+
+总结，会被标记为逃逸的变量的特点：
+1. 编译器不能在编译期知道大小的变量会发生逃逸
+2. 变量的地址被其他变量使用
+3. 返回值会比入参更容易逃逸（也许这就是标准库中很多方法都是传入 []byte 而不是返回 []byte 的原因）
+
+参考：
++ [[https://www.youtube.com/watch?v=CkSv4dp2KMY][Deep Dive into The Escape Analysis in Go | GopherCon TW 2020 - YouTube]]
++ [[https://tonybai.com/2021/05/24/understand-go-escape-analysis-by-example/][通过实例理解 Go 逃逸分析 | Tony Bai]]
+
+* 例子
+  #+begin_src go
+    func m() *int {
+      a := 1
+      b := &a
+      m := map[*int]*int{b: new(int)}
+      return m[b]
+    }
+  #+end_src
+
+  对于函数 m 来说，存在这样的一些边：
+  #+begin_example
+    r0 -> m: 0
+    m -> new(int): -1
+    m -> b: 0
+    b -> a: -1
+  #+end_example
+
+  r0 -> new(int) 和 r0 -> a 权重都是 -1，因此 new(int) 和 a 都会逃逸。
+
+  -----
+
+  #+begin_src go
+    func s() *int {
+      a := 1
+      b := &a
+      s := []*int{b}
+      return s[0]
+    }
+    
+  #+end_src
+
+  对于函数 s 来说，存在这样的一些边：
+  #+begin_example
+    r0 -> s: 1
+    s -> slice struct: -1
+    slice struct -> b: 0
+    b -> a: -1
+  #+end_example
+
+  r0 -> a 的权重为 -1，a 会逃逸。
+
+  -----
+
+  #+begin_src go
+    func foo() *int {
+      var v **int
+      g := 2
+      ,*v = &g
+      return *v
+    }
+  #+end_src
+
+  对于函数 foo 来说，存在这样的一些边：
+  #+begin_example
+    r0 -> v: 1
+    v -> *v: -1
+    ,*v -> g: -1
+  #+end_example
+
+  r0 -> g 权重为 -1，g 会逃逸。
+
+  PS：这里 *v -> &g 的顶点是不是 *v 不是很清楚，但推导起来确实走的通，结果也一样。
+
+* 工具
+  编译时可以通过参数 =-gcflags "-m=2 -l"= 来查看逃逸分析的日志，其中 =-l= 选项避免内联，例子：
+  #+begin_example
+    .\foo.go:5:2: g escapes to heap:
+    .\foo.go:5:2:   flow: {heap} = &g:
+    .\foo.go:5:2:     from &g (address-of) at .\foo.go:6:7
+    .\foo.go:5:2:     from *v = &g (assign) at .\foo.go:6:5
+    .\foo.go:5:2: moved to heap: g
+  #+end_example
+  
+  含义：
+  + 当逃逸分析输出 “b escapes to heap” 时，意思是指存储在 b 中的值逃逸到堆上了(当 b 为指针变量时才有意义），即任何被 b 引用的对象必须分配在堆上，而 b 自身则不需要
+  + 如果 b 自身也逃逸到堆上，那么逃逸分析会输出 “b escapes to heap”
+
+* 问题
+  + [[https://github.com/golang/go/issues/8618][runtime: don't allocate for non-escaping conversions to interface{} · Issue #8618 · golang/go]]
+

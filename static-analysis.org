@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       f5357bb3-d9a2-4bf9-b79c-6ee56a2432d3
+:END:
+#+TITLE: Static analysis
+
++ Tag :: [[id:ec2ce391-94c6-4143-a25c-8ceb740b2305][Compiler optimizations]]
+
