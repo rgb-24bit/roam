@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       B22B35F8-4C97-40A7-92A2-0555B1E15721
+:END:
+#+TITLE: Dijkstra's algorithm
+
++ Tag :: [[id:fb9ade3b-283f-40b6-8628-f9b313301b61][graph]]
+
+Dijkstra's 算法用于解决有向加权图的最短路径问题，和 [[id:DEE49193-B820-467F-8FB8-0B254B472921][Bellman–Ford algorithm]] 不同，Dijkstra's algorithm 不允许 *负权边* 的存在，算法流程为：
+#+begin_example
+  function Dijkstra(Graph, source):
+  
+      create vertex set Q
+  
+      for each vertex v in Graph:            
+          dist[v] ← INFINITY                 
+          prev[v] ← UNDEFINED                
+          add v to Q                     
+      dist[source] ← 0                       
+     
+      while Q is not empty:
+          u ← vertex in Q with min dist[u]   
+                                             
+          remove u from Q
+         
+          for each neighbor v of u still in Q:
+              alt ← dist[u] + length(u, v)
+              if alt < dist[v]:              
+                  dist[v] ← alt
+                  prev[v] ← u
+  
+      return dist[], prev[]
+#+end_example
+
+参考：[[https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm][Dijkstra's algorithm - Wikipedia]]
+

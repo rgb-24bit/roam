@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       CDD2044C-2C70-4C34-A98A-6C866012275A
+:END:
+#+TITLE: golang generics
+
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+
+[[https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md][Type Parameters Proposal]]
+

@@ -2,7 +2,7 @@
 :ID:       70419078-c528-4b63-a932-12f6ed532d28
 :END:
 #+TITLE: golang escape analysis
-#+OPTIONS: broken-links:t 
+#+OPTIONS: broken-links:t
 + Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]、[[id:1fc8ee6a-f062-4711-bb10-4f1bd8f53d5e][Escape analysis]]、[[id:fb9ade3b-283f-40b6-8628-f9b313301b61][graph]]
 
 Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树（Abstract syntax tree，AST）后，会进行「逃逸分析」判断变量是否应该分配到堆上。
@@ -21,7 +21,7 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
   p = q        //  0
   p = *q       //  1
   p = **q      //  2
-  
+
   p = **&**&q  // 2
 #+end_example
 
@@ -29,7 +29,7 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
 #+begin_example
   var x struct { f, g *int }
   var u []*int
-  
+
   x.f = u[0]
 #+end_example
 
@@ -71,11 +71,11 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
      func leak(x *int) **int  {
        return &x  // *int 被引用成为 **int，逃逸
      }
-     
+
      func notleak(x *int) *int {
        return x  // 这里 x 原类型为 *int，返回值为 *int，没有被引用，不会逃逸
      }
-     
+
      leak(&v)    // v 逃逸
      notleak(&v) // v 不逃逸
    #+end_src
@@ -86,7 +86,7 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
        y := 1
        x = &y  // x 被闭包捕获，边 x -> y 权重为 -1，因此 y 会逃逸
      }
-     
+
      func(x *int) {
        y := 1
        x = &y  // x 不是被闭包捕获的变量，因此 y 不会逃逸
@@ -131,7 +131,7 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
       s := []*int{b}
       return s[0]
     }
-    
+
   #+end_src
 
   对于函数 s 来说，存在这样的一些边：
@@ -175,11 +175,13 @@ Go 编译器在解析了 Go 源文件后获得了整个程序的抽象语法树�
     .\foo.go:5:2:     from *v = &g (assign) at .\foo.go:6:5
     .\foo.go:5:2: moved to heap: g
   #+end_example
-  
+
   含义：
   + 当逃逸分析输出 “b escapes to heap” 时，意思是指存储在 b 中的值逃逸到堆上了(当 b 为指针变量时才有意义），即任何被 b 引用的对象必须分配在堆上，而 b 自身则不需要
   + 如果 b 自身也逃逸到堆上，那么逃逸分析会输出 “b escapes to heap”
 
+  也可以用 =go tool compile -S= 得到汇编代码，出现 =runtime.newobject= 说明对象在堆上创建。
+
 * 问题
   + [[https://github.com/golang/go/issues/8618][runtime: don't allocate for non-escaping conversions to interface{} · Issue #8618 · golang/go]]
-
+    reflect.TypeOf(a).Kind() 导致逃逸，原因不清楚

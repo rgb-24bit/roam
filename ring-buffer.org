@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       8DAC0F37-18B4-4C48-841E-135F2F0A5CF0
+:END:
+#+TITLE: ring buffer
+
++ Tag :: [[id:409f3d8f-5a5f-442d-925f-ac9ca50d072b][algorithm]]
+
+ring buffer 是一种固定尺寸、头尾相连的数据结构，通常作为先进先出缓冲区缓存连续数据流，特点：当一个数据元素被用掉后，其余数据元素不需要移动其存储位置。
+
+ring buffer 通过固定大小的数组实现，内部维护读写指针，读写分别从对应指针位置开始：
+#+HTML: <img src="https://upload.wikimedia.org/wikipedia/commons/f/fd/Circular_Buffer_Animation.gif">
+
