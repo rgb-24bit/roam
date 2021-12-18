@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       CE3CAC64-8ED2-48B6-81A0-AD37C507B327
+:END:
+#+TITLE: Token bucket
+
++ Tag :: [[id:8EC71D76-5F00-49A1-AF81-DC3718C77BD7][rate limiting]]
+
+#+begin_quote
+The token bucket is an algorithm used in packet-switched and telecommunications networks. It can be used to check that data transmissions, in the form of packets, conform to defined limits on bandwidth and burstiness (a measure of the unevenness or variations in the traffic flow). It can also be used as a scheduling algorithm to determine the timing of transmissions that will comply with the limits set for the bandwidth and burstiness.
+#+end_quote
+
+简单来说，Token bucket 算法可以用于流量限制和调度，其基本思想为：
+1. 假设存在一个用于存放 token 的桶，桶的容量为 b
+2. 每 1/r 秒往桶中放入一个 token，如果桶满了就丢弃多出来的 token
+3. 当请求来临时需要 n 个 token 时
+   + 桶中如果存在 n 个以上的 token，那么就放行请求
+   + 否则，根据需要对请求进行处理，如等待 token 足够、丢弃请求等
+
+使用 Token bucket 时需要注意：
+1. 桶的容量决定了瞬时可以处理的请求的上限，当桶满时有桶容量 b 个 token 可以直接使用
+2. r 的大小决定了最短间隔多久可以处理一个请求，当桶为空时，需要等待 1/r 的时间才可以有一个 token 使用
+
+参考：[[https://en.wikipedia.org/wiki/Token_bucket][Token bucket - Wikipedia]]
+

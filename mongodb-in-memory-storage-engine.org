@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       AA8E382D-C6C1-4411-8D1A-4636AE4B8129
+:END:
+#+TITLE: MongoDB In-Memory Storage Engine
+
++ Tag :: [[id:B289F82F-84CF-42E3-BBBF-720448304700][mongodb]]
+
+mongodb 支持 In-Memory Storage Engine，参考：[[https://docs.mongodb.com/manual/core/inmemory/][In-Memory Storage Engine — MongoDB Manual]]。
+

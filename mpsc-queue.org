@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       FE3E54E0-AD1B-4A2B-97FC-1E3F856FDD7D
+:END:
+#+TITLE: mpsc queue
+
++ Tag :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
+
+Multiple Producer, Single Consumer _Wait-Free_ Queue.
+

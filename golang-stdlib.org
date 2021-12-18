@@ -1,0 +1,26 @@
+:PROPERTIES:
+:ID:       C1C7131B-F648-47E8-90F9-56B49E93C9DD
+:END:
+#+TITLE: golang stdlib
+
++ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+
+* time/rate
+  golang 标准库 [[https://pkg.go.dev/golang.org/x/time/rate][time/rate]] 提供了基于 [[id:CE3CAC64-8ED2-48B6-81A0-AD37C507B327][Token bucket]] 实现的限流器，使用例：
+  #+begin_src go
+    func main() {
+      limiter := rate.NewLimiter(7, 3)
+      for i := 0; i < 100; i++ {
+        if limiter.Allow() {
+          fmt.Println(i)
+        }
+        time.Sleep(time.Millisecond * time.Duration(rand.Intn(30)))
+      }
+    }
+  #+end_src
+
+  实现方式为：
+  1. 根据 rate 可以知道每秒可以生成的 token 数量，根据 brust 知道最大容量
+  2. 请求到来时，根据当前时间和最后一次访问时间的间隔计算得到生成的 token 数量
+  3. 根据 token 数量进行判断处理
+

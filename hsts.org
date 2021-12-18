@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       EEC09106-36FD-4DC0-B6AA-9F39E678BAA0
+:END:
+#+TITLE: HSTS
+
++ Tag :: [[id:D5F042BC-723C-487B-84D9-DBCB5648507B][HTTPS]]
+
+HTTP 严格传输安全（英语：HTTP Strict Transport Security，缩写：HSTS）是一套由互联网工程任务组发布的互联网安全策略机制。网站可以选择使用 HSTS 策略，来让浏览器强制使用 HTTPS 与网站进行通信，以减少会话劫持风险。
+
+服务器开启 HSTS 的方法是，当客户端通过 HTTPS 发出请求时，在服务器返回的 HTTP 响应头中包含 Strict-Transport-Security 字段：
+#+begin_example
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+#+end_example
+
+上述响应头含义：
+1. 在接下来的 31536000 秒（即一年）中，浏览器向对应域名或其子域名发送 HTTP 请求时，必须采用 HTTPS 来发起连接
+2. 在接下来的一年中，如果服务器发送的 TLS 证书无效，用户不能忽略浏览器警告继续访问网站
+
+注意：非加密传输时设置的 HSTS 字段无效。
+
