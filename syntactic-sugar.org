@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       e3e0dc9a-2bd2-46d9-a83e-08e2db4f81d2
+:END:
+#+TITLE: Syntactic sugar
+
+
+

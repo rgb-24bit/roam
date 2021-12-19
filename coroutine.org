@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       8351db35-5130-46a4-9166-5528a9913352
+:END:
+#+TITLE: coroutine
+
++ Tag :: [[id:0A7FC8FC-7DA5-40FD-8E61-897B555ABE1E][Asynchronous programming]]
+
+☞ [[https://en.wikipedia.org/wiki/Coroutine#Java][Coroutine - Wikipedia]]
+

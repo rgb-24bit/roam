@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       4a10481b-dbee-4f22-9a7b-f120cbef9654
+:END:
+#+TITLE: clang
+
++ Tag :: [[id:DA84DF93-2D0B-4F5F-AF0B-29E1A379CB46][programming language]]
+

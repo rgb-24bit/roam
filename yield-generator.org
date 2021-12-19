@@ -1,0 +1,77 @@
+:PROPERTIES:
+:ID:       1eb32a7a-8283-4276-b47b-c235c1813a04
+:END:
+#+TITLE: yield generator
+
++ Tag :: [[id:e3e0dc9a-2bd2-46d9-a83e-08e2db4f81d2][Syntactic sugar]]
+
+generator 是一种语法糖，可以在编译时转译为普通函数，比如这篇[[https://blog.kghost.info/2011/11/15/abstract-control-1-stackless-coroutine/][博客]]中使用「循环变递归」和「CPS 变换」来进行转换，也可以像 Rust 生成 generator 对象：
+#+begin_src rust
+  #![feature(generators, generator_trait)]
+
+  use std::ops::Generator;
+  use std::pin::Pin;
+
+  fn main() {
+      let ret = "foo";
+      let mut generator = move || {
+          yield 1;
+          return ret
+      };
+
+      Pin::new(&mut generator).resume(());
+      Pin::new(&mut generator).resume(());
+  }
+#+end_src
+
+上面的代码可以转译为如下代码：
+#+begin_src rust
+  #![feature(arbitrary_self_types, generators, generator_trait)]
+
+  use std::ops::{Generator, GeneratorState};
+  use std::pin::Pin;
+
+  fn main() {
+      let ret = "foo";
+      let mut generator = {
+          enum __Generator {
+              Start(&'static str),
+              Yield1(&'static str),
+              Done,
+          }
+
+          impl Generator for __Generator {
+              type Yield = i32;
+              type Return = &'static str;
+
+              fn resume(mut self: Pin<&mut Self>, resume: ()) -> GeneratorState<i32, &'static str> {
+                  use std::mem;
+                  match mem::replace(&mut *self, __Generator::Done) {
+                      __Generator::Start(s) => {
+                          ,*self = __Generator::Yield1(s);
+                          GeneratorState::Yielded(1)
+                      }
+
+                      __Generator::Yield1(s) => {
+                          ,*self = __Generator::Done;
+                          GeneratorState::Complete(s)
+                      }
+
+                      __Generator::Done => {
+                          panic!("generator resumed after completion")
+                      }
+                  }
+              }
+          }
+
+          __Generator::Start(ret)
+      };
+
+      Pin::new(&mut generator).resume(());
+      Pin::new(&mut generator).resume(());
+  }
+#+end_src
+
+参考：
++ [[https://blog.kghost.info/2011/11/15/abstract-control-1-stackless-coroutine/][高阶流程控制语句（一）： stackless coroutine]]
++ [[https://dmitrykandalov.com/yielding-generators][Yielding Generators]]

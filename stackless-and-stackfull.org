@@ -1,0 +1,59 @@
+:PROPERTIES:
+:ID:       e7061cdc-319f-4957-b65c-f7821254a580
+:END:
+#+TITLE: stackless and stackfull
+
++ Tag :: [[id:8351db35-5130-46a4-9166-5528a9913352][coroutine]]
+
+coroutine 的实现方式大致可以分为 stackless 和 stackfull 两类，两者的主要区别在于切换上下文时是否保留执行栈。
+
+* stackless
+  stackless coroutine 的实现方式给人的感觉比较像状态机，切换上下文时通过某种方式将当前 coroutine 的状态保存，恢复时根据保存的状态确定需要执行的逻辑。
+
+  比如 [[https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html][Coroutines in C]] 中的例子，通过静态变量保存当前 coroutine 的状态，恢复执行时通过 swicth 跳转到状态对应分支继续执行：
+  #+begin_src c
+    int function(void) {
+      static int i, state = 0;
+      switch (state) {
+      case 0: /* start of function */
+        for (i = 0; i < 10; i++) {
+          state = 1; /* so we will come back to "case 1" */
+          return i;
+        case 1:; /* resume control straight after the return */
+        }
+      }
+    }
+  #+end_src
+
+  当然，这是比较简陋的实现方式，更常见的是基于 [[id:1eb32a7a-8283-4276-b47b-c235c1813a04][generator]] 的实现，使用编译器自动生成的对象来作为状态机，并提供 =async/await= 包装。
+
+  可以发现，无论是静态变量，还是 generator，stackless coroutine 上下文切换时，只是将执行栈中的必要信息作为「状态」保存到状态机中，
+  执行栈并没有保留。
+
+  这带来的问题是：stackless coroutine 的挂起本质上是返回了一个状态机，并没有真的挂起当前 coroutine，如果要真的挂起 coroutine，
+  需要调用者在识别返回了状态机后，也将自己包装为状态机返回给上层，直到 scheduler/runtime 拿到最终的状态机后放到某个地方，
+  取出另一个状态机恢复执行。
+  
+  带来的问题就是 =async/await= 的扩散，只要内层有一个函数是 async 修饰的，要让它能正常执行，往往就需要它所有外层函数也是 async 的。
+
+* stackfull
+  对于一个 coroutine 来说，其执行状态由 ={cpu_registers, code, heap, stack}= 决定，其中 =code= 执行信息由 =cpu_registers= 确定，而 =heap= 中分配出的内存地址信息一般会间接或者直接的保存在 =stack= 中，
+  因此，切换上下文时只需要考虑 ={cpu_registers, stack}= 就行了。
+
+  stackfull coroutine 便是基于这个思路，为每一个 coroutine 分配一个执行栈，切换时将恢复执行栈所需要 =cpu_registers= 信息保存，恢复时取出更新到对应的寄存器上后继续执行就可以了。
+  
+  对于 stackfull coroutine 来说，切换上下文时 coroutine 的执行栈没有被销毁，只是简单地将寄存器信息保存/恢复，比如博客 [[https://mthli.xyz/stackful-stackless/][有栈协程与无栈协程]] 中简易 stackfull coroutine 的实现。
+  
+  带来的好处就是我们可以像写同步代码那样写异步代码，只需要在 io 操作时切换上下文即可。
+  
+  比如 golang 实现的便是 stackfull coroutine。
+
+* reference
+  + [[https://www.zhihu.com/question/52193579][腾讯开源的 libco 号称千万级协程支持，那个共享栈模式原理是什么? - 知乎]]
+  + [[https://www.zhihu.com/question/65647171][async/await异步模型是否优于stackful coroutine模型？ - 知乎]]
+  + [[https://tmandry.gitlab.io/blog/posts/optimizing-await-1/][How Rust optimizes async/await I - Tyler Mandry]]
+  + [[https://rust-lang.github.io/async-book/04_pinning/01_chapter.html][Pinning - Asynchronous Programming in Rust]]
+  + [[https://doc.rust-lang.org/stable/unstable-book/language-features/generators.html][generators - The Rust Unstable Book]]
+  + [[https://dmitrykandalov.com/coroutines-as-threads][Coroutines As Threads]]
+  + [[https://mthli.xyz/stackful-stackless/][有栈协程与无栈协程]]
+

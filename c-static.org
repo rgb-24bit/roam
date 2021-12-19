@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       42b1bf3c-dbab-43e2-a531-ffb102d4b548
+:END:
+#+TITLE: c static
+
++ Tag :: [[id:4a10481b-dbee-4f22-9a7b-f120cbef9654][clang]]
+
+* Static variable inside of a function in C
+  位于函数内的静态变量：
+  + 函数内静态变量只在函数内可以
+  + 生命周期依然为静态生命周期
+
+  参考：[[https://stackoverflow.com/questions/5033627/static-variable-inside-of-a-function-in-c][Static variable inside of a function in C - Stack Overflow]]
+
