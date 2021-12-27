@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       F3F2EF3F-BD00-48DE-AFD9-C60C2C741790
+:END:
+#+TITLE: Actor model
+
++ Tag :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
+
+#+begin_quote
+An actor is the primitive unit of computation. It’s the thing that receives a message and do some kind of computation based on it.
+#+end_quote
+
+Ref:
++ [[https://www.brianstorti.com/the-actor-model/][The actor model in 10 minutes]]
++ [[https://en.wikipedia.org/wiki/Actor_model][Actor model - Wikipedia]]
+

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       6E1BD020-24C7-4D12-A14B-CD36DCF0BC97
+:END:
+#+TITLE: Memory management
+
+
+

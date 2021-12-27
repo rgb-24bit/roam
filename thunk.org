@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       1106F6B4-3AA2-495E-8C9C-383489FEA9BF
+:END:
+#+TITLE: Thunk
+
++ Tag :: [[id:D36A4F86-2806-431E-8A45-B8952386A76C][Functional programming]]
+
+Thunk 函数是和函数参数 *求值策略* 相关的一个概念，在很多编程语言中，函数参数的求值策略都是传值调用，在计算得到表达式的值后传递给函数：
+#+begin_src js
+  let x = 1;
+  
+  function f(m){
+      return m * 2;
+  }
+  
+  f(x + 5);  // => f(6)
+#+end_src
+
+而 Thunk 函数的作用是将表达式转换为临时函数，通过传名调用的方式传入函数：
+#+begin_src js
+  var thunk = function () {
+    return x + 5;
+  };
+  
+  function f(thunk){
+    return thunk() * 2;
+  }
+#+end_src
+
+参考：
++ [[https://www.ruanyifeng.com/blog/2015/05/thunk.html][Thunk 函数的含义和用法 - 阮一峰的网络日志]]
++ [[https://en.wikipedia.org/wiki/Thunk][Thunk - Wikipedia]]
+

@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       5D8677C3-747E-41DA-A19C-B49564974F86
+:END:
+#+TITLE: Arena Allocation
+
++ Tag :: [[id:6E1BD020-24C7-4D12-A14B-CD36DCF0BC97][Memory management]]
+
+#+begin_quote
+In computer science, region-based memory management is a type of memory management in which each allocated object is assigned to a region. A region, also called a zone, arena, area, or memory context, is a collection of allocated objects that can be efficiently reallocated or deallocated all at once.
+#+end_quote
+
+Ref: [[https://en.wikipedia.org/wiki/Region-based_memory_management][Region-based memory management - Wikipedia]]
+

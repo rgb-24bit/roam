@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       DBF404BF-7046-430A-8809-D6220EEB4306
+:END:
+#+TITLE: redis eviction policies
+
++ Tag :: [[id:93AEA8F0-56ED-4B22-897F-310B1A94E229][redis]]
+
+当 Redis 使用的内存达到 =maxmemory= 限制后，会根据 =maxmemory-policy= 配置确定淘汰行为，可选的配置有：
+|-----------------+----------------------------------------------------|
+| 策略            | 行为                                               |
+|-----------------+----------------------------------------------------|
+| noeviction      | 拒绝可能造成更多内存使用的命令，并返回错误         |
+| allkeys-lru     | 在所有 key 中按 LRU 的方式淘汰老数据               |
+| volatile-lru    | 仅在设置了过期时间的 key 中按 LRU 的方式淘汰老数据 |
+| allkeys-random  | 在所有 key 中随机淘汰                              |
+| volatile-random | 仅在设置了过期时间的 key 中随机淘汰                |
+| volatile-ttl    | 淘汰设置了过期时间的 key，优先淘汰过期时间短的     |
+|-----------------+----------------------------------------------------|
+
+volatile-xxx 如果没有可淘汰的 key，那么会和 noeviction 一样返回错误。
+
+参考：[[https://redis.io/topics/lru-cache][Using Redis as an LRU cache – Redis]]
+

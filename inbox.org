@@ -22,3 +22,5 @@
 + io
   + https://zhuanlan.zhihu.com/p/96391501
 
+* mysql
+  + https://mariadb.com/kb/en/show-engine-innodb-status/

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       D36A4F86-2806-431E-8A45-B8952386A76C
+:END:
+#+TITLE: Functional programming
+
+
+

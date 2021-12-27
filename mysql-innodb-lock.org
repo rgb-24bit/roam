@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       7E1567B5-49EC-4C05-8346-D6614A9ED51C
+:END:
+#+TITLE: mysql innodb lock
+
++ Tag :: [[id:CEA916CC-2871-4D97-BC56-E8A414278E52][MySQL]]
+
+* unix index next-key
+  在 MySQL 中，无论是 RC 还是 RR 的隔离级别，在插入数据时，如果存在二级唯一索引，都会使用间隙锁确保唯一索引不被破坏，如果不使用间隙锁而是简单使用插入意向锁，会出现 BUG：
+  + [[https://www.bookstack.cn/read/aliyun-rds-core/ea7a43cf992eca56.md#952rjc][数据库内核月报 － 2021/04 - MySQL · 内核分析 · InnoDB主键约束和唯一约束的实现分析 - 《数据库内核月报》 - 书栈网 · BookStack]]
+  + [[https://bugs.mysql.com/bug.php?id=68021][MySQL Bugs: #68021: Unexplainable InnoDB unique index locks on DELETE + INSERT with same values]]
+
