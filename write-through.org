@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       8E4D858A-08DA-41E1-A30E-C8FF60404A87
+:END:
+#+TITLE: Write-through
+
++ Tag :: [[id:47A9EECB-D057-4851-ACDE-E8556C048770][Cache Pattern]]
+
+Write-through 在有数据更新的时候，如果没有命中缓存，直接更新数据库，然后返回。如果命中了缓存，则更新缓存，然后再由 Cache 自己更新数据库：
+#+HTML: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Write-through_with_no-write-allocation.svg/440px-Write-through_with_no-write-allocation.svg.png">
+
+参考：[[https://en.wikipedia.org/wiki/Cache_(computing)#Writing_policies][Cache (computing) - Wikipedia]]
+

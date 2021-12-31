@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       9AFECD11-7545-4E9D-A375-4EC00EF2DC7C
+:END:
+#+TITLE: Write-behind
+
++ Tag :: [[id:47A9EECB-D057-4851-ACDE-E8556C048770][Cache Pattern]]
+
+和 Linux 文件系统的 Page Cache 算法一样，在更新数据的时候，只更新缓存，不更新数据库，而我们的缓存会异步地批量更新数据库。这可以带来更好的性能，但数据不是强一致性的，而且可能会丢失。
+
+#+HTML: <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Write-back_with_write-allocation.svg/440px-Write-back_with_write-allocation.svg.png">
+
+参考：[[https://en.wikipedia.org/wiki/Cache_(computing)#Writing_policies][Cache (computing) - Wikipedia]]
+

@@ -1,0 +1,100 @@
+:PROPERTIES:
+:ID:       9E4CA8FE-B4C4-4EBA-8B9B-75614E7D1E4B
+:END:
+#+TITLE: Zero-copy
+
++ Tag :: [[id:9A451EB9-B3ED-4B8D-AA60-2E5CBA63CC04][io]]
+
+#+begin_quote
+"Zero-copy" describes computer operations in which the CPU does not perform the task of copying data from one memory area to another or in which unnecessary data copies are avoided.This is frequently used to save CPU cycles and memory bandwidth in many time consuming tasks, such as when transmitting a file at high speed over a network, etc., thus improving performances of programs (processes) executed by a computer.
+([[https://en.wikipedia.org/wiki/Zero-copy][Zero-copy - Wikipedia]])
+#+end_quote
+
+* DMA
+ 在 DMA 技术出现前，I/O 的过程如下：
+ + CPU 发出对应的指令给磁盘控制器，然后返回
+ + 磁盘控制器收到指令后，开始准备数据，并把数据加载到磁盘缓冲区中，然后发起中断
+ + CPU 接收到中断后，停止当前任务，进行中断处理，该中断程序会从磁盘缓冲区中按照字节进行读取数据到寄存器中
+ + 然后 CPU 从寄存器加载数据到内存，此期间无法执行任何其他的任务
+
+ #+HTML: <img src="https://s2.loli.net/2021/12/28/ERsWLm5fgrPDObF.png">
+
+ 这个过程中，CPU 会参与数据从磁盘到内核缓冲区的搬运工作，而 DMA 的作用就是将 CPU 从数据的搬运工作中释放出来：
+ #+HTML: <img src="https://s2.loli.net/2021/12/28/FDVPdJtAvcqiO5f.png">
+
+ 有了 DMA 后，I/O 的过程就变成了：
+ + CPU 发出对应的指令给 DMA，然后返回
+ + DMA 进一步将 I/O 请求发送给磁盘
+ + 磁盘收到 DMA 的 I/O 请求，把数据从磁盘读取到磁盘控制器的缓冲区中，当磁盘控制器的缓冲区被读满后，向 DMA 发起中断信号，告知自己缓冲区已满
+ + *DMA 收到磁盘的信号，将磁盘控制器缓冲区中的数据拷贝到内核缓冲区中，此时不占用 CPU，CPU 可以执行其他任务*
+ + 当 DMA 读取了足够多的数据，就会发送中断信号给 CPU
+ + CPU 收到 DMA 的信号，知道数据已经准备好，于是将数据从内核拷贝到用户空间，系统调用返回
+
+ 整个过程中的主要变化就是：CPU 不在需要参与内核缓冲区和磁盘之间的数据搬运工作。
+
+* 无零拷贝的数据传输流程
+  传统 I/O 流程中，数据需要在用户空间和内核空间来回复制，存在：
+  1. 内核态和用户态之间的切换消耗
+  2. 数据在不同缓冲区间的复制消耗
+
+  #+HTML: <img src="https://s2.loli.net/2021/12/29/RJrjuIVqX7dL4lU.png">
+
+* 零拷贝的实现
+  零拷贝的主要实现思路就是减少内核态和用户态之间的切换，减少不同缓冲区间的拷贝次数，主要的实现方式有 mmap+write 以及 sendFile 两种。
+
+** mmap+write
+   在 mmap+write 实现方式中，通过 mmap 函数替代了传统的 read 函数（写依然通过 write 完成），mmap 系统调用函数会将内核中的数据映射到用户缓冲区中，这样操作系统就可以不用数据拷贝也可以操作内核缓冲区中的数据：
+   #+HTML: <img src="https://s2.loli.net/2021/12/29/btVO695oZCgSBsJ.png">
+
+   具体流程为：
+   1. 在操作系统使用 mmap 模式时，数据仍然先从磁盘缓冲区通过 DMA 读取到内核缓冲区
+   2. 调用 mmap 函数使得用户缓冲区和内核缓冲区共享一下这个数据
+   3. 在调用 write 函数时，直接操作内核缓冲区的数据到 socket 缓冲区，这些搬运都发生在内核态，需要 CPU 进行数据搬运
+   4. 最后将 socket 缓冲区的数据通过 DMA 拷贝到网卡中
+
+   相较于无零拷贝的实现，read 系统调用替换为了 mmap 系统调用，仍然存在两次上下文切换，但是去掉了内核缓冲区到用户缓冲区之间的数据拷贝，
+   数据的拷贝统一在内核层面完成。
+
+   对比：
+   |-------------+----------------------------+--------------------|
+   | 操作 \ 方式 | 无零拷贝                   | mmap+write         |
+   |-------------+----------------------------+--------------------|
+   | 数据拷贝    | 两次，内核 -> 用户 -> 内核 | 一次，内核 -> 内核 |
+   | 上下文切换  | 四次，read+write           | 四次，mmap+write   |
+   |-------------+----------------------------+--------------------|
+
+** sendFile
+   linux 内核版本 2.1 中提供了发送文件的系统调用函数 sendFile，该函数可以替代传统 I/O 中的 read 以及 write 系统调用，该系统调用函数可以直接将内核的数据拷贝到 socket 缓冲区中，不用再拷贝到用户态：
+   #+HTML: <img src="https://s2.loli.net/2021/12/29/rskjlOpWbG9KTDP.png">
+
+   sendfile 整体为一次系统调用，只有两次上下文切换和一次数据拷贝，对比：
+   |-------------+----------------------------+--------------------|
+   | 操作 \ 方式 | 无零拷贝                   | sendfile           |
+   |-------------+----------------------------+--------------------|
+   | 数据拷贝    | 两次，内核 -> 用户 -> 内核 | 一次，内核 -> 内核 |
+   | 上下文切换  | 四次，read+write           | 两次，sendfile     |
+   |-------------+----------------------------+--------------------|
+
+   如果网卡支持 SG-DMA 技术（The Scatter-Gather Direct Memory Access），则可以进一步减少内核缓冲区拷贝到 socket 缓冲区的操作：
+   #+HTML: <img src="https://s2.loli.net/2021/12/29/xBAMilkXEfno42D.png">
+
+   利用 SG-DMA 技术，CPU 可以不在参与内核缓冲区间数据的拷贝，直接由 SG-DMA 完成，对比：
+   |-------------+--------------------+-----------------|
+   | 操作 \ 方式 | sendfile           | sendfile+SG-DMA |
+   |-------------+--------------------+-----------------|
+   | 数据拷贝    | 一次，内核 -> 内核 | 零次            |
+   | 上下文切换  | 两次，sendfile     | 两次，sendfile  |
+   |-------------+--------------------+-----------------|
+
+* 大文件处理
+  零拷贝技术依赖内核缓存也就是 PageCache，如果使用零拷贝来传输大文件，可能导致「热点」小文件无法利用到 PageCache，带来性能问题。
+
+  因此，大文件可以考虑使用「异步 I/O + 直接 I/O」的方式绕过 PageCache 传输。
+
+* 总结
+  文件传输方式选择：
+  + 传输大文件的时候，使用「异步 I/O + 直接 I/O」
+  + 传输小文件的时候，则使用「零拷贝技术」
+
+  参考：[[https://blog.csdn.net/weixin_41947378/article/details/109726826][原来 8 张图，就可以搞懂「零拷贝」了_多学习多思考-CSDN博客]]
+

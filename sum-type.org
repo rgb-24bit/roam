@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       B5E92FEC-C717-4AA0-9AF0-29BC36D49399
+:END:
+#+TITLE: sum type
+
++ Tag :: [[id:67AE2BAB-CA63-42AC-AD19-1E1740677EB3][Type System]]
+
+#+begin_quote
+In computer science, a tagged union, also called a variant, variant record, choice type, discriminated union, disjoint union, sum type or coproduct, _is a data structure used to hold a value that could take on several different, but fixed, types. Only one of the types can be in use at any one time, and a tag field explicitly indicates which one is in use_.
+#+end_quote
+
+Ref: [[https://en.wikipedia.org/wiki/Tagged_union][Tagged union - Wikipedia]]
+

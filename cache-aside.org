@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       9BFBB0A3-4942-4815-AB1A-22780387534D
+:END:
+#+TITLE: Cache Aside
+
++ Tag :: [[id:47A9EECB-D057-4851-ACDE-E8556C048770][Cache Pattern]]
+
+Cache Aside 模式是最常用的缓存模式，基本策略为：
++ 失效：应用程序先从 cache 取数据，没有得到，则从数据库中取数据，成功后，放到缓存中
++ 命中：应用程序从 cache 中取数据，取到后返回
++ 更新：先把数据存到数据库中，成功后，再让缓存失效
+
+问题：
+1. 为什么不是先删除缓存再更新存储？
+   #+begin_quote
+   先删除可以在更新前又有读请求过来读取到旧数据放到缓存中，先删后写就导致了缓存不一致。
+   #+end_quote
+2. 先更新存储再删除缓存就不会有脏数据吗？
+   #+begin_quote
+   会出现，但概率比较低，出现脏数据的条件是：
+   1. 缓存失效，导致读请求回源
+   2. 缓存失效的瞬间，有读请求与更新请求的并发
+   3. 在更新请求更新完 DB 之前，读请求读到了老数据
+   4. 读请求读完 DB 到回源 Cache 完成的短暂的时间内，更新请求完成更新 DB 和使 Cache 失效的操作
+
+   这需要写操作比读操作更快完成，同时读写并发，读没命中缓存，是比较低概率的事件。
+   #+end_quote
+3. 为什么不是直接把最新的存储数据更新到缓存?
+   #+begin_quote
+   需要严格保证写请求更新缓存的顺序，容易出现脏数据，删缓存更直接。
+   #+end_quote
+4. 如果删除缓存失败怎么办?
+   #+begin_quote
+   双删，同步删除可以保证时效性，异步删除保证最终能删除成功。常见的异步删除的方式有 2 种：
+   1. 使用 MQ 来进行异步删除
+   2. 消费数据库 binlog 进行删除
+
+   双删除了可以解决删除缓存失败的问题以外，还能解决数据库主从延时引入的脏数据问题。
+   #+end_quote
+
+参考：
++ [[https://docs.microsoft.com/en-us/azure/architecture/patterns/cache-aside][Cache-Aside pattern - Cloud Design Patterns | Microsoft Docs]]
++ [[https://www.cnblogs.com/rjzheng/p/9041659.html][分布式之数据库和缓存双写一致性方案解析 - 孤独烟 - 博客园]]

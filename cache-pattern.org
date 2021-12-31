@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       47A9EECB-D057-4851-ACDE-E8556C048770
+:END:
+#+TITLE: Cache Pattern
+
++ Tag :: [[id:8AAAF1E3-805B-43C5-B07A-24B6D9A58493][Cache]]
+
+缓存模式/模式定义了应用、缓存层和存储层三者之间的关系，包括读写顺序和更新策略。常见的 Cache 模式/策略有 Cache Aside、Read Through 和 Write Through。除了三种常见缓存以外还有 Write Behind，Write Behind 类似 Write Through 模式。
+

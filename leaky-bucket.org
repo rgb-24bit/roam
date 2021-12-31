@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       613DACF0-34D0-474D-B8C7-1164DC479525
+:END:
+#+TITLE: Leaky bucket
+
++ Tag :: [[id:8EC71D76-5F00-49A1-AF81-DC3718C77BD7][rate limiting]]
+
+#+begin_quote
+The leaky bucket is an algorithm based on an analogy of how a bucket with a constant leak will overflow if either the average rate at which water is poured in exceeds the rate at which the bucket leaks or if more water than the capacity of the bucket is poured in all at once. 
+#+end_quote
+
+Leaky bucket 的基本思路为：
+1. 假设存在容量为 B 的 bucket
+2. bucket 以恒定的速率 R 向外漏水
+3. bucket 具有初始水量 F
+
+根据输入速率，桶中的水量可能增加/减少，但只要变化区间在一定范围内，那么都可以保持输出速率为 R。
+
+和 [[id:CE3CAC64-8ED2-48B6-81A0-AD37C507B327][Token bucket]] 的区别在于，Token bucket 会保存令牌，允许突发的较大的流量，而 Leaky bucket 限制了最大输出速率。
+
+参考：
++ [[https://docs.microsoft.com/en-us/windows/win32/medfound/the-leaky-bucket-buffer-model][The Leaky Bucket Buffer Model (Microsoft Media Foundation) - Win32 apps | Microsoft Docs]]
++ [[https://en.wikipedia.org/wiki/Leaky_bucket][Leaky bucket - Wikipedia]]
+
