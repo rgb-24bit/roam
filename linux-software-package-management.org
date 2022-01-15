@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       8c863541-ad09-4fc3-906f-f0732d866855
+:END:
+#+TITLE: linux software package management
+
++ Tag :: [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]]
+
+Linux 上软件包安装管理的方式大致可以分为两类：
++ 手动下载源码编译安装
++ 通过包管理器一键安装
+
+其中，Linux 软件通常会通过 Tarball 的方式分发源代码，使用 wget 或者其他工具获得源码后，便可以执行通过 [[id:c4b4619c-99c7-4117-a7d1-c0847b4d8236][autoconf & automake]] 生成的 =configure= 脚本，配置编译参数生成 [[id:1a25c18e-c415-4b7e-9167-38a7cd120f3a][Makefile]] 编译安装：
+#+begin_example
+  $ ./configure
+  $ make
+  $ make install
+#+end_example
+
+通常，源码可以放在在 =/usr/local/src= 目录下，最后编译结果会放在 =/usr/local/xxx= 目录下。
+
+而 Linux 发行厂商或社区也可以将这些源码在特定的硬件编译后，将安装所需文件打包成一个特殊的格式并发布，被发布的软件就是一个适用于指定 Linux 发行版本的安装包，用户可以使用这个文件通过安装进行安装。
+在安装包中，会包含检测系统与软件依赖的脚本，在安装前进行环境检测。若符合安装条件，就会安装该软件。软件安装后还会将相关信息写入软件管理机制中，以便将来进行软件的升级或删除等：
++ RPM - 由 Red Hat 公司开发，Fedora、CentOS、SUSE 等发行版都使用该软件管理器
++ DPKG - 由 Debian 社区开发，Ubuntu、B2D 等发行版都使用该软件管理器
+
+无论是 RPM 还是 DPKG，都会遇到软件依赖的问题。如，安装软件 A 时，需要先安装软件 B，而安装软件 B 又要先安装软件 C。因此，RPM 和 DPKG 都提供了在线升级机制，能够能够从指定的服务器自动下载安装包，并能自动处理依赖关系，且可以一次性自动安装软件及其依赖：
++ 在 RPM 中，使用 YUM 进行软件安装、依赖管理、在线升级等
++ 在 DPKG 中，使用 APT 进行软件安装、依赖管理、在线升级等
+
+参考：[[https://itbilu.com/linux/management/NJ8WlHCmM.html][Linux 软件管理器-RPM、DPKG 相关介绍 - IT 笔录]]
+
