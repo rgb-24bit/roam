@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       FADB6939-0299-4DD5-A512-639F74189DAA
+:END:
+#+TITLE: Raft algorithm
+
++ Tag :: [[id:7E39F12B-5295-4B80-8FE1-F90282CCEE3C][Consensus algorithm]]
+
+Raft 是一个非拜占庭的一致性算法，即所有通信是正确的而非伪造的。N 个结点的情况下（N 为奇数）可以最多容忍 (N − 1) / 2 个结点故障。
+
+因此通常至少会有 3 个节点。
+
+参考：[[https://zinglix.xyz/2020/06/25/raft/][「图解Raft」让一致性算法变得更简单 - ZingLix Blog]]
+

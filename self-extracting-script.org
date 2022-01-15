@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       45382C9C-A4D5-434C-B10E-1F1323E96D74
+:END:
+#+TITLE: Self-extracting script
+
++ Tag :: [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]]
+
+利用 cat 拼接脚本和数据文件，脚本末尾通过 #EOF# 标识数据的开始：
+#+begin_src sh
+  #!/bin/bash
+  
+  sed '0,/^#EOF#$/d' $0 | tar zx; exit 0
+  #EOF#
+#+end_src
+
+#+begin_src sh
+  # create sfx
+  cat selfextract.sh data.tar.gz > example_sfx.sh
+  
+  # unpack sfx
+  bash example_sfx.sh
+#+end_src
+
+参考：[[https://stackoverflow.com/questions/20758981/self-extracting-script-in-sh-shell][Self-extracting script in sh shell - Stack Overflow]]
+

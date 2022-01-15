@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       A6FC079B-9018-42B8-AAFA-56BABE5E3E8F
+:END:
+#+TITLE: Distributed computing
+
+
+

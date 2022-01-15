@@ -24,3 +24,6 @@
 
 * mysql
   + https://mariadb.com/kb/en/show-engine-innodb-status/
+
+* rust
+  nonnull 需要自己在 drop 释放

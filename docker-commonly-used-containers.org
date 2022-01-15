@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       AA69720B-1007-47BE-B04E-A849D2FC87C6
+:END:
+#+TITLE: docker commonly used containers
+
++ Tag :: [[id:1997781D-9E01-4428-B57F-9E348C4C7906][docker]]
+
+* Busybox
+  BusyBox 是一个集成了一百多个最常用 Linux 命令和工具（如 cat、echo、grep、mount、telnet 等）的精简工具箱，它只需要几 MB 的大小，很方便进行各种快速验证：
+  #+begin_example
+    docker run -it busybox bash
+  #+end_example
+
+* Alpine
+  Alpine 操作系统是一个面向安全的轻型 Linux 发行版。它不同于通常 Linux 发行版，Alpine 采用了 musl libc 和 busybox 以减小系统的体积和运行时资源消耗，但功能上比 busybox 又完善的多：
+  #+begin_example
+    FROM alpine:3.14    
+  #+end_example
+
+* MySQL
+  创建 MySQL 容器，使用 5.7 镜像：
+  #+begin_src bash
+    docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=yourpassword -d mysql:5.7 --max-allowed-packet=67108864
+  #+end_src
+
+* Redis
+  创建 redis 容器，使用最新镜像：
+  #+begin_src bash
+    docker run --name redis -p 6379:6379 -d redis
+  #+end_src
+

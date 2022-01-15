@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       1997781D-9E01-4428-B57F-9E348C4C7906
+:END:
+#+TITLE: docker
+
+Namespace 做隔离，Cgroups 做限制，rootfs 做文件系统。
+
