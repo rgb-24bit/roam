@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       1EAD688C-04DE-4F2F-8172-974432778D03
+:END:
+#+TITLE: StorageClass
+
++ Tag :: [[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]]
+
+在 Kubernetes 中可以使用 StorageClass 自动创建符合 [[id:8599F268-3508-4E21-AD82-042A909ACD73][PVC]] 声明的 [[id:A32240ED-DF8D-4F28-993E-96FD51930676][PV]]，Spec：
+#+begin_src yaml
+  apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: standard
+  provisioner: kubernetes.io/aws-ebs
+  parameters:
+    type: gp2
+  reclaimPolicy: Retain
+  allowVolumeExpansion: true
+  mountOptions:
+    - debug
+  volumeBindingMode: Immediate
+#+end_src
+
+在 StorageClass 的 Spec 中的字段 volumeBindingMode 控制了卷绑定和动态制备（PV 的创建和 PVC 的绑定）应该发生在什么时候，默认情况下，Immediate 表示一旦创建了 PersistentVolumeClaim 也就完成了卷绑定和动态制备，但部分场景下这样的策略会存在问题。
+
+比如创建 hostPath 类型的 PV 时，PV 应该和 [[id:5EF907B9-714E-4C61-8E65-BE0962ED3F53][Pod]] 在同一个节点上，而不是先于 Pod 创建绑定。
+
+这时可以指定 volumeBindingMode 的值为 WaitForFirstConsumer，该模式将延迟 PersistentVolume 的绑定和制备，直到使用该 PersistentVolumeClaim 的 Pod 被创建。
+
+参考：[[https://kubernetes.io/docs/concepts/storage/storage-classes/][Storage Classes | Kubernetes]]
+

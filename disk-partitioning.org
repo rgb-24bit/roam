@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       02D51ACA-1959-4D7A-B3DF-161CB79742A5
+:END:
+#+TITLE: Disk partitioning
+
+
+

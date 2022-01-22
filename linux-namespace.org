@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       1FCC1385-CCFD-40E3-9B49-AC1151C49B9F
+:END:
+#+TITLE: linux namespace
+
+
+

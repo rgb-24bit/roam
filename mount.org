@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       34447746-DE99-40E4-809B-1DA32B9C7975
+:END:
+#+TITLE: mount
+
+在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 中，通过 mount 可以将设备和文件系统挂载到指定目录，常用命令格式为：
+#+begin_example
+  mount -t type [-o options] device dir
+#+end_example
+
+整个操作涉及了三个对象：设备（device）、文件系统（type）和挂载目录（dir）。
+
+其中，Linux 将 device 都放在 /dev 目录下，其中一部分设备是系统生成的软件设备，比如 /dev/null 这些，有些则是物理设备，比如磁盘、内存。
+
+PS：Linux 系统的根目录 / 默认会挂载磁盘的主[[id:02D51ACA-1959-4D7A-B3DF-161CB79742A5][分区]]。
+
+可以直接在 dir 下挂载知道文件系统，设备设置为 none：
+#+begin_example
+  mount -t type none dir
+#+end_example
+
+挂载后，会在 Linux VFS 上添加和文件系统对应的 mount 结构，进入对应目录后，会判断改目录是否为挂载点，如果是，就会从挂载的文件系统的根目录开始进行访问。
+
+挂载点是一个链表，后挂载的文件系统会位于链表末尾，因此 mount 后之前 mount 的文件系统的内容就看不见了。
+
+参考：
++ [[https://blog.csdn.net/jinking01/article/details/105683360][linux 的 mount 结构与原理_jinking01的专栏-CSDN博客_linux mount原理]]
++ [[https://forum.ubuntu.org.cn/viewtopic.php?t=257333][细说 linux 挂载——mount，及其他…… - Ubuntu中文论坛]]
++ [[https://www.cnblogs.com/sparkdev/p/9015312.html][Linux mount 命令 - sparkdev - 博客园]]
++ [[https://man7.org/linux/man-pages/man8/mount.8.html][mount(8) - Linux manual page]]
+

@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       F1A77328-1581-44B6-9AF3-9F789D932BD2
+:END:
+#+TITLE: MTU
+
+Maximum Transmission Unit，缩写 MTU，中文名是：最大传输单元。MTU 是数据链路层的概念，限制了数据链路层的 Payload，也就是上层协议的大小，例如 IP，ICMP 等。
+
+当不同设备的 MTU 值不一样时，MTU 大的设备发往 MTU 小的设备可能会出现发的包太大导致需要分包的情况，这样的分包会导致包截成大小不均匀的包，甚至如果不允许分包，那么包就会被丢弃，导致出现传输问题。
+
+参考：[[https://developer.aliyun.com/article/222535][什么是 MTU？为什么 MTU 值普遍都是 1500？-阿里云开发者社区]]
+

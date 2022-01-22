@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       73DC1E28-D066-44C3-B983-2080F1903B1D
+:END:
+#+TITLE: resolv.conf(5)
+
+可以通过 =/etc/resolv.conf= 文件对 [[id:61C1D530-75EE-4D8A-8261-2074BEB16698][DNS]] 进行配置，常用的两个配置项：
++ *nameserver* 指定上游 DNS 服务器的 IP 地址，最多可以配置 MAXNS(3) 个上游 DNS 服务器，例子：
+  #+begin_example
+    nameserver 1.1.1.1
+  #+end_example
++ *search* 指定当 lookup 的目标不包含域名（点）时用于查询的域名列表，对于下面的例子来说，如果 lookup 目标是 foo，那么会对 foo.a.com、foo.b.com 进行查询：
+  #+begin_example
+    search a.com b.com
+  #+end_example
+
+PS：配置项 *domain* 可以看作是只有单个选项的 *search* 配置，当两者同时存在时，只有最后一个会生效。
+
+参考：[[https://man7.org/linux/man-pages/man5/resolv.conf.5.html][resolv.conf(5) - Linux manual page]]
+

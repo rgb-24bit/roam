@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       4B89824E-1F9B-4926-9614-0F7C6AC453D7
+:END:
+#+TITLE: OpenAPI Specification
+
+OpenAPI Specification（OAS）源自 Swagger，Swagger 被 SmartBear 收购后，在 LINUX 基金、Google、IBM、MicroSoft、PayPal 等一席大公司的赞助下启动了 OpenAPI 这个组织，推出并定义了 OpenAPI Spec。
+
+目前 kubernetes [[id:A6B2E31E-356C-4E39-BEC8-41187B9902E0][apiserver]] 的接口设计便遵循 OAS。
+
+参考：
++ [[https://spec.openapis.org/oas/v3.1.0#openapi-specification][OpenAPI Specification v3.1.0 | Introduction, Definitions, & More]]
++ [[https://xie.infoq.cn/article/534c5217b2a3d59c9cf187fe0][聊聊 OpenAPI Specification（OAS） - InfoQ 写作平台]]
+

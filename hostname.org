@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       41731659-C753-4AFA-A0AD-78467ABEFE90
+:END:
+#+TITLE: hostname
+
+hostname 作为主机的标识，可以在网络中作为 domain name 使用，比如可以在 [[id:73DC1E28-D066-44C3-B983-2080F1903B1D][resolv.conf(5)]] 中指定 search list，然后使用 hostname 作为 domain name 进行 dns 解析，只要对应的 dns server 能够解析成功，就可以直接通过 hostname 访问主机。
+
+这在 Kubernetes 的 [[id:5EF907B9-714E-4C61-8E65-BE0962ED3F53][Pod]] 有所使用。
+
+参考：
++ [[https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/][DNS for Services and Pods | Kubernetes]]
++ [[https://en.wikipedia.org/wiki/Hostname][Hostname - Wikipedia]]
+

@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       17E07A59-9E7E-4907-B86D-246BD60B67BE
+:ROAM_ALIASES: SPOF
+:END:
+#+TITLE: 单点故障
+
+单点故障（英语：single point of failure，缩写 SPOF）是指系统中一旦失效，就会让整个系统无法运作的部件[1]，换句话说，单点故障即会整体故障。
+
+参考：[[https://zh.wikipedia.org/wiki/%E5%8D%95%E7%82%B9%E6%95%85%E9%9A%9C][单点故障 - 维基百科，自由的百科全书]]
+

@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       F12B6144-DE9C-473A-9837-69782AF63E19
+:END:
+#+TITLE: TTY
+
++ Tag :: [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]]
+
+TTY 是 Teletype 或 Teletypewriter 的缩写，原来是指电传打字机，后来这种设备逐渐键盘和显示器取代。不管是电传打字机还是键盘显示器，都是作为计算机的终端设备存在的，所以 TTY 也泛指计算机的终端(terminal)设备。
+
+而现在的 tty 设备通常是一个虚拟的终端，接收键盘的输入，将程序输出显示在屏幕上。
+
+在 Linux 中，登录 [[id:0DC05289-45D7-47C0-8614-DA8202D80341][Shell]] 后，可以通过 =tty= 命令查看当前打开的 tty 设备，往对应 tty 设备写入一些内容，也可以看到效果和 echo 一致：
+#+begin_example
+  echo tty > $(tty)
+#+end_example
+
+参考：[[https://www.cnblogs.com/sparkdev/p/11460821.html][Linux 终端(TTY) - sparkdev - 博客园]]
+

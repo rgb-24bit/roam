@@ -1,0 +1,98 @@
+:PROPERTIES:
+:ID:       92E42186-5FBE-4DF7-BF47-C184F4C6AF6E
+:END:
+#+TITLE: Linux UnionFS
+
++ Tag :: [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]]
+
+UnionFS（Union File System）可以把不同物理位置的目录合并 mount 到同一个目录中。
+
+* AUFS
+  UnionFS 的一种实现，没进 Linux 内核。
+
+* OverlayFS
+  OverlayFS 是 UnionFS 的一种实现，于 2014 年被合并到 Linux 内核的 3.18 版本。
+
+  挂载一个 overlay 文件系统，可以通过 =mount -t overlay -o <options> overlay <mount point>= 来实现，其中 overlay 主要的三个 option： 
+  |----------+---------------------------------------------------------------------------------------------------|
+  | option   | 作用                                                                                              |
+  |----------+---------------------------------------------------------------------------------------------------|
+  | lowerdir | 指定用户需要挂载的 lower 层目录，lower 层支持多个目录，用 =:= 间隔，优先级依次降低。最多支持 500 层 |
+  | upperdir | 指定用户需要挂载的 upper 层目录，upper 层优先级高于所有的 lower 层目录                            |
+  | workdir  | 指定文件系统挂载后用于存放临时和间接文件的工作基础目录                                            |
+  |----------+---------------------------------------------------------------------------------------------------|
+
+  将 lower 和 upper 进行 overlay，挂载到 merge 目录，临时 workdir 为 work 目录：
+  #+begin_example
+    mount -t overlay -o lowerdir=lower,upperdir=upper,workdir=work overlay merge
+  #+end_example
+
+  将 lower 和 upper 进行 overlay 到 merge，但是 merge 为只读属性：
+  #+begin_example
+    mount -t overlay -o lowerdir=upper:lower overlay merge
+  #+end_example
+  
+  各层之间的规则：
+  1. lowerdir 和 upperdir 两个目录存在同名文件时，lowerdir 的文件将会被隐藏，用户只能看到 upperdir 的文件
+  2. lowerdir 低优先级的同目录同名文件将会被隐藏
+  3. 如果存在同名目录，那么 lowerdir 和 upperdir 目录中的内容将会合并
+  4. 当用户修改 mergedir 中来自 upperdir 的数据时，数据将直接写入 upperdir 中原来目录中，删除文件也同理
+  5. 当用户修改 mergedir 中来自 lowerdir 的数据时，lowerdir 中内容均不会发生任何改变。因为 lowerdir 是只读的，用户想修改来自 lowerdir 数据时，overlayfs 会首先拷贝一份 lowerdir 中文件副本到 upperdir 中。
+     后续修改或删除将会在 upperdir 下的副本中进行，lowerdir 中原文件将会被隐藏
+
+  例子：
+  #+begin_example
+    root:~/mount# tree
+    .
+    ├── lower
+    │   ├── a
+    │   ├── b
+    │   └── c
+    ├── union
+    ├── upper
+    └── work
+    
+    4 directories, 3 files
+    root:~/mount# mount -t overlay -o lowerdir=lower,upperdir=upper,workdir=work overlay union
+    root:~/mount# tree
+    .
+    ├── lower
+    │   ├── a
+    │   ├── b
+    │   └── c
+    ├── union
+    │   ├── a
+    │   ├── b
+    │   └── c
+    ├── upper
+    └── work
+        ├── index
+        └── work
+    
+    6 directories, 6 files
+    root:~/mount# touch union/d
+    root:~/mount# echo 1 > union/a
+    root:~/mount# tree
+    .
+    ├── lower
+    │   ├── a
+    │   ├── b
+    │   └── c
+    ├── union
+    │   ├── a
+    │   ├── b
+    │   ├── c
+    │   └── d
+    ├── upper
+    │   ├── a
+    │   └── d
+    └── work
+        ├── index
+        │   └── 00fb1d0001d54be6200ff84681bb6e9e5946eeac1d90020400f509f9cf
+        └── work
+    
+    6 directories, 10 files
+  #+end_example
+
+  参考：[[https://www.cnblogs.com/arnoldlu/p/13055501.html][OverlayFS 初识以及使用 - ArnoldLu - 博客园]]
+

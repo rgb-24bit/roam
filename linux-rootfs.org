@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       F5DD774A-6707-4E8D-A5DF-46A34775AA7F
+:END:
+#+TITLE: linux rootfs
+
+
+

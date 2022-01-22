@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       96E143AD-A8EF-447C-99E7-506EFDBD9DAA
+:END:
+#+TITLE: VPC
+
++ Tag :: [[id:650BF56A-8BD9-4BE3-9825-8C4A2DD6B772][cloud]]
+
+虚拟私有云（Virtual Private Cloud，VPC）是为云服务器、云容器、云数据库等资源构建隔离的、用户自主配置和管理的 *虚拟网络* 环境，提升用户云上资源的安全性，简化用户的网络部署。
+

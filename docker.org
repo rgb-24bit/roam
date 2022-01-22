@@ -3,5 +3,7 @@
 :END:
 #+TITLE: docker
 
-Namespace 做隔离，Cgroups 做限制，rootfs 做文件系统。
++ Tag :: [[id:27DBED3A-A4B2-4C1C-BFCD-C958D5A4BB17][cri]]
+
+docker 是最早的 [[id:3A7A541A-195B-4C13-B397-25E14C9C99FE][Container]] 实现，随着 [[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 的发展和 [[id:27DBED3A-A4B2-4C1C-BFCD-C958D5A4BB17][cri]] 规范的提出，现在已经有了更多的 cri 选择。
 

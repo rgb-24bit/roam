@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       3815ECFF-2724-4A28-B873-E39E6C9C4569
+:END:
+#+TITLE: chroot
+
+chroot，即 change root directory (更改 root 目录)。在 linux 系统中，系统默认的目录结构都是以 /，即以根 (root) 开始的。而在使用 chroot 之后，系统的目录结构将以指定的位置作为 / 位置。
+
+参考：[[https://www.cnblogs.com/sparkdev/p/8556075.html][linux chroot 命令 - sparkdev - 博客园]]
+

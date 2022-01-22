@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       9AF8F3A5-805F-4E3A-A870-997EACD6F72F
+:END:
+#+TITLE: route table
+
+路由表（Route Table）用于 [[id:6A3F1F42-0B72-4F52-A4CE-74C06816495C][IP]] 数据报的转发，在 Linux 中可以通过 route 命令查看路由表：
+#+begin_example
+$ route
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         gatewat         0.0.0.0         UG    0      0        0 eth0
+10.227.68.0     0.0.0.0         255.255.252.0   U     0      0        0 eth0
+172.17.0.0      0.0.0.0         255.255.0.0     U     0      0        0 docker0
+192.168.36.0    0.0.0.0         255.255.255.192 U     0      0        0 *
+#+end_example
+
+IP 数据报转发时，会先用目标 IP 地址和 Genmask 进行与运算，看结果和 Destination 是否相同，相同说明命中该条路由规则，使用对应的 Iface 设备转发。
+
+同时匹配多个 Genmask 时，选择命中的最长的 Genmask（1 的数量最多的）对应的路由规则。
+
