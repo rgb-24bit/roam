@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       8dd0864d-3ef7-43f7-92b9-eeff331732ab
+:END:
+#+TITLE: Kernel Bypass
+
+目前，单核 CPU 的性能已经难以进一步提升，而 NIC 却还在变得更快。在面对大量网络流量时，[[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 内核协议栈会带来很多额外的消耗。
+
+Kernel Bypass 就是绕过内核协议栈在 User Space 直接处理网络流量的一种方式。
+

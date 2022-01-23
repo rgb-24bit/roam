@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       2c2efed7-015b-4afb-b854-63be0a7e3b0d
+:END:
+#+TITLE: eBPF
+
++ Tag :: [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]]
+
+eBPF 是一项革命性的技术，可以在 Linux 内核中运行沙盒程序，而无需更改内核源代码或加载内核模块。
+

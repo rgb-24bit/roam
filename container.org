@@ -25,5 +25,21 @@
 * Summary
   通过 FS、Namespace 和 Cgroups，我们便为容器进程提供了一个类似虚拟机的环境，但需要注意的是，这样的隔离是不彻底的，容器本质上还是运行在宿主机上，因此容器进程可能影响到宿主机上的其他进程，同时宿主机的内核版本也现在了容器进程可以使用的内核能力。
 
+  #+begin_example
+    root@iZ2vc0m61b6rmsa0f79k6eZ:~# docker run -dit --name httpd -p 8080:80  httpd:2.4                                                              
+    
+    # httpd namespace
+    root@iZ2vc0m61b6rmsa0f79k6eZ:~# lsns | grep httpd
+    4026532202 mnt         4  4251 root            httpd -DFOREGROUND
+    4026532203 uts         4  4251 root            httpd -DFOREGROUND
+    4026532204 ipc         4  4251 root            httpd -DFOREGROUND
+    4026532205 pid         4  4251 root            httpd -DFOREGROUND
+    4026532207 net         4  4251 root            httpd -DFOREGROUND
+    
+    # httpd rootfs, path get by docker inspect httpd
+    root@iZ2vc0m61b6rmsa0f79k6eZ:~# ls /var/lib/docker/overlay2/a97bc7582d362c3fe1f179b73d7e3dc65dc8f47cc08b9667a62f9b305c05c9e2/merged
+    bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+  #+end_example
+  
   参考：[[https://juejin.cn/post/6844904078238040078#heading-6][容器是个啥？一篇读懂三大核心技术——Namespace，Cgroup 和 UnionFS - 掘金]]
 
