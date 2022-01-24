@@ -3,5 +3,18 @@
 :END:
 #+TITLE: Disk partitioning
 
+硬盘一般由很多的盘片组成，每个盘片被切成一块一块的扇面，同时沿着半径的方向被划分成了很多同心圆，这些同心圆被称为磁道。每条磁道被扇面切成很多的扇形区域叫做扇区（扇区是从磁盘读出和写入信息的最小单位，通常大小为 512 字节）。
 
+在磁盘的第一扇区上，存储着整块硬盘的重要信息：
++ MBR（Master Boot Record 主启动记录）：开机引导程序就在安装在这里，占用 446 字节
++ DPT（Disk Partition table 硬盘分区表）：记录硬盘上的分区元信息，占用 64 字节，其中，每条分区记录需要占用 16 字节
+
+由于 DPT 只有 64 字节，因此最多只能有 4 条分区距离，为了可以有更多的分区，便引入了扩展分区的概念。
+
+扩展分区通过使用 DPT 中一条记录来记录分区的信息，然后在扩展分区中再继续划分逻辑分区，而逻辑分区的分区信息则记录在扩展分区的第一个扇区中，如此则可以像链表一样划分出很多分区来。
+
+参考：
++ [[https://gtcsq.readthedocs.io/en/latest/linux_tools/disk_note.html][5. Linux 磁盘和分区 — Welcome to Sitian's Blog 1.0 documentation]]
++ [[https://www.eet-china.com/mp/a12275.html][硬盘的物理结构与磁盘分区原理-面包板社区]]
++ [[https://en.wikipedia.org/wiki/Disk_partitioning][Disk partitioning - Wikipedia]]
 

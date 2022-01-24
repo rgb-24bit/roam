@@ -1,0 +1,22 @@
+:PROPERTIES:
+:ID:       D2E9DBB8-A374-4B03-9430-8AC95B9060D7
+:END:
+#+TITLE: Regions & Zones
+
++ Tag :: [[id:650BF56A-8BD9-4BE3-9825-8C4A2DD6B772][cloud]]
+
++ Region ::
+  - 地域指物理的数据中心的地理区域，一般一个地域都是一个城市
+  - 不同地域间完全隔离，保证不同地域间最大程度的稳定性和容错性
+  - 每个地域由一个地理区域内的多个隔离的且在物理上可分隔的可用区组成
+  - 一般情况下，每个地域至少有两个可用区
+
++ Availability Zone（AZ） ::
+  - 可用区指同一地域内，电力和网络互相独立的物理区域
+  - 一个地域的可用区间内网互通，可用区间能做到故障隔离
+  - 可用区间通过高带宽、低延迟网络与完全冗余的专用城域光纤互连，提供高吞吐量和低延迟的网络
+
+#+HTML: <img src="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/images/aws-az.png">
+
+参考：[[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html][Regions and Zones - Amazon Elastic Compute Cloud]]
+

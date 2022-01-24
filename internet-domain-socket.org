@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       F28E9148-1790-49DC-A38A-25FA833A6790
+:ROAM_ALIASES: socket
+:END:
+#+TITLE: Internet domain socket
+
+区别于 [[id:6FFAC24A-029B-4365-98E3-859BF4E66B12][Unix domain socket]]，也就是常规意义上的 socket，用于网络通信。
+

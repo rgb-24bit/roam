@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       6188BB08-436C-4EA7-A0AD-8651085EBDC1
+:END:
+#+TITLE: RPO & RTO
+
++ Tag :: [[id:650BF56A-8BD9-4BE3-9825-8C4A2DD6B772][cloud]]
+
++ RPO ::
+  Recovery Point Objective，数据恢复点目标，以时间为单位。即在灾难发生时，系统和数据必须恢复的时间点要求。RPO 标志系统能够容忍的最大数据丢失量。系统容忍丢失的数据量越小，RPO 的值越小。
+
++ RTO :: 
+  Recovery Time Objective，恢复时间目标，以时间为单位。即在灾难发生后，信息系统或业务功能从停止到必须恢复的时间要求。RTO 标志系统能够容忍的服务停止的最长时间。系统服务的紧迫性要求越高，RTO 的值越小。
+
+#+HTML: <img src="https://d2908q01vomqb2.cloudfront.net/fc074d501302eb2b93e2554793fcaf50b3bf7291/2021/04/02/Figure-1.png">
+
+简单来说，AZ 间数据的同步存在延迟，RPO 可以认为是灾难发生前有 RPO 这么长时间的数据未同步，会丢失。而 RTO 是灾难发生后服务恢复的时间。
+
+参考：[[https://aws.amazon.com/cn/blogs/architecture/disaster-recovery-dr-architecture-on-aws-part-i-strategies-for-recovery-in-the-cloud/][Disaster Recovery (DR) Architecture on AWS, Part I: Strategies for Recovery in the Cloud | AWS Architecture Blog]]
+

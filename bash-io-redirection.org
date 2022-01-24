@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       F9C213A7-111B-42B3-A2AD-AB0A5DF2BA19
+:END:
+#+TITLE: bash io redirection
+
++ Tag :: [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]]
+
+基于文件描述符的 I/O 重定向：
+#+begin_example
+  M>N
+    # "M" is a file descriptor, which defaults to 1, if not explicitly set.
+    # "N" is a filename.
+    # File descriptor "M" is redirect to file "N."
+  M>&N
+    # "M" is a file descriptor, which defaults to 1, if not set.
+    # "N" is another file descriptor.
+#+end_example
+
+参考：[[https://tldp.org/LDP/abs/html/io-redirection.html][I/O Redirection]]
+

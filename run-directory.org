@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       96041A63-BDEC-4E0C-AB0C-FA6BC6F52712
+:END:
+#+TITLE: run directory
+
+通常，我们可以使用 =/var/run/= 目录来存放应用运行时的数据，但是 =/var= 目录的挂载在引导过程稍后的阶段，而类似 [[id:A8CACEAF-DE71-4AB0-8057-BECD5A9978E1][systemd]] 的程序需要在 =/var= 目录挂载前寻找一个目录存放运行时数据。
+
+以前可能就会放在类似 =/dev/.systemd= 的目录下，管理起来不方便，还很别扭。
+
+因此，后来新增了 =/run= 目录可以用于为这样的程序存放运行时数据。
+
+另，systemd 通过 [[id:9F014FD0-8D26-4706-806D-BC6C7F8CE90B][XDG Base Directory]] 中的 XDG_RUNTIME_DIR 指定存放运行时数据的目录，比如 =/run/user/$uid= 目录。
+
+参考：
++ [[http://www.h-online.com/open/news/item/Linux-distributions-to-include-run-directory-1219006.html][Linux distributions to include /run/ directory - The H Open: News and Features]]
++ [[https://unix.stackexchange.com/questions/162900/what-is-this-folder-run-user-1000][linux - What is this folder /run/user/1000? - Unix & Linux Stack Exchange]]
+

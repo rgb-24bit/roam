@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       0E2A9B43-C4ED-42E7-AE33-D6E3B8C4E00F
+:END:
+#+TITLE: Shim
+
+#+begin_quote
+In computer programming, a shim is a library that transparently intercepts API calls and changes the arguments passed, handles the operation itself or redirects the operation elsewhere.
+#+end_quote
+
+简单来说，shim 就像是一个 adapter，在不改变调用方调用方式的前提下，将调用转换为符合目标格式的形式。
+
+参考：[[https://en.wikipedia.org/wiki/Shim_(computing)][Shim (computing) - Wikipedia]]
+

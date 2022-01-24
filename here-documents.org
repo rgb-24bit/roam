@@ -1,0 +1,22 @@
+:PROPERTIES:
+:ID:       BB8D6774-128E-433D-B3A3-8BA6081406D0
+:END:
+#+TITLE: Here Documents
+
+在 [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]] 中，可以使用如下的方式指示 shell 从当前源读取输入，直到看到只包含 word（没有尾随空格）的行：
+#+begin_example
+  [n]<<[-]word
+          here-document
+  delimiter
+#+end_example
+
+比如，通过如下方式创建文件：
+#+begin_src sh
+  cat <<EOF | tee /etc/xxx/xxx.conf
+  key1=val1
+  key2=val2
+  EOF
+#+end_src
+
+参考：[[https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Here-Documents][Bash Reference Manual#Here Documents]]
+

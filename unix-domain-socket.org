@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       6FFAC24A-029B-4365-98E3-859BF4E66B12
+:END:
+#+TITLE: Unix domain socket
+
+Unix domain socket 是在 socket 框架上发展出来的一种 IPC 机制，用于实现同一主机上的进程间通信。虽然 [[id:F28E9148-1790-49DC-A38A-25FA833A6790][Internet domain socket]] 也可用于同一台主机的进程间通讯（通过 loopback 地址 127.0.0.1），但是 Unix domain socket 用于 IPC 更有效率，
+不需要经过网络协议栈，不需要打包拆包、计算校验和、维护序号和应答等，只是将应用层数据从一个进程拷贝到另一个进程。这是因为，IPC 机制本质上是可靠的通讯，而网络协议是为不可靠的通讯设计的。
+
+而在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 系统中，一切皆文件，作为 server 端的 Unix socket 创建在指定路径上，客户端便可以直接通过该文件连接 socket 了。
+
+参考：[[https://www.cnblogs.com/sparkdev/p/8359028.html][Unix domain socket 简介 - sparkdev - 博客园]]
+

@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       9F014FD0-8D26-4706-806D-BC6C7F8CE90B
+:END:
+#+TITLE: XDG Base Directory
+
+XDG Base Directory 用于指定存放 user-specific 的应用配置、数据等文件的 Base 目录，比如 XDG_CONFIG_HOME 指定存放用户配置文件的目录。
+
+参考：[[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html][XDG Base Directory Specification]]
+
