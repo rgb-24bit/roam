@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       1b114764-f80c-4f21-8895-e617bd7b27db
+:END:
+#+TITLE: TCP
+
+* TCP Connections
+  TCP Connection 由 =(src ip, src port, dst ip, dst port)= 四元组唯一确定，虽然端口数只有 65535 个，但只是两个 IP 之间能够建立的连接最多为 65535 个，
+  服务端和不同的客户端建立连接时 src ip 会变，客户端和不同的服务端建立连接时 dst ip 会变，因此单个主机可以建立连接数是多余 65535 的。
+
+  另外，当拥有多个网卡时，两个进程可以在不同的网卡上监听相同的端口：
+  + [[https://stackoverflow.com/questions/1694144/can-two-applications-listen-to-the-same-port][sockets - Can two applications listen to the same port? - Stack Overflow]]
+

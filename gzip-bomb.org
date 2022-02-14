@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       8b01fc39-4b90-4627-976f-8129929bf35c
+:END:
+#+TITLE: gzip bomb
+
+HTTP/1.1 协议中规定了一种利用通过 [[id:41D63C1E-570D-421D-8775-A7FA7F9A9275][GZIP]] 压缩网络内容减少传输数据大小的技术，网站上的内容以 GZIP 格式压缩，下载到浏览器后再解压出来显示。
+
+可以构造一种压缩比率非常高的 GZIP 内容，使得浏览器端因为解压消耗内容过大，或者使用缓存超过了一定程度，导致卡死甚至死机。
+
+生成方式：
+#+begin_example
+  dd if=/dev/zero bs=1M count=1000 | gzip > big.gzip
+#+end_example
+
