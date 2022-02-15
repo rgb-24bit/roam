@@ -16,5 +16,18 @@
     # "N" is another file descriptor.
 #+end_example
 
+顺序问题：
+#+begin_quote
+Note that the order of redirections is significant. For example, the command
+
+ls > dirlist 2>&1
+
+directs both standard output (file descriptor 1) and standard error (file descriptor 2) to the file dirlist, while the command
+
+ls 2>&1 > dirlist
+
+directs only the standard output to file dirlist, because the *standard error was made a copy of the standard output before the standard output was redirected to dirlist*.
+#+end_quote
+
 参考：[[https://tldp.org/LDP/abs/html/io-redirection.html][I/O Redirection]]
 

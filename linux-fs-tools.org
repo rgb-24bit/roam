@@ -1,0 +1,76 @@
+:PROPERTIES:
+:ID:       BE0ED624-25B6-43E0-AED1-078FA2237114
+:END:
+#+TITLE: linux fs tools
+
+* df
+  磁盘使用情况统计：
+  #+begin_example
+    $ df -h
+    Filesystem      Size  Used Avail Use% Mounted on
+    udev            7.9G     0  7.9G   0% /dev
+    tmpfs           1.6G   57M  1.6G   4% /run
+    /dev/vda1       126G   84G   37G  70% /
+    tmpfs           7.9G     0  7.9G   0% /dev/shm
+    tmpfs           5.0M     0  5.0M   0% /run/lock
+    tmpfs           7.9G     0  7.9G   0% /sys/fs/cgroup
+    tmpfs           1.6G     0  1.6G   0% /run/user/1000
+  #+end_example
+
+* du
+  统计目录或者文件大小：
+  #+begin_src bash
+    # To show cumulative human-readable size:
+    du -sh
+    
+    # To sort directories/files by size(human-readable):
+    du -sh * | sort -rh
+  #+end_src
+
+* lsblk
+  获取块设备信息：
+  #+begin_src bash
+    # To show all available block devices along with their partitioning schemes:
+    lsblk
+    
+    # To show SCSI devices:
+    lsblk --scsi
+    
+    # To show a specific device:
+    lsblk /dev/sda
+    
+    # To verify TRIM support:
+    # Check the values of DISC-GRAN (discard granularity) and DISC-MAX (discard max bytes) columns.
+    # Non-zero values indicate TRIM support
+    lsblk --discard
+    
+    # To fetch info about filesystems:
+    lsblk --fs
+    
+    # For JSON, LIST or TREE output formats use the following flags:
+    lsblk -J/--json
+    lsblk -l/--list
+    lsblk -T/--tree # default view
+  #+end_src
+
+* fdisk
+  磁盘分区管理：
+  #+begin_example
+    $ fdisk -l
+    Disk /dev/vda: 40 GiB, 42949672960 bytes, 83886080 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0xe84cc148
+    
+    Device     Boot Start      End  Sectors Size Id Type
+    /dev/vda1  *     2048 83886046 83883999  40G 83 Linux
+    
+    
+    Disk /dev/vdb: 20 GiB, 21474836480 bytes, 41943040 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+  #+end_example
+

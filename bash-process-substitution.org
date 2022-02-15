@@ -1,0 +1,22 @@
+:PROPERTIES:
+:ID:       9469EE68-448C-4CA0-A0FE-C1B9F0CFAAB1
+:END:
+#+TITLE: bash process substitution
+
++ Tag :: [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]]
+
+process substitution 可以用于多个 command stdout 的 [[id:F9C213A7-111B-42B3-A2AD-AB0A5DF2BA19][io redirection]]，格式为：
+#+begin_example
+  >(command_list) as command_list stdin
+
+  <(command_list) get command list stdout
+#+end_example
+
+比如，将 stdout 重定向到 file，同时将 stderr 重定向到 file 末尾，保留 stderr 身份：
+#+begin_example
+  $ command 1>filename 2> >(tee -a filename >&2)
+#+end_example
+
+参考：
++ [[https://stackoverflow.com/questions/692000/how-do-i-write-stderr-to-a-file-while-using-tee-with-a-pipe][linux - How do I write stderr to a file while using "tee" with a pipe? - Stack Overflow]]
++ [[https://tldp.org/LDP/abs/html/process-sub.html][Process Substitution]]

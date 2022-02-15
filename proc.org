@@ -9,6 +9,8 @@ proc 是一个虚拟文件系统，有时也被称为进程信息伪文件系统
   这个文件中会记录对应 =pid= 进程启动时的环境变量配置，通过 ='\0'= 分隔，可以通过如下命令切分：
   #+begin_example
     $ cat /proc/1/environ | tr '\000' '\n'
+    $ or
+    $ xargs -0 -L1 -a /proc/1/environ
   #+end_example
 
   注意：进程在运行时修改的环境变量不会在这个文件中体现。

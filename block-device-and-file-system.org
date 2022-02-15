@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       18BFD1C0-B06B-4566-A23C-ECAC5B82EA2B
+:END:
+#+TITLE: block device and file system
+
+块设备（block device）是 I/O 设备中的一类，将信息存储在固定大小的块中，每个块都有自己的地址，同时可以在设备的任意位置读取一定长度的数据。硬盘或虚拟硬盘就是常见的块设备。
+
+而文件系统（file system）是一种存储和组织计算机数据的方法，通过文件系统，可以使用简单的方式来对物理介质执行操作。比如，没有文件系统，如果我要删除一个文件，那么我就得先找到它在硬盘上的哪个扇区，哪个柱面，然后删除它。
+有了文件系统，我可以用图形化的界面按 Shift+Delete 删除。
+
+单独的块设备可能并不包含文件系统（file system），在 Linux 中可以通过 mkfs 命令为块设备添加文件系统。
+
+参考：
++ [[https://www.jianshu.com/p/2246464306b2][一篇文章让你理解Ceph的三种存储接口(块设备、文件系统、对象存储) - 简书]]
++ [[https://vra.github.io/2014/12/15/devices-partition-filesystem/][设备文件,分区和文件系统辨析 | Yunfeng's Simple Blog]]
+

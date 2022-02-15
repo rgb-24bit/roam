@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       59E1891F-92BA-4E44-AB37-D1438028E85B
+:END:
+#+TITLE: bash builtin commands
+
++ Tag :: [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]]
+
+* :(colon)
+  #+begin_quote
+  No effect; the command does nothing beyond expanding arguments and performing any specified redirections.  The return status is zero.
+  #+end_quote
+
+  #+begin_example
+    $ set -x
+    $ : $PATH
+    + : /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  #+end_example
+
+  Ref [[https://stackoverflow.com/questions/3224878/what-is-the-purpose-of-the-colon-gnu-bash-builtin][shell - What is the purpose of the : (colon) GNU Bash builtin? - Stack Overflow]]
+
+* . or source
+  #+begin_quote
+  Read and execute commands from filename in the current shell environment and return the exit status of the last command executed from filename.
+  #+end_quote
+

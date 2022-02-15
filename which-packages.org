@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       87BDCDDC-D5A8-40B1-B710-55040E6AAA07
+:END:
+#+TITLE: which packages
+
+* dig or nslookup
+  #+begin_src sh
+    # Install dig and nslookup on Ubuntu (Debian)
+    $ apt install dnsutils
+    
+    # Install dig and nslookup on Alpine
+    $ apk add bind-tools
+  #+end_src
+
