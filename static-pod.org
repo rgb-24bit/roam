@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       C5E3093E-6006-4748-966E-CE43B33AEBF2
+:END:
+#+TITLE: static pod
+
+
+

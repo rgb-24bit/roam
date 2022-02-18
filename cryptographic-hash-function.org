@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       6D2A03A4-EB55-4196-9C38-BE1138045184
+:END:
+#+TITLE: Cryptographic hash function
+
+
+

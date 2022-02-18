@@ -1,0 +1,81 @@
+:PROPERTIES:
+:ID:       C01EF9F0-C3AC-423C-8B13-602FA9809602
+:END:
+#+TITLE: admission webhook
+
+admission webhook 本质上就是一个 HTTP 回调服务，在 [[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] apiserver 开启了 =MutatingAdmissionWebhook= 或 =ValidatingAdmissionWebhook= 的情况下，apiserver 收到请求后会调用对应的回调，在回调验证通过后请求才会持久化到 etcd。
+
+#+HTML: <img src="https://bxdc-static.oss-cn-beijing.aliyuncs.com/images/k8s-api-request-lifecycle.png">
+
+现在非常火热的的 [[id:cedfb257-acc7-4747-8c7b-a9c1e9c332ed][Service Mesh]] 应用 istio 就是通过 mutating webhooks 来自动将 Envoy 这个 sidecar 容器注入到 Pod 中去的：https://istio.io/docs/setup/kubernetes/sidecar-injection/。
+
+* 参数配置
+  kube-apiserver 属于 [[id:C5E3093E-6006-4748-966E-CE43B33AEBF2][static pod]]，因此之间修改 =/etc/kubernetes/manifests/kube-apiserver.yaml= 配置就行了：
+  #+begin_src yaml
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      labels:
+        component: kube-apiserver
+        tier: control-plane
+      name: kube-apiserver-ydzs-master
+      namespace: kube-system
+    ......
+    spec:
+      containers:
+      - command:
+        - kube-apiserver
+        - --advertise-address=10.151.30.11
+        - --allow-privileged=true
+        - --authorization-mode=Node,RBAC
+        - --client-ca-file=/etc/kubernetes/pki/ca.crt
+        - --enable-admission-plugins=NodeRestriction,MutatingAdmissionWebhook,ValidatingAdmissionWebhook
+    ......
+  #+end_src
+
+* 请求和响应
+  定义 adminssion webhook 资源时，可以指定请求的 Path，监听的资源类型和范围，可以通过这种方式只编写单个 webhook 服务，定义多个 webhook 资源，在不同的 Path 上处理不同类型的请求：
+  #+begin_src yaml
+    apiVersion: admissionregistration.k8s.io/v1
+    kind: ValidatingWebhookConfiguration
+    ...
+    webhooks:
+    - name: my-webhook.example.com
+      rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1", "v1beta1"]
+        resources: ["deployments", "replicasets"]
+        scope: "Namespaced"
+      clientConfig:
+        caBundle: "Ci0tLS0tQk...<base64-encoded PEM bundle containing the CA that signed the webhook's serving certificate>...tLS0K"
+        service:
+          namespace: my-service-namespace
+          name: my-service-name
+          path: /my-path
+          port: 1234      
+  #+end_src
+
+  mutating 类型的 webhook 响应应该使用 [[id:80033B41-1429-4521-89EA-8EDD65E21245][JSON Patch]] 来表示要修改的内容：
+  #+begin_src json
+    {
+      "apiVersion": "admission.k8s.io/v1",
+      "kind": "AdmissionReview",
+      "response": {
+        "uid": "<value from request.uid>",
+        "allowed": true,
+        "patchType": "JSONPatch",
+        "patch": "W3sib3AiOiAiYWRkIiwgInBhdGgiOiAiL3NwZWMvcmVwbGljYXMiLCAidmFsdWUiOiAzfV0="
+      }
+    }
+  #+end_src
+
+* HTTPS
+  通常 webhook 会使用 HTTPS 来通信，因此需要生成 CA 证书，可以使用 =certificates.k8s.io= API 来签发受 k8s 信任的 x509 证书，当然也可以直接在定义 webhook 时指定 CA 证书。
+  
+  签署可参考脚本：https://github.com/newrelic/k8s-webhook-cert-manager/blob/master/generate_certificate.sh
+
+* 参考
+  + [[https://www.qikqiak.com/post/k8s-admission-webhook/][深入理解 Kubernetes Admission Webhook-阳明的博客|Kubernetes|Istio|Prometheus|Python|Golang|云原生]]
+  + [[https://kubernetes.io/zh/docs/reference/access-authn-authz/extensible-admission-controllers/#%E7%BC%96%E5%86%99%E4%B8%80%E4%B8%AA%E5%87%86%E5%85%A5-webhook-%E6%9C%8D%E5%8A%A1%E5%99%A8][动态准入控制 | Kubernetes]]
+

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       7B958C10-CF99-43FB-99BE-ED8E79B07730
+:END:
+#+TITLE: python nested namespace packages
+
+从 Python 3.3 版本开始，可以利用 [[https://www.python.org/dev/peps/pep-0420/#nested-namespace-packages][PEP 420 -- Implicit Namespace Packages | Python.org]] 省略 =__init__.py= 文件。
+

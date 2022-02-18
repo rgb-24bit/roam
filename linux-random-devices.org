@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       D5064298-E43B-4ED9-9892-64DC82B7E27B
+:END:
+#+TITLE: linux random devices
+
+在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 中有两个生成随机数的设备，/dev/random 和 /dev/urandom，两者区别是前者会阻塞到有足够的熵去生成随机数，后者如果发现熵不够就返回伪随机数，所以不会阻塞。
+
+可以使用 =dd if=/dev/random bs=3 count=100= 在 Linux 系统上尝试下。
+

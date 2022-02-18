@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       E05BB580-3DC8-4079-92FE-616FF92B7F34
+:END:
+#+TITLE: docker registry
+
+#+begin_example
+  $ docker run -d -p 5000:5000 --restart always --name registry registry:2
+#+end_example
+
+push 镜像到 private registry：
+#+begin_example
+  $ docker tag image private_registry/image
+  $ docker push private_registry/image
+#+end_example
+
+导出镜像为 tar 包：
+#+begin_example
+  $ docker save image > image.tar
+#+end_example
+
+Load tar 包镜像：
+#+begin_example
+  $ docker image load --input image.tar
+#+end_example
+

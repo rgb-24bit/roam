@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       18821FC2-DB22-4E98-B680-249E1F714BC7
+:END:
+#+TITLE: PEM
+
+在涉及到 SSL 的场景常常可以看到类似 =xxx.pem= 的文件，其中 PEM 是 Privacy-Enhanced Mail 的缩写，用于存储 [[id:2F836899-F6B9-4D48-A9FA-DFA6F0236F60][PKI]] 类型的数据，比如公钥、私钥、证书。
+
+其格式为：
+#+begin_example
+  -----BEGIN LABEL-----
+  
+  BASE64 DATA
+  
+  -----END LABEL-----
+#+end_example
+
+其中，LABEL 可以是 CERTIFICATE、CERTIFICATE REQUEST、PRIVATE KEY 等。
+
+简单来说就是通过 LABEL 标识存储的数据类型，用于保存证书、证书签名请求、私钥等数据的文件格式。根据实际保存的数据类型，有时文件后缀也会相应地命名：
++ =.cer= 或 =.crt= 证书
++ =.csr= 证书签名请求
++ =.key= 公钥或私钥
+
+使用 file 命令可以得到对应的类型信息：
+#+begin_example
+  $ file /etc/ssl/etcd/ssl/ca-key.pem
+  /etc/ssl/etcd/ssl/ca-key.pem: PEM RSA private key
+  $ file /etc/ssl/etcd/ssl/ca.pem
+  /etc/ssl/etcd/ssl/ca.pem: PEM certificate
+#+end_example
+
+参考：
++ [[https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail][Privacy-Enhanced Mail - Wikipedia]]
++ [[https://docs.microfocus.com/SM/9.51/Hybrid/Content/security/concepts/what_are_pem_files.htm][What are PEM files?]]
+
+* 相关问题
+** Can I get a public key from an RSA private key?  
+   通常，我们可以通过 =private_key.pem= 中的额外信息计算得到 public key：
+   #+begin_example
+     $ openssl rsa -text -in key.pem -pbubout
+   #+end_example
+
+   参考：[[https://security.stackexchange.com/questions/172274/can-i-get-a-public-key-from-an-rsa-private-key][Can I get a public key from an RSA private key? - Information Security Stack Exchange]]
+

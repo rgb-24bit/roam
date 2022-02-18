@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       47E98027-6495-45EF-8EC3-A19B4F54EE2A
+:END:
+#+TITLE: Certificate signing request(CSR)
+
+在 [[id:2F836899-F6B9-4D48-A9FA-DFA6F0236F60][PKI]] 中，证书签名请求（Certificate signing request）是申请人发送给认证机构用于申请数字证书的请求消息，使用申请人的私钥签名，包含申请人的基本信息。
+
+参考：[[https://en.wikipedia.org/wiki/Certificate_signing_request][Certificate signing request - Wikipedia]]
+
