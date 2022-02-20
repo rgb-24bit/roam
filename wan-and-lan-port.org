@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       2f103ea8-0d1c-45f6-87ec-a6e035791001
+:END:
+#+TITLE: WAN and LAN port
+
+在路由器上常常有 WAN 就和 LAN 口的标识，两者的区别为：
++ WAN 口用于访问外网或互联网，通常用于连接宽带运营商的设备
++ LAN 口用于访问内网设备，比如连接自己的电脑啥的
+

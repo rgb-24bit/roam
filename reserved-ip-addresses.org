@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       f3df3340-7230-4fc6-bfe3-5be966f82441
+:END:
+#+TITLE: Reserved IP addresses
+
+保留 [[id:6A3F1F42-0B72-4F52-A4CE-74C06816495C][IP]] 地址中，常见的为 A、B、C 三类地址中的私网地址：
++ A 类地址：10.0.0.0 ~ 10.255.255.255
++ B 类地址：172.16.0.0 ~ 172.31.255.255
++ C 类地址：192.168.0.0 ~ 192.168.255.255
+
+另外，还有一个电信级 NAT 网络地址段 100.64.0.0 ~ 100.127.255.255，登录路由器管理页面就可以看到这个地址段的地址。
+
+参考：[[https://en.wikipedia.org/wiki/Reserved_IP_addresses][Reserved IP addresses - Wikipedia]]
+

@@ -5,7 +5,13 @@
 
 Maximum Transmission Unit，缩写 MTU，中文名是：最大传输单元。MTU 是数据链路层的概念，限制了数据链路层的 Payload，也就是上层协议的大小，例如 IP，ICMP 等。
 
-当不同设备的 MTU 值不一样时，MTU 大的设备发往 MTU 小的设备可能会出现发的包太大导致需要分包的情况，这样的分包会导致包截成大小不均匀的包，甚至如果不允许分包，那么包就会被丢弃，导致出现传输问题。
+当不同设备的 MTU 值不一样时，MTU 大的设备发往 MTU 小的设备可能会出现发的包太大导致需要分包的情况，这样的分包会导致包截成大小不均匀的包，
+如果不允许分包，那么包还会被丢弃，导致出现传输问题。
 
-参考：[[https://developer.aliyun.com/article/222535][什么是 MTU？为什么 MTU 值普遍都是 1500？-阿里云开发者社区]]
+在 [[id:7dbbe653-ae4e-42e6-8976-cee9d6e58878][VXLAN]] 网络中，封装 VXLAN 后的报文有时比承载网络中某些设备的 MTU 值大，因此当设备通过 VXLAN 网络通信时，建议修改应用层服务器发送报文的长度值，
+修改后的长度值加上 VXLAN 封装的 50 字节后，需保证在整个承载网中，均小于设备的 MTU 值。
+
+参考：
++ [[https://developer.aliyun.com/article/222535][什么是 MTU？为什么 MTU 值普遍都是 1500？-阿里云开发者社区]]
++ [[https://support.huawei.com/enterprise/zh/doc/EDOC1100130741][跨 DC 间 VXLAN 互联的 MTU 规划建议 - 华为]]
 
