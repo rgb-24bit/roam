@@ -3,5 +3,16 @@
 :END:
 #+TITLE: linux namespace
 
+* nsenter
+  命令 nsenter 可以加入已有进程的 namespace，在调试容器的场景可以方便进入容器 namespace 调试：
+  #+begin_example
+    $ crictl ps | grep <container>
+    $ crictl inspect <container id>
+    $ nsenter -t <pid>
+  #+end_example
 
+  可以指定需要加入的 namespace 类型，常见的调试网络相关问题时，容器 rootfs 常常没有相关命令，这时可以只加入 network namespace 来解决：
+  #+begin_example
+    nsenter -n -t <pid>
+  #+end_example
 

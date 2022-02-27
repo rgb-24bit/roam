@@ -3,5 +3,19 @@
 :END:
 #+TITLE: ansible
 
+* Ad-Hoc
+  命令格式：
+  #+begin_example
+    ansible [pattern] -m [module] -a "[module options]"
+  #+end_example
 
+  ansible 默认会读取位于 =/etc/ansible/hosts= 作为 inventory，也可以使用 =-i= 选项指定 inventory 文件。
+
+  常用模块：
+  #+begin_src sh
+    # run shell command
+    ansible all -m shell -a 'echo $TERM'
+  #+end_src
+
+  参考：[[https://docs.ansible.com/ansible/latest/user_guide/intro_adhoc.html][Introduction to ad hoc commands — Ansible Documentation]]
 

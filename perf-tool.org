@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       1EA44B38-835A-4FC5-99F5-51DE8594EE37
+:END:
+#+TITLE: perf tools
+
+|----------+------------------------------------+----------+--------------------|
+| 测试目标 | 测试工具                           | 参考     | 备注               |
+|----------+------------------------------------+----------+--------------------|
+| 磁盘     | fio                                |          |                    |
+| 网络带宽 | iperf2、iperf3                     |          | 3 并发存在一点问题 |
+| 网络延迟 | ping                               |          |                    |
+| MySQL    | sysbench                           | [[https://www.volcengine.com/docs/6313/78477][测试方法]] |                    |
+| Redis    | memtier_benchmark、redis-benchmark | [[https://www.volcengine.com/docs/6293/79870][测试方法]] |                    |
+|----------+------------------------------------+----------+--------------------|
+
+参考：[[https://www.brendangregg.com/linuxperf.html][Linux Performance]]
+

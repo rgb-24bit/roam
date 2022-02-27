@@ -3,5 +3,20 @@
 :END:
 #+TITLE: VXLAN
 
+VXLAN 是 [[id:59A9EF64-9AD8-49A3-905B-BA65929BF810][Tunneling protocol]] 的一种，通过 UDP 负载传输 MAC 帧，用来解决 [[id:D771D05F-107D-4AE3-BDB1-39A52370F28F][VLAN]] 中网络数量不足和二层范围有限的问题，只要三层可达，那么就可以通过 VXLAN 组网。
 
+VXLAN 中的几个重要概念：
++ VTEP - 是 VXLAN 隧道网络的端点，负责 VXLAN 报文的封装和解析
++ VNI - 是 VXLAN 网络的标识，是个 24 位整数，能够支持千万级网络的划分
++ Tunnel - VXLAN 隧道的逻辑概念，在 VXLAN 模型中并没有具体的物理实体相对应
+
+在 Linux 中，发出 IP 包时会根据路由表选择 VXLAN 设备，然后通过 [[id:A9AAD3F1-70A3-4E36-A470-442725B18E96][ARP]] 表找到对应的 MAC 地址，再通过 [[id:1F10D0CC-5FD8-454B-8010-95E71353C3B7][FD[[id:B5213435-6FED-42EC-90CC-FE1074AF901D][multicast]]B]] 表找到 MAC 对应的 VTEP 的 IP 地址，
+通过将 MAC 帧封装在目标为这个 IP 的 UDP 包中发送给目标。
+
+缺点：VXLAN 会带来额外的数据传输开销，需要在 MAC 帧外额外包一层，同时也需要跳转源包的 [[id:F1A77328-1581-44B6-9AF3-9F789D932BD2][MTU]] 大小，避免出现网络问题。
+
+参考：
++ [[https://zhuanlan.zhihu.com/p/130277008][VXLAN 基础教程：VXLAN 协议原理介绍 - 知乎]]
++ [[https://zhuanlan.zhihu.com/p/36165475][VXLAN vs VLAN - 知乎]]
++ [[https://support.huawei.com/enterprise/zh/doc/EDOC1100087027][什么是 VXLAN - 华为]]
 

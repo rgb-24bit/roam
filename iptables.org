@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       800E88CE-BB0F-4CC0-8CFF-6302F992F0C3
+:END:
+#+TITLE: iptables
+
+iptables 基于 [[id:9B50133E-FEB3-42C2-B35D-DAE5E6B46369][netfilter]]，是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 下的包过滤防火墙，也可以进行 [[id:2429468C-67CA-4AAE-9502-E13F0D01BBA8][NAT]] 操作，在 IP 层通过 PREROUTING、INPUT、OUTPUT、POSTROUTING 和 FORWARD 五个 hook 对本机的 IP 包进行处理。
+
+iptables 中存在很多的 rule，每个 rule 匹配一定的目标，执行相应的操作，根据 rule 生效的优先级和位置，iptables 抽象出了对应的 table 和 chain 概念：
++ table 用于表示规则集，每个 hook 节点上会挂对应的几张 table，不同 table 执行的优先级不同
++ chain 用于表示规则集 table 内规则的分类，table 挂在某个 hook 上时，会执行这个 table 内对应的 chain 链上的规则
+
+数据走到 hook 节点后，按照 raw、mangle、nat、filter、security 的顺序执行表中的规则，比如 PREROUTING 这个 hook，会按照顺序执行 raw、mangle 和 nat 表中 PREROUTING 链上的规则。
+
+各个 table 上也可以自定义 chain，通过在内置 chain 上添加操作为 JUMP 的 rule，然后跳转到自定义 chain 上执行。
+
+命令使用：
+#+begin_src sh
+  # show filter table rules
+  iptables -L 
+  
+  # show special table rules
+  iptables -t <table> -L
+#+end_src
+

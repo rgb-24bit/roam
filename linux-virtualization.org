@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       33BB3384-96A3-4A83-9BC2-4CFA60D9A1FF
+:END:
+#+TITLE: Linux Virtualization
+
+通常，目前常用的 Linux [[id:2A92A1AA-75FE-4A1E-8AB6-61517F9361AE][虚拟化]]技术为 [[id:A72D3D29-5C36-46A4-9D06-DEF1209230F2][LXC]] 和 [[id:C3DB3E7E-9C17-4C69-9E37-8B13A379CE50][KVM]]，两者分别对应容器和虚拟机级别的虚拟化，通常，云厂商提供的 ECS 实例便是基于 KVM 的虚拟机实例，而提供的云原生软件服务则是基于容器技术提供的。
+

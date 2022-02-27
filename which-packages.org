@@ -10,5 +10,8 @@
     
     # Install dig and nslookup on Alpine
     $ apk add bind-tools
+    
+    # Install dig and nslookup on Centos
+    $ yum install bind-tools
   #+end_src
 

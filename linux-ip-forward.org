@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       9E06B2E6-4ACB-4C23-9FB6-1DA55C747804
+:END:
+#+TITLE: Linux IP forward
+
+ip forward 指当主机拥有多于一块的网卡时，其中一块收到数据包，根据数据包的目的 IP 地址将数据包发往本机另一块网卡，该网卡根据路由表继续发送数据包。
+
+出于安全考虑，Linux 系统默认是禁止 ip forward 的，可以配置内核参数 net.ipv4.ip_forward 开启这一功能：
+#+begin_example
+  cat <<EOF | sudo tee /etc/sysctl.d/99-kubernetes-cri.conf
+  net.bridge.bridge-nf-call-iptables  = 1
+  net.ipv4.ip_forward                 = 1
+  net.bridge.bridge-nf-call-ip6tables = 1
+  EOF
+  
+  sudo sysctl --system
+#+end_example
+
+通常也会有对应的 iptables 规则指定转发规则。
+

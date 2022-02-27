@@ -16,7 +16,7 @@ default         gateway         0.0.0.0         UG    0      0        0 eth0
 
 IP 数据报转发时，会先用目标 IP 地址和 Genmask 进行与运算，看结果和 Destination 是否相同，相同说明命中该条路由规则，使用对应的 Iface 设备转发。
 
-同时匹配多个 Genmask 时，选择命中的最长的 Genmask（1 的数量最多的）对应的路由规则。
+同时匹配多个 Genmask 时，选择命中的最长的 Genmask（1 的数量最多的）对应的路由规则，Genmask 为 0.0.0.0 时表示为默认网关。
 
 当 Gateway 为 =0.0.0.0= 时，说明目标主机和本机在同一网络，可以直接交付，否则需要先将 IP 包转发给 Gateway，由 Gateway 做进一步的转发。（MAC 帧目标为 Gateway，上层 IP 包不变）
 

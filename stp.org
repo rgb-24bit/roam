@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       8D477827-B4AF-40BE-A6E3-368D659E5B04
+:END:
+#+TITLE: STP
+
+STP（Spanning Tree Protocol）是生成树协议的英文缩写，在网络拓扑中可能存在多个交换机互联的情况，比如：
+#+begin_example
+  A <--> B
+  B <--> C
+  C <--> A
+#+end_example
+
+此时，如果交换机遇到广播帧，那么可能会出现 A -> B -> C -> A 的情况，形成环路，而 STP 协议便用于避免这样情况，通过逻辑上剪切掉部分路径，使得有环图变成一棵树。
+

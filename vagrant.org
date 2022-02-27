@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       BC16BADB-80AC-4337-9162-BDBCD7EBE2C4
+:END:
+#+TITLE: Vagrant
+
+Vagrant 有点类似于 [[id:1997781D-9E01-4428-B57F-9E348C4C7906][docker]]，是一个虚拟机管理工具，在电脑上安装了虚拟机软件后，比如 virtualbox 后就可以使用 Vagrant 快速创建虚拟机，比如通过如下命令创建 debian9 虚拟机：
+#+begin_example
+  vagrant init generic/debian9
+  vagrant up
+#+end_example
+
+这样可以免去手动下载系统镜像、配置实例的工作，有些开源项目也使用它作为分布式开发的环境配置。
+
