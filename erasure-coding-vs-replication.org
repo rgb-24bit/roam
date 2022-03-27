@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       6C30BC89-0050-44EA-8795-52359E77493F
+:END:
+#+TITLE: erasure coding vs replication
+
+EC(Erasure Code) 和多副本是在分布式存储系统中常见的数据保护方法，两者的区别：
++ 多副本：一份数据以副本的方式写到多个分布式系统中的存储节点中
++ EC：将 n 份原始数据，增加 m 份数据，并能通过 n+m 份中的任意 n 份数据，还原为原始数据
+
+参考：
++ [[https://oceanstore.cs.berkeley.edu/publications/papers/pdf/erasure_iptps.pdf][Erasure Coding vs. Replication: A Quantitative Comparison]]
++ [[https://bbs.huaweicloud.com/blogs/115216][浅谈EC和多副本-云社区-华为云]]
+

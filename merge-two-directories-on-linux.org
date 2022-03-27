@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       E5D3D6A1-C748-45AC-B7F9-368A8E46B477
+:END:
+#+TITLE: merge two directories on linux
+
+#+begin_example
+rsync -a /path/to/source/ /path/to/destination
+#+end_example
+

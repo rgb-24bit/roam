@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       88207ACA-748B-477D-9485-98BF4125EF5E
+:END:
+#+TITLE: k8s resource quantity
+
+在 [[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 中，资源数量通过 [[https://pkg.go.dev/k8s.io/apimachinery/pkg/api/resource#Quantity][Quantity]] 对象表示，Quantity 是定点数的一种实现，支持多种 Format：
+#+begin_src go
+  const (
+    DecimalExponent = Format("DecimalExponent") // e.g., 12e6
+    BinarySI        = Format("BinarySI")        // e.g., 12Mi (12 * 2^20)
+    DecimalSI       = Format("DecimalSI")       // e.g., 12M  (12 * 10^6)
+  )
+#+end_src
+
+通常，CPU 资源通过 DecimalSI 格式描述，而 Mem 资源通过 BinarySI 格式描述：
++ Quantity 值为 1 时表示 1 个 CPU 核，通常分配资源时会存在分配 0.x 个 CPU 资源的情况，因此 CPU 通常使用 DecimalSI 格式，比如 0.1、100m 之类的
++ Quantity 值为 1 时表示 1 个字节，Mem 资源的分配通常会以 M、G 为单位，因此 Mem 通常使用 BinarySI 格式，比如 1Gi 之类的
+

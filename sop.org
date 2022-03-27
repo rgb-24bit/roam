@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       7C7E3F1C-510F-40FA-84AA-C9DFDC277DAA
+:END:
+#+TITLE: SOP
+
+标准作业程序（SOP，Standard Operating Procedures），将某一事件的标准操作步骤和要求以统一的格式描述出来，用来指导和规范日常的工作。
+

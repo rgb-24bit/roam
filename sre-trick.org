@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       B2D02335-F2A5-40FC-8055-2A35FFE90284
+:END:
+#+TITLE: sre trick
+
+1. 日志清理用 echo > xxx.log，而不是直接 rm
+

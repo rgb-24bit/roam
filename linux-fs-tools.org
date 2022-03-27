@@ -22,7 +22,7 @@
   #+begin_src bash
     # To show cumulative human-readable size:
     du -sh
-    
+
     # To sort directories/files by size(human-readable):
     du -sh * | sort -rh
   #+end_src
@@ -32,21 +32,21 @@
   #+begin_src bash
     # To show all available block devices along with their partitioning schemes:
     lsblk
-    
+
     # To show SCSI devices:
     lsblk --scsi
-    
+
     # To show a specific device:
     lsblk /dev/sda
-    
+
     # To verify TRIM support:
     # Check the values of DISC-GRAN (discard granularity) and DISC-MAX (discard max bytes) columns.
     # Non-zero values indicate TRIM support
     lsblk --discard
-    
+
     # To fetch info about filesystems:
     lsblk --fs
-    
+
     # For JSON, LIST or TREE output formats use the following flags:
     lsblk -J/--json
     lsblk -l/--list
@@ -63,14 +63,28 @@
     I/O size (minimum/optimal): 512 bytes / 512 bytes
     Disklabel type: dos
     Disk identifier: 0xe84cc148
-    
+
     Device     Boot Start      End  Sectors Size Id Type
     /dev/vda1  *     2048 83886046 83883999  40G 83 Linux
-    
-    
+
+
     Disk /dev/vdb: 20 GiB, 21474836480 bytes, 41943040 sectors
     Units: sectors of 1 * 512 = 512 bytes
     Sector size (logical/physical): 512 bytes / 512 bytes
     I/O size (minimum/optimal): 512 bytes / 512 bytes
   #+end_example
 
+* truncate
+  truncate 可用于将文件缩小或扩展到指定的大小。如果文件大于指定的大小，则会丢失额外的数据。如果文件较短，则会对其进行扩展，并且扩展部分的读数为零字节：
+  #+begin_example
+    # To clear the contents from <file>:
+    truncate -s 0 <file>
+
+    # To truncate <file> to 100 bytes:
+    truncate -s 100 <file>
+
+    # To truncate <file> to 100 KB:
+    truncate -s 100K <file>
+
+    # (M, G, T, P, E, Z, and Y may be used in place of "K" as required.)
+  #+end_example

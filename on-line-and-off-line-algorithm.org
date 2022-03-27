@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       C237B1B9-87D2-454D-B03B-32D2A428B889
+:END:
+#+TITLE: on-line and off-line algorithm
+
++ 在线算法：算法不需要知道所有信息，根据输入实时计算得到结果
++ 离线算法：需要在一开始就获得所有输入才能计算得到结果
+

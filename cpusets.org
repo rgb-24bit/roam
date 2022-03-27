@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       D65FCB30-A5E1-45F8-B91B-95A56389E35C
+:END:
+#+TITLE: cpusets
+
+cpusets 可以限制某一组进程只运行在某些 cpu 和内存节点上，可以使用 [[https://github.com/lpechacek/cpuset][cpuset]] 命令来进行创建、查询。
+
+参考：
++ https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
++ [[https://github.com/lpechacek/cpuset/blob/master/doc/tutorial.txt]]
+

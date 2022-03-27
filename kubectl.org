@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       43DB12B9-56D5-4BD9-A5A9-C65AE9A8995E
+:END:
+#+TITLE: kubectl
+
+* 常用资源别名：
+  |------------------------+------------|
+  | Name                   | Short Name |
+  |------------------------+------------|
+  | configmaps             | cm         |
+  | namespaces             | ns         |
+  | nodes                  | no         |
+  | persistentvolumeclaims | pvc        |
+  | persistentvolumes      | pv         |
+  | pods                   | po         |
+  | secrets                |            |
+  | services               | svc        |
+  | daemonsets             | ds         |
+  | deployments            | deploy     |
+  | replicasets            | rs         |
+  | statefulsets           | sts        |
+  | ingresses              | ing        |
+  | storageclasses         | sc         |
+  |------------------------+------------|
+
+  参考：[[https://kubernetes.io/docs/reference/kubectl/#resource-types][Command line tool (kubectl) | Kubernetes]]
+

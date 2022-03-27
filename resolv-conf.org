@@ -8,6 +8,7 @@
   #+begin_example
     nameserver 1.1.1.1
   #+end_example
+
 + *search* 指定当 lookup 的目标不包含域名（点）时用于查询的域名列表，对于下面的例子来说，如果 lookup 目标是 foo，那么会对 foo.a.com、foo.b.com 进行查询：
   #+begin_example
     search a.com b.com
@@ -25,4 +26,6 @@ PS：配置项 *domain* 可以看作是只有单个选项的 *search* 配置，�
   #+begin_quote
   The algorithm used is to try a name server, and if the query times out, try the next, until out of name servers, then repeat trying all the name servers until a maximum number of retries are made.
   #+end_quote
+
+  注：只有在 nameserver 访问失败的情况下才会尝试下一个 nameserver，如果 nameserver 访问成功但返回了结果是解析失败，并不会尝试下一个 nameserver
 

@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       B7190303-7B2A-49EA-9A00-F923877AF05B
+:END:
+#+TITLE: k8s static cpu manager policy
+
+在 [[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 中，可以配置 [[id:ADA2EEB1-271F-445E-9AFC-4AF18F2E2027][kubelet]] 的 CPU 管理策略为 static，该策略下，Pod QoS 等级为 Guaranteed 且请求的 CPU 数为整数时，kubelet 会为 Pod 分配独占的 CPU 资源，其他 Pod 运行时不会被调度到这些 CPU 上。
+
+实现方式，假设机器有 16 个 CPU：
+1. 在 static 策略下 kubelet 使用 [[id:D65FCB30-A5E1-45F8-B91B-95A56389E35C][cpusets]] 来管理 cpu 的分配，默认情况下所有 pod 都运行在 0-15 这个 cpuset 下[fn:1]
+   #+begin_example
+     {"policyName":"static","defaultCpuSet":"0-15","entries":{},"checksum":1430007553}  # /var/lib/kubelet/cpu_manager_state
+   #+end_example
+
+2. 分配独占 cpu 后，独占 cpu 的 pod 会绑定包含独占 cpu 的新 cpuset 上，比如 2-3 之类的，然后剩下的 pod 将运行在 0-1,4-15 这个 cpuset 下
+   #+begin_example
+     {"policyName":"static","defaultCpuSet":"0-1,4-15","entries":{"f48c5678-48ba-4ae3-a2da-345dc6fb63e6":{"pods-simple-container":"2-3"}},"checksum":1430007553}
+   #+end_example
+
+这样依赖，拥有独占 CPU 的 pod 会运行在单独的 cpuset 中，和其他 pod 的 cpuset 分开，确保独占 CPU 的 pod 运行不备干扰。
+
+PS：但是看实际的 cpuset 会发现 k8s 的 cpuset 没有设置 exclusive 标志，也就是说操作系统进程还是可能调度到独占 cpu 上([[https://github.com/kubernetes/kubernetes/issues/87249][issue-87249]])：
+#+begin_example
+  # cset set -l
+  cset:
+           Name       CPUs-X    MEMs-X Tasks Subs Path
+   ------------ ---------- - ------- - ----- ---- ----------
+           root       0-15 y       0 y   970    2 /
+       kubepods       0-15 n       0 n     0    4 /kubepods
+        systemd       0-15 n       0 n     0    1 /systemd
+#+end_example
+
+参考：[[https://kubernetes.io/zh/docs/tasks/administer-cluster/cpu-management-policies/][控制节点上的 CPU 管理策略 | Kubernetes]]
+
+* Footnotes
+
+[fn:1] 预留 cpu 也在 defaultCpuSet 中，只不过调度时 node 可用的 cpu 数会减去预留的

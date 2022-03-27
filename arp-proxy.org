@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       19BBBB0E-4D8B-4172-9D33-D19F32DA97F0
+:END:
+#+TITLE: arp proxy
+
+当 [[id:A9AAD3F1-70A3-4E36-A470-442725B18E96][arp]] 请求中目标 IP 地址不在当前物理网络时，具备 arp proxy 功能的设备可以回答该 arp 请求，代理设备会发起新的 arp 请求到其他物理网络，而代理设备返回的 MAC 地址就是自己的 MAC 地址。
+
+此时，源主机发出的 MAC 帧的目标 MAC 地址就是代理设备的 MAC 地址，代理设备收到后取出 IP 包进行下一次转发。
+

@@ -28,3 +28,6 @@
   + [[https://docs.microsoft.com/en-us/windows-hardware/drivers/network/introduction-to-receive-side-scaling][Introduction to Receive Side Scaling - Windows drivers | Microsoft Docs]]
   + [[https://www.cnblogs.com/whl320124/articles/10083203.html][浅谈NVMe的多队列技术和IO调度 - 海之心1213 - 博客园]]
 
+* al
+  装箱问题和背包问题
+

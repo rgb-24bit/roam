@@ -1,0 +1,75 @@
+:PROPERTIES:
+:ID:       CFC305D9-31C5-4BB4-91FE-1F9C87139F5E
+:END:
+#+TITLE: Calico
+
+* 实现
+  Calico 是常用的一种 [[id:5232D2F4-F982-4D10-8B1E-2AF420FD0097][CNI]] 实现，一开始我以为它的实现会是：
+  1. 通过 [[id:D9857BCF-90F8-4CFC-ABD5-D7D5BD4E56DC][Linux Network Bridge]] 和 [[id:D9857BCF-90F8-4CFC-ABD5-D7D5BD4E56DC][Veth Pair]] 连接 Node 上各个 Pod 的网络
+  2. 通过 [[id:7dbbe653-ae4e-42e6-8976-cee9d6e58878][VXLAN]] 连接不同 Node 之间的网络
+
+  但实际实现上，Calico 并没有使用 Bridge，而是使用了另外的方式来连接 Node 上的 Pod 网络：
+  1. Calico 为每个 Pod 创建了一个 Veth Pair，一端放在 Host Namespace，一端在 Pod Namespace
+  #+begin_example
+    root@node:~# ip link
+    7: vxlan.calico: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UNKNOWN mode DEFAULT group default
+        link/ether 66:8d:0d:bd:bd:a0 brd ff:ff:ff:ff:ff:ff
+    91: cali2953e0ed0cf@if3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue state UP mode DEFAULT group default
+        link/ether ee:ee:ee:ee:ee:ee brd ff:ff:ff:ff:ff:ff link-netnsid 0
+  #+end_example
+
+  2. 设置 Pod Namespace 中默认路由为 169.254.1.1，从 Namespace 内的 Veth 出去
+  #+begin_example
+    root@pod:/# route -n
+    Kernel IP routing table
+    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+    0.0.0.0         169.254.1.1     0.0.0.0         UG    0      0        0 eth0
+    169.254.1.1     0.0.0.0         255.255.255.255 UH    0      0        0 eth0
+  #+end_example
+
+  3. 由于 169.254.1.1 不在当前网段，同时 Calico 为 Veth 开启了 [[id:19BBBB0E-4D8B-4172-9D33-D19F32DA97F0][arp proxy]] 功能，因此，当发往 169.254.1.1 的包会交给 Host Namespace 下的路由转发
+  #+begin_example
+    root@node:~# cat /proc/sys/net/ipv4/conf/cali2953e0ed0cf/proxy_arp
+    1
+  #+end_example
+
+  4. 而 Calico 也早就将当前 Node 上各 Pod 的 IP 写入了 Node 的路由表，这样，发往当前 Node 其他 Pod 的包会直接被转发给该 Pod 在 Host Namespace 的 Veth 端上
+  #+begin_example
+    root@node:~# route -n
+    Kernel IP routing table
+    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+    0.0.0.0         192.168.1.1     0.0.0.0         UG    0      0        0 eth0
+    172.25.80.1     0.0.0.0         255.255.255.255 UH    0      0        0 cali2953e0ed0cf
+    172.25.80.3     0.0.0.0         255.255.255.255 UH    0      0        0 cali15236e67fdf
+    172.25.80.4     0.0.0.0         255.255.255.255 UH    0      0        0 calidabe3f99304
+    172.25.80.5     0.0.0.0         255.255.255.255 UH    0      0        0 cali553d400c685
+    172.25.80.6     0.0.0.0         255.255.255.255 UH    0      0        0 calie3b188bf996
+    172.25.80.7     0.0.0.0         255.255.255.255 UH    0      0        0 cali13506cb9162
+    172.25.80.8     0.0.0.0         255.255.255.255 UH    0      0        0 cali0e7cdac5a72
+    172.25.80.9     0.0.0.0         255.255.255.255 UH    0      0        0 cali1eb9c648dc7
+    172.25.80.10    0.0.0.0         255.255.255.255 UH    0      0        0 calie3d33a381bd
+    172.25.80.11    0.0.0.0         255.255.255.255 UH    0      0        0 cali72bc6ba5255
+  #+end_example
+
+  5. 而其他 Node 的请求会通过本机的 VXLAN Tunnel 发送，[[id:1F10D0CC-5FD8-454B-8010-95E71353C3B7][FDB]] 表也能找到对应的记录
+  #+begin_example
+    root@node:~# route -n
+    Kernel IP routing table
+    Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+    172.17.106.0    172.17.106.0    255.255.255.0   UG    0      0        0 vxlan.calico
+    172.18.141.0    172.18.141.0    255.255.255.0   UG    0      0        0 vxlan.calico
+    172.20.30.0     172.20.30.0     255.255.255.0   UG    0      0        0 vxlan.calico
+    172.24.130.0    172.24.130.0    255.255.255.0   UG    0      0        0 vxlan.calico
+    172.28.221.0    172.28.221.0    255.255.255.0   UG    0      0        0 vxlan.calico
+    
+    root@node:~# bridge fdb
+    66:4a:bf:03:e5:31 dev vxlan.calico dst 192.168.1.247 self permanent
+    66:fe:70:54:93:0c dev vxlan.calico dst 192.168.1.214 self permanent
+    66:ff:7d:9e:13:88 dev vxlan.calico dst 192.168.1.8 self permanent
+    66:cd:13:6f:ac:f5 dev vxlan.calico dst 192.168.1.183 self permanent
+    66:fc:db:06:e2:6c dev vxlan.calico dst 192.168.1.93 self permanent
+    66:eb:56:ef:c0:9d dev vxlan.calico dst 192.168.1.216 self permanent
+  #+end_example
+
+  参考：[[https://cloud.tencent.com/developer/article/1495301][戳穿 Calico 的谎言 - 云+社区 - 腾讯云]]
+
