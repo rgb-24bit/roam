@@ -1,0 +1,132 @@
+:PROPERTIES:
+:ID:       A5110D95-A9E6-4CE3-A9F3-E7601FA5B31A
+:END:
+#+TITLE: k8s scheduler enhancement
+
+[[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 官方提供的 scheduler 扩展手段有 [[https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/1819-scheduler-extender][scheduler extender]] 和 [[https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/624-scheduling-framework][scheduling framework]] 两种。
+
+* scheduler extender
+  scheduler extender 类似 webhook，是一个独立于 scheduler 的 HTTP 服务，扩展点包括 Filter、Prioritize、Bind 和 [[id:D680BA0D-F5F4-46A4-9EAD-76B10B7D5537][Preempt]] 四个，scheduler 在执行到相应的阶段后，会通过 HTTP 调用对应 extender 服务。
+
+  通过 KubeSchedulerConfiguration 配置 extender：
+  #+begin_src yaml
+    apiVersion: kubescheduler.config.k8s.io/v1beta1
+    kind: KubeSchedulerConfiguration
+    extenders:
+    - urlPrefix: "http://127.0.0.1:12345/api/scheduler"  # 服务地址
+      filterVerb: "filter"                               # 扩展点 path
+      preemptVerb: "preempt"
+      prioritizeVerb: "prioritize"
+      bindVerb: "bind"
+      enableHttps: false
+      nodeCacheCapable: false
+      managedResources:
+      - name: opaqueFooResource
+        ignoredByScheduler: true
+      ignorable: false
+  #+end_src
+
+  + 优点：无需改动 scheduler 代码，维护方便，依赖问题少
+  + 缺点：扩展能力有限，需要引入而外的 HTTP 服务
+  
+* scheduler framework
+  scheduler framework 简单的使用方式是和 scheduler 一起编译，将自己实现的 plugin 作为参数传递给 scheduler，并通过配置启用[fn:1]：
+  #+begin_src go
+    import (
+        scheduler "k8s.io/kubernetes/cmd/kube-scheduler/app"
+    )
+    
+    func main() {
+        command := scheduler.NewSchedulerCommand(
+                scheduler.WithPlugin("example-plugin1", ExamplePlugin1),
+                scheduler.WithPlugin("example-plugin2", ExamplePlugin2))
+        if err := command.Execute(); err != nil {
+            fmt.Fprintf(os.Stderr, "%v\n", err)
+            os.Exit(1)
+        }
+    }
+  #+end_src
+
+  通过 KubeSchedulerConfiguration 配置 scheduler：
+  #+begin_src yaml
+    apiVersion: kubescheduler.config.k8s.io/v1beta1
+    kind: KubeSchedulerConfiguration
+    leaderElection:
+      leaderElect: false
+      profiles:
+        - schedulerName: xxx-scheduler"
+          plugins:
+            preFilter:
+              enabled:
+                - name: "example-plugin1"
+  #+end_src
+
+* KubeSchedulerConfiguration
+  KubeSchedulerConfiguration 可以通过 configMap 来使用：
+  #+begin_src yaml
+    ---
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: scheduler-config
+      namespace: kube-system
+    data:
+      scheduler-config.yaml: |
+        apiVersion: kubescheduler.config.k8s.io/v1beta1
+        kind: KubeSchedulerConfiguration
+        leaderElection:
+          leaderElect: false
+        profiles:
+          - schedulerName: "foo-scheduler"
+            plugins:
+              preFilter:
+                enabled:
+                - name: "foo"
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: foo-scheduler
+      namespace: kube-system
+      labels:
+        component: foo-scheduler
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          component: foo-scheduler
+      template:
+        metadata:
+          labels:
+            component: foo-scheduler
+        spec:
+          volumes:
+            - name: scheduler-config
+              configMap:
+                name: scheduler-config
+          containers:
+            - name: scheduler-ctrl
+              image: docker-registry.infcs.tob/foo-scheduler:v1
+              imagePullPolicy: IfNotPresent
+              args:
+                - foo-scheduler
+                - --config=/etc/kubernetes/scheduler-config.yaml
+                - --v=3
+              resources:
+                requests:
+                  cpu: "50m"
+              volumeMounts:
+                - name: scheduler-config
+                  mountPath: /etc/kubernetes
+    
+  #+end_src
+
+* reference
+  + [[https://www.qikqiak.com/post/custom-kube-scheduler/#%E8%B0%83%E5%BA%A6%E6%A1%86%E6%9E%B6][自定义 Kubernetes 调度器-阳明的博客]]
+  + [[https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/624-scheduling-framework][scheduling framework]]
+  + [[https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/1819-scheduler-extender][scheduler extender]]
+
+* Footnotes
+
+[fn:1] https://github.com/kubernetes/enhancements/tree/master/keps/sig-scheduling/624-scheduling-framework#use-cases 
+

@@ -2,9 +2,32 @@
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#m03][M03]]
+- [[#m04][M04]]
 
 * M03
   ☞ [[http://icyfenix.cn/immutable-infrastructure/network/linux-vnet.html][Linux 网络虚拟化 | 凤凰架构]]
 
  这篇文章在我 Chrome Net 组中待了有一段时间了，买了本 《Kubernetes 网络权威指南》，不时对照着看，不得你说这篇文章写的真的好，从 underlay 到 overlay，一条线梳理下来能够清晰不少。 
+
+* M04
+  ☞ [[https://help.aliyun.com/document_detail/412172.html][动态资源超卖]]
+
+  1) 针对 QoS 等级为 BestEffort 的 Pod，通过统计 Node 实际资源使用率计算得到可动态超卖的资源量
+  2) 这部分 Pod 本身就会被随意调度，这种设计下可以让调度更和里，同时可动态超卖的资源量是通过自定义资源来描述的，定义 Pod 时不影响 QoS 等级
+  3) 就是需要自定义 Scheduler
+
+  -----
+
+  ☞ [[https://news.ycombinator.com/item?id=30903940][25+ years of personal knowledge management | Hacker News]]
+
+  #+begin_quote
+  - Do NOT migrate to new tools, even if they are really shiny and popular.
+  - Try search instead of organisation.
+  - Use fewer services, even if they are not the best tools for the job.
+  #+end_quote 
+
+  之前自己的笔记就从树状的目录结构迁移到了 roam 平铺图状结构，感受：
+  1) 迁移成本很高，之前的笔记太多了，不可能一次性迁移完成，目前状态还处于 copy on usage
+  2) “搜索” 的体感比 “组织” 要好很多
+  3) 将所有笔记放在了 roam 中，比之前分散在几个地方要舒服，不用纠结到底放在什么地方了
 

@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       72314C9D-CC46-4F5E-8692-A39E84A4ACF6
+:END:
+#+TITLE: nslookup
+
+nslookup 会忽略 =/etc/hosts= 只用 =/etc/resolv.conf= 中配置的 nameserver 进行解析。
+

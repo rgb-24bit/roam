@@ -1,0 +1,146 @@
+:PROPERTIES:
+:ID:       C570A012-F42D-4995-A0F3-6F2628EAD089
+:END:
+#+TITLE: go1.18 generics implementation
+
+在常见的[[id:C77D25C3-3AB9-4A41-BE97-C6BD09998A1F][泛型实现]]中，通常有两个选择：
+1. 单态（monomorphization），为每个类型生成一份代码，优点是没有运行时成本，但会带来较大的编译成本和代码膨胀问题，Rust、C++ 采用的这种实现
+2. 装箱（boxing），所有类型共享一份代码，优点是编译器实现简单，但会带来运行时开销，Java 采用的这种实现
+
+go1.18 的泛型实现介于两种实现方式之间，不为每个类型生成代码，而是通过 gcshape 对类型分组，为每个 gcshape 生成一份代码，均衡了编译时和运行时成本。其中，具有相同 underlying type 的类型属于同一个 gcshape，而所有指针也属于同一个 gcshape。
+
+运行时成本主要在指针类型上，因为所有指针类型共享一份代码，go 编译器实现时会使用 =*uint8= 作为这份代码的参数，如果需要调用对象的方法，需要通过这个指针进行两次间接寻址找到对应的函数指针：
+#+begin_src go
+  package main
+  
+  import (
+    "bytes"
+    "io"
+    "math/rand"
+  )
+  
+  //go:noinline
+  func WithGeneric[T io.Writer](a, b T) T {
+    if rand.Int()%7 == 0 {
+      _, _ = a.Write(nil)
+      return a
+    }
+    return b
+  }
+  
+  //go:noinline
+  func WithInterface(a, b io.Writer) io.Writer {
+    if rand.Int()%7 == 0 {
+      _, _ = a.Write(nil)
+      return a
+    }
+    return b
+  }
+  
+  //go:noinline
+  func WithType(a, b *bytes.Buffer) *bytes.Buffer {
+    if rand.Int()%7 == 0 {
+      return a
+    }
+    return b
+  }
+  
+  func main() {
+    var a, b bytes.Buffer
+  
+    println(WithGeneric(&a, &b))
+    println(WithInterface(&a, &b))
+    println(WithType(&a, &b))
+  }
+#+end_src
+
+上面代码调用 Write 方法生成的汇编代码[fn:1]：
+#+begin_example
+  # WithGeneric
+          MOVQ    ""..dict+56(SP), DX
+          PCDATA  $0, $-1
+          MOVQ    16(DX), DX
+          MOVQ    24(DX), DX
+          MOVQ    "".a+64(SP), AX
+          XORL    BX, BX
+          XORL    CX, CX
+          MOVQ    CX, DI
+          PCDATA  $1, $2
+          CALL    DX
+  # WithInterface
+          MOVQ    "".a+48(SP), DX
+          MOVQ    24(DX), SI
+          MOVQ    "".a+56(SP), AX
+          XORL    BX, BX
+          XORL    CX, CX
+          MOVQ    CX, DI
+          PCDATA  $1, $1
+          CALL    SI
+  # WithType
+          MOVQ    ""..autotmp_5+32(SP), AX
+          XORL    BX, BX
+          XORL    CX, CX
+          MOVQ    CX, DI
+          PCDATA  $1, $2
+          NOP
+          CALL    bytes.(*Buffer).Write(SB)
+#+end_example
+
+可以看到，指令数量上泛型 > interface > 具体类型。
+
+另外就是泛型参数的传递、返回和泛型函数的调用：
+#+begin_src go
+  package main
+  
+  //go:noinline
+  func Square(x int) int {
+      return x
+  }
+  
+  //go:noinline
+  func SquareT[T ~int8|~int16|~int32|~int64|~int](x T) T {
+      return x
+  }
+  
+  
+  func main() {
+      SquareT(2)
+      Square(2)
+  }
+#+end_src
+
+上面代码生成的汇编代码[fn:2]：
+#+begin_example
+  # Square
+          TEXT    "".Square(SB), NOSPLIT|ABIInternal, $0-8
+          RET
+  # SquareT[int]
+          TEXT    "".SquareT[%2eshape.int_0](SB), DUPOK|NOSPLIT|ABIInternal, $0-16
+          MOVQ    BX, AX
+          RET
+  # main
+          LEAQ    ""..dict.SquareT[int](SB), AX
+          MOVL    $2, BX
+          PCDATA  $1, $0
+          CALL    "".SquareT[%2eshape.int_0](SB)
+  
+          MOVL    $2, AX
+          CALL    "".Square(SB)
+#+end_example
+
+可以看到，泛型函数的传参、返回和调用，相较于具体类型，会多出一个对 AX 寄存器的操作。
+
+但整体来看，go 泛型的运行时消耗还是很小的，可以和使用具体类型比，比 interface{} + 断言好很多，因此，对于容器数据结构或其他一些场景来说，完全可以考虑使用泛型代替 interface + 断言，还能带来性能提升。
+
+参考：
++ [[https://github.com/golang/proposal/blob/master/design/generics-implementation-dictionaries-go1.18.md][Go 1.18 Implementation of Generics via Dictionaries and Gcshape Stenciling]]
++ [[https://github.com/golang/proposal/blob/master/design/generics-implementation-gcshape.md][Generics implementation - GC Shape Stenciling]]
++ [[https://github.com/golang/proposal/blob/master/design/generics-implementation-dictionaries.md][Generics implementation - Dictionaries]]
++ [[https://github.com/golang/proposal/blob/master/design/generics-implementation-stenciling.md][Generics implementation - Stenciling]]
++ [[https://planetscale.com/blog/generics-can-make-your-go-code-slower][Generics can make your Go code slower]]
+
+* Footnotes
+[fn:1] https://godbolt.org/z/7eTvY1v1v 
+
+[fn:2] https://godbolt.org/z/3WEdrYzaM
+

@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       974FBDCE-2FD7-423A-BE05-C3BB37BC18B1
+:END:
+#+TITLE: awk
+
+打印第 N 列：
+#+begin_example
+  awk '{print $N}'
+#+end_example
+
+打印最后一列：
+#+begin_example
+  awk '{print $NF}'
+#+end_example
+
+指定分隔符：
+#+begin_example
+  awk -F <ch> '{print $N}'
+#+end_example
+

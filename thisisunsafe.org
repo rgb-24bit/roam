@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       1333A42F-314B-42DC-875F-70C4FFC97CD5
+:END:
+#+TITLE: thisisunsafe
+
+提示不安全的 https 网页，Chrome 没有提供继续访问选项的情况下，可以点击空白处输入 =thisisunsafe= 继续访问。
+

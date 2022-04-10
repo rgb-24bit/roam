@@ -3,8 +3,6 @@
 :END:
 #+TITLE: golang generics
 
-+ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
-
 #+begin_quote
 + Functions can have an additional type parameter list that uses square brackets but otherwise looks like an ordinary parameter list: func F[T any](p T) { ... }.
 + These type parameters can be used by the regular parameters and in the function body.
@@ -21,7 +19,7 @@
 + Type inference permits omitting the type arguments of a function call in common cases.
 #+end_quote
 
-golang 选择了通过 =[]= 来标识类型参数，避免使用 =<>= 时遇到类似 [[id:43FA198D-C667-4723-8A44-67AF5D743A83][rust bastion of the turbofish]] 的问题：
+[[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]] 选择了通过 =[]= 来标识类型参数，避免使用 =<>= 时遇到类似 [[id:43FA198D-C667-4723-8A44-67AF5D743A83][rust bastion of the turbofish]] 的问题：
 #+begin_src go
   type M[T any] []T
   func F[T Constraint](p T) { ... }
@@ -30,8 +28,6 @@ golang 选择了通过 =[]= 来标识类型参数，避免使用 =<>= 时遇到�
 内置 Constraint：
 + any 任意类型
 + comparable 支持 ==== 和 =!== 操作的类型
-
-目前泛型实现存在运行时消耗，可以用来替换原有代码中使用 interface{} 的场景，不建议在算法/数据结构库中使用。
 
 参考：[[https://go.googlesource.com/proposal/+/refs/heads/master/design/43651-type-parameters.md][Type Parameters Proposal]]
 
