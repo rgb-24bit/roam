@@ -1,7 +1,7 @@
 :PROPERTIES:
 :ID:       43DB12B9-56D5-4BD9-A5A9-C65AE9A8995E
 :END:
-#+TITLE: kubectl
+#+TITLE: k8s resource alias
 
 * 常用资源别名：
   |------------------------+------------|

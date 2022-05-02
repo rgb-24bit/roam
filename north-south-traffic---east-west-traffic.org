@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       DEF96B63-CB0B-4B8D-9000-0321B2883236
+:ROAM_ALIASES: 南北向流量和东西向流量
+:END:
+#+TITLE: NORTH-SOUTH traffic & EAST-WEST traffic
+
+南北流量（NORTH-SOUTH traffic）和东西流量（EAST-WEST traffic）是数据中心环境中的网络流量模式，而这种叫法是根据网络架构图的惯例来的。
+
+网络架构图一般是将客户端放在顶端，服务端放在底端，从地图上看，上北下南，所以从客户端到服务端的流量就是南北流量，即 client-server 之间的流量。
+
+而服务端因为属于同样角色，会画在相同逻辑组内，从地图上看，左西右东，所以在一个数据中心或数据中心之间，服务端与服务端之间的流量是东西流量，即 server-server 之间的流量。
+
+参考：[[https://www.zhihu.com/question/268635163/answer/1880057009][网络中的东西向和南北向是什么意思呀？有什么区别？ - 看山的回答 - 知乎]]
+

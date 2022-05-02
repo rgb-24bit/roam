@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       1234EEA0-34E0-4E1C-B159-990BE578A5CC
+:END:
+#+TITLE: k8s device plugins
+
+[[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 提供了一个 device plugin 框架，可以通过编写 device plugin 将系统硬件资源发布到 [[id:ADA2EEB1-271F-445E-9AFC-4AF18F2E2027][kubelet]]，比如 GPU。
+
+使用上，device plugin 适用于 *标量* 类型的资源，资源 ResourceName 需要遵循[[https://kubernetes.io/zh/docs/concepts/configuration/manage-resources-containers/#extended-resources][扩展资源命名方案]]，这样，对于标量类型的资源，[[id:91E3CB27-D311-4378-A5B8-EED73B0E7FEC][k8s scheduler]] 能够自动识别分配。
+
+相关逻辑可以在 [[https://github.com/kubernetes/kubernetes/blob/v1.23.6/pkg/apis/core/v1/helper/helpers.go#L36]] 找到。
+
+参考：[[https://kubernetes.io/zh/docs/concepts/extend-kubernetes/compute-storage-net/device-plugins/][设备插件 | Kubernetes]]
+

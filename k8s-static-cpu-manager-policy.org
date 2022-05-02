@@ -31,6 +31,24 @@ PS：但是看实际的 cpuset 会发现 k8s 的 cpuset 没有设置 exclusive �
 
 参考：[[https://kubernetes.io/zh/docs/tasks/administer-cluster/cpu-management-policies/][控制节点上的 CPU 管理策略 | Kubernetes]]
 
+* 切换策略
+  从 static 切到 none，或者从 none 切到 static 需要遵循如下步骤：
+  #+begin_quote
+  Since the CPU manger policy can only be applied when kubelet spawns new pods, simply changing from "none" to "static" won't apply to existing pods. So in order to properly change the CPU manager policy on a node, perform the following steps:
+  1. Drain the node.
+  2. Stop kubelet.
+  3. Remove the old CPU manager state file. The path to this file is /var/lib/kubelet/cpu_manager_state by default. This clears the state maintained by the CPUManager so that the cpu-sets set up by the new policy won’t conflict with it.
+  4. Edit the kubelet configuration to change the CPU manager policy to the desired value.
+  5. Start kubelet.
+  #+end_quote
+
+  如果不删除 =/var/lib/kubelet/cpu_manager_state= 会导致 kubelet 启动失败：
+  #+begin_example
+    could not restore state from checkpoint: configured policy "static" differs from state checkpoint policy "none", please drain this node and delete the CPU manager checkpoint file "/var/lib/kubelet/cpu_manager_state" before restarting Kubelet
+  #+end_example
+
+  参考：[[https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/#changing-the-cpu-manager-policy][Control CPU Management Policies on the Node | Kubernetes]]
+
 * Footnotes
 
 [fn:1] 预留 cpu 也在 defaultCpuSet 中，只不过调度时 node 可用的 cpu 数会减去预留的

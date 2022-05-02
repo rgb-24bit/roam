@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       91E3CB27-D311-4378-A5B8-EED73B0E7FEC
+:END:
+#+TITLE: k8s scheduler
+
+
+

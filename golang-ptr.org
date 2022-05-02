@@ -1,0 +1,43 @@
+:PROPERTIES:
+:ID:       7F85E2A6-40F4-4A8E-92EE-E250D2E8864C
+:END:
+#+TITLE: golang ptr
+
+在 golang 中存在有三种指针类型：
+|----------------+--------------------------------------------------------------------+--------------------------------|
+| 指针类型       | 解释                                                               | 常用场景                       |
+|----------------+--------------------------------------------------------------------+--------------------------------|
+| *T             | 指向 T 类型对象的指针                                              | -                              |
+| uintptr        | 本质上是一个无符号的整型，长度和平台相关，可以用来保存一个指针地址 | 指针运算                       |
+| unsafe.Pointer | 由 unsafe 包提供的指针，可以指向任意类型的指针                     | 用于不同类型的指针进行互相转换 |
+|----------------+--------------------------------------------------------------------+--------------------------------|
+
+其中，uintptr 并不安全，其本质上只是一个整数值，当一个变量被移动，所有的保存改变量旧地址的指针必须同时被更新为变量移动后的新地址。从垃圾收集器的视角来看，一个 unsafe.Pointer 是一个指向变量的指针，
+因此当变量被移动时对应的指针也会被更新，但是 uintptr 类型的临时变量只是一个普通的数字，所以其值不会被改变。
+
+指针间的转换规则：
+#+begin_quote
+- A pointer value of any type can be converted to a Pointer.
+- A Pointer can be converted to a pointer value of any type.
+- A uintptr can be converted to a Pointer.
+- A Pointer can be converted to a uintptr.
+#+end_quote
+
+虽然可以直接转换，但一般需要遵循以下约定来确保转换是安全的：
++ 通过 unsafe.Pointer 来完成 *T1 到 *T2 的强制转换，要求 T2 占用内存不大于 T1 同时 T1 和 T2 拥有相同的内存布局。
+  
+  这在部分[[id:76FFA82E-1EC8-40A0-8C79-56E030F17B9A][类型转换]]和需要获取结构 private 字段时挺有用的。
+
++ 转换 unsafe.Pointer 为 uintptr，但不能转换回来，因为转换为 uintptr 可能因为 GC 的原因导致 uintptr 的值已经失效。
+
++ 转换 unsafe.Pointer 为 uintptr 后，经过指针运算转换回 unsafe.Pointer，但注意不要使用临时变量保存 uintptr 值 
+  #+begin_src go
+    p = unsafe.Pointer(uintptr(p) + offset)
+  #+end_src
+
++ 转换 reflect.Value.Pointer 或 reflect.Value.UnsafeAddr 返回值为 unsafe.Pointer
+
++ 转换 unsafe.Pointer 为 reflect.SliceHeader 或 reflect.StringHeader
+
+参考：[[https://pkg.go.dev/unsafe#Pointer][unsafe#Pointer]]。
+

@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       A01B7799-64E6-45F5-A713-365ED76CC658
+:END:
+#+TITLE: tmux
+
+tmux 是一个终端复用器，由 session > window > pane 三层组成，使得可以在单个终端中管理复数的命令窗口：
+#+HTML: <img src="http://louiszhai.github.io/docImages/tmux01.png">
+
+配置参考：
++ Emacs 键位绑定 [[https://github.com/zhammer/hmux][zhammer/hmux]]
++ 美化 [[https://github.com/gpakosz/.tmux/tree/9a2387c0c7aa8d12cff06d6be17251e8ebdfd034][gpakosz/.tmux]]
+
+教程参考：[[http://louiszhai.github.io/2017/09/30/tmux/#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5][Tmux使用手册 | louis blog]]
+

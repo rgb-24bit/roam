@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       76FFA82E-1EC8-40A0-8C79-56E030F17B9A
+:END:
+#+TITLE: golang type conversions
+
+当两个结构体忽略 tag 后拥有相同的底层类型，那么就可以进行显示类型转换：
+#+begin_quote
+A non-constant value x can be converted to type T in any of these cases:
++ ignoring struct tags (see below), x's type and T have identical underlying types.
++ ignoring struct tags (see below), x's type and T are pointer types that are not defined types, and their pointer base types have identical underlying types.
+#+end_quote
+
+参考：[[https://golang.org/ref/spec#Conversions][Conversions ¶]]
+

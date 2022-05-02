@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       AA871FD8-7906-41C2-B287-262C4B2B98FB
+:END:
+#+TITLE: LVM
+
+逻辑卷管理（Logical Volume Manager，LVM）是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 内核中的一个硬盘系统工具，LVM 可以在物理硬盘的基础上创建和管理「逻辑卷」，而不是直接使用物理硬盘：
+#+HTML: <img src="https://img.linux.net.cn/data/attachment/album/201406/18/134408sa12dauefffyszfg.jpg">
+
+一个或多个物理卷可以用来创建卷组（VG）。然后基于卷组可以创建逻辑卷（LV）。只要在卷组中有可用空间，就可以随心所欲的创建逻辑卷。文件系统就可以在逻辑卷上创建，然后可以在操作系统挂载和访问。
+
+参考：[[https://linux.cn/article-3218-1.html][系统运维|Linux LVM 简明教程]]
+

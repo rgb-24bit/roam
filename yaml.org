@@ -1,0 +1,39 @@
+:PROPERTIES:
+:ID:       3EA55BDE-DC38-4445-A1F4-D3956740A5E8
+:END:
+#+TITLE: yaml
+
+* Anchors
+  在 yaml 中可以使用 =&= 创建锚点，然后使用 =*= 引用锚点，就像指针的引用和解引用一样：
+  #+begin_src yaml
+    left hand: &A
+      name: The Bastard Sword of Eowyn
+      weight: 30
+    right hand: *A
+  #+end_src
+
+* Tags
+  #+begin_quote
+  A Schema is the connection between Tags in YAML and Classes / data types in the programming language.
+  #+end_quote
+
+  简单来说 yaml 配置文件的内容到实际的编程语言中的类型/数据是通过 Tags 来标注的，这个 Tags 默认情况下是缺省的，但也可以指定。
+
+  对应到 yaml 解析库，可以自己实现 tags 来解析 yaml 到自己想要的类型。
+
+  比如在 pyyaml 中可以通过如下代码定义一个 =join!= tag 来 join array：
+  #+begin_src python
+    class StringConcatinator(yaml.YAMLObject):
+        yaml_loader = yaml.FullLoader
+        yaml_tag = '!join'
+        @classmethod
+        def from_yaml(cls, loader, node):
+            return functools.reduce(lambda a, b: a.value + b.value, node.value)
+  #+end_src
+
+  #+begin_src yaml
+    arr: !join [ "a", "b" ]
+  #+end_src
+
+  参考：[[http://blogs.perl.org/users/tinita/2018/01/introduction-to-yaml-schemas-and-tags.html][Introduction to YAML Schemas and Tags | tinita [blogs.perl.org]]]
+
