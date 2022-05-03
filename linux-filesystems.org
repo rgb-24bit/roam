@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       2B12BF08-5425-4A54-B91C-03367CE557BB
+:END:
+#+TITLE: linux filesystems
+
++ [[https://www.kernel.org/doc/Documentation/filesystems/][Index of /doc/Documentation/filesystems/]]
+

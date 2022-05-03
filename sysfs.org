@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       503DA51A-5562-4DF3-A2AE-6CF2045121DD
+:ROAM_REFS: https://www.kernel.org/doc/Documentation/filesystems/sysfs.txt
+:END:
+#+TITLE: sysfs
+
+sysfs 是 [[id:2B12BF08-5425-4A54-B91C-03367CE557BB][linux filesystems]] 之一，用于导出 [[id:CF2D0847-D434-47AB-8DFA-1265BABC539B][linux kernal objects]]，当内核对象注册到系统后，会自动在 =/sys= 下创建对应的目录。新目录属于内核对象父对象的一个子目录，整体目录结构为：
+#+begin_example
+  sys -> root kobject(Top-level directories) -> sub kobject
+#+end_example
+
+内核对象的 *属性* 作为 *文件* 导出在内核对象自己的目录下，每个属性文件为 ASCII text files，同时每个文件只有一个值：
+#+begin_example
+  sys -···> kobject directory -> attribute 
+#+end_example
+
+可以通过读写 attribute 文件来查看/修改内核对象的配置。
+
+* Top Level Directory Layout
+  + devices ::
+    devices 目录通过目录树表示 device tree 的结构。
+
+  + bus ::
+    包含各种 bus 类型的内核对象，每个 bus 对象目录包含两个子目录：
+    - devices 包含指向位于根目录 =/= 下的每个设备文件的符号链接
+    - drivers 包含每个设备已加载的设备驱动
+
+  + fs ::
+    包含部分文件系统，如果文件系统需要导出属性必然会在 fs 下面创建属性文件，如果不导出就不一定了。
+
+  + dev :: 
+    包含 =char/= 和 =block/= 两个子目录，目录下符号链接名称格式为 =<major>:<minor>=, 符号链接指向 =/sys/devices= 目录下的设备文件，方便快速查看。
+

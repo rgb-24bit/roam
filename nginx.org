@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       624D7486-A450-4C49-8D5F-560E630A9EEA
+:END:
+#+TITLE: nginx
+
+* add_header & proxy_set_header
+  指令 add_header 可以为响应添加 header，比如 [[id:1B3D8120-685F-4E60-9746-F459A159E79B][cors]] 场景添加允许跨域的 header：
+  #+begin_src conf
+    add_header 'Access-Control-Allow-Origin' '*';
+    add_header 'Access-Control-Allow-Headers' 'X-Requested-With';
+    add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS'
+    if ($request_method = 'OPTIONS') {
+      add_header 'Access-Control-Max-Age' 2592000;
+      add_header 'Content-Type' 'text/plain; charset=utf-8';
+      add_header 'Content-Length' 0;
+      return 204;
+    }
+  #+end_src
+
+  proxy_add_header 可以为请求添加 header 传递给上游服务器，比如标识真实 IP：
+  #+begin_src conf
+    proxy_set_header X-Real-IP $remote_addr;
+  #+end_src
+

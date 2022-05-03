@@ -1,0 +1,74 @@
+:PROPERTIES:
+:ID:       C0D25E50-1674-4C44-9517-EDCBAF04027F
+:ROAM_REFS: https://www.kernel.org/doc/Documentation/filesystems/proc.txt
+:END:
+#+TITLE: procfs
+
+procfs 是 [[id:2B12BF08-5425-4A54-B91C-03367CE557BB][linux filesystems]] 之一，用于充当文件系统到内核 *内部数据结构* 的接口，可用于获取有关系统的信息并更改运行时的某些内核参数。
+
+=/proc= 目录下大体可以分为两类：
++ =/proc/PID/xxx= - 特定于某进程的数据，当前进程 PID 可以使用 =self= 表示
++ =/proc/xxx= - 内核相关的数据
+
+* /proc/pid/environ
+  这个文件中会记录对应 =pid= 进程启动时的环境变量配置，通过 ='\0'= 分隔，可以通过如下命令切分：
+  #+begin_example
+    $ cat /proc/1/environ | tr '\000' '\n'
+    $ or
+    $ xargs -0 -L1 -a /proc/1/environ
+  #+end_example
+
+  注意：进程在运行时修改的环境变量不会在这个文件中体现。
+
+* kernel data
+  #+begin_example
+    ..............................................................................
+     File        Content                                           
+     apm         Advanced power management info                    
+     buddyinfo   Kernel memory allocator information (see text)	(2.5)
+     bus         Directory containing bus specific information     
+     cmdline     Kernel command line                               
+     cpuinfo     Info about the CPU                                
+     devices     Available devices (block and character)           
+     dma         Used DMS channels                                 
+     filesystems Supported filesystems                             
+     driver	     Various drivers grouped here, currently rtc (2.4)
+     execdomains Execdomains, related to security			(2.4)
+     fb	     Frame Buffer devices				(2.4)
+     fs	     File system parameters, currently nfs/exports	(2.4)
+     ide         Directory containing info about the IDE subsystem 
+     interrupts  Interrupt usage                                   
+     iomem	     Memory map						(2.4)
+     ioports     I/O port usage                                    
+     irq	     Masks for irq to cpu affinity			(2.4)(smp?)
+     isapnp	     ISA PnP (Plug&Play) Info				(2.4)
+     kcore       Kernel core image (can be ELF or A.OUT(deprecated in 2.4))   
+     kmsg        Kernel messages                                   
+     ksyms       Kernel symbol table                               
+     loadavg     Load average of last 1, 5 & 15 minutes                
+     locks       Kernel locks                                      
+     meminfo     Memory info                                       
+     misc        Miscellaneous                                     
+     modules     List of loaded modules                            
+     mounts      Mounted filesystems                               
+     net         Networking info (see text)                        
+     pagetypeinfo Additional page allocator information (see text)  (2.5)
+     partitions  Table of partitions known to the system           
+     pci	     Deprecated info of PCI bus (new way -> /proc/bus/pci/,
+                 decoupled by lspci					(2.4)
+     rtc         Real time clock                                   
+     scsi        SCSI info (see text)                              
+     slabinfo    Slab pool info                                    
+     softirqs    softirq usage
+     stat        Overall statistics                                
+     swaps       Swap space utilization                            
+     sys         See chapter 2                                     
+     sysvipc     Info of SysVIPC Resources (msg, sem, shm)		(2.4)
+     tty	     Info of tty drivers
+     uptime      Wall clock since boot, combined idle time of all cpus
+     version     Kernel version                                    
+     video	     bttv info of video resources			(2.4)
+     vmallocinfo Show vmalloced areas
+    ..............................................................................
+  #+end_example
+

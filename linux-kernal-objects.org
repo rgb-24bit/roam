@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       CF2D0847-D434-47AB-8DFA-1265BABC539B
+:END:
+#+TITLE: linux kernal objects
+
++ [[https://www.kernel.org/doc/Documentation/kobject.txt][Everything you never wanted to know about kobjects, ksets, and ktypes]]
+

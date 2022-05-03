@@ -1,0 +1,34 @@
+:PROPERTIES:
+:ID:       D7543A46-216B-46D8-90C4-76E241D86304
+:END:
+#+TITLE: lscpu
+
+lscpu 从 =/proc/cpuinfo= 收集 cpu 体系结构信息，再以易读的格式输出，输出格式为：
+#+begin_example
+  Architecture:        # 架构
+  CPU op-mode(s):      # CPU 运行模式
+  Byte Order:          # 字节序
+  CPU(s):              # 逻辑 CPU 颗数
+  On-line CPU(s) list: # 在线 CPU 列表
+  Thread(s) per core:  # 每个核的超线程数
+  Core(s) per socket:  # 每颗物理 CPU 核数
+  CPU socket(s):       # 物理 CPU 数
+  NUMA node(s):        # NUMA 节点
+  Vendor ID:           # CPU 厂商 ID
+  CPU family:          # CPU 系列
+  Model:               # 型号
+  Model name:          # 型号名称
+  Stepping:            # 步进
+  CPU MHz:             # CPU 主频
+  CPU max MHz:         # CPU 最大主频
+  CPU min MHz:         # CPU 最小主频
+  Virtualization:      # CPU 支持的虚拟化技术
+  L1d cache:           # 一级缓存（CPU 的 L1 数据缓存）
+  L1i cache:           # 一级缓存（CPU 的 L1 指令缓存）
+  L2 cache:            # 二级缓存
+  ...
+#+end_example
+
+#+begin_example
+  逻辑 CPU 数 = 物理 CPU 数 * 每颗物理 CPU 核数 * 每个核的超线程数
+#+end_example
