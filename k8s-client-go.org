@@ -13,7 +13,8 @@
   + =DynamicClient= 可以获取任意 k8s 资源，但这里更多的是针对 CRD 使用，内置已有 ClientSet
   + =DiscoveryClient= 可以访问 apiserver 查看目前 apiserver 中有哪些资源类型
 
-  #+HTML: <img src="//www.plantuml.com/plantuml/png/SoWkIImgAStDuU9ApaaiBbO8SWqESSx9JCqhWGf0EC6fCBvBPLvYRcOoYXgNpEBa_BBKeageA1TSauAkhXsocSYwCIJXnc2Nvd98pKi1EXK0">
+  # //www.plantuml.com/plantuml/png/SoWkIImgAStDuU9ApaaiBbO8SWqESSx9JCqhWGf0EC6fCBvBPLvYRcOoYXgNpEBa_BBKeageA1TSauAkhXsocSYwCIJXnc2Nvd98pKi1EXK0
+  #+HTML: <img src="https://user-images.githubusercontent.com/26481411/167287189-50dbcaf5-5cb9-4ad7-89c7-e4be00cd24d1.png">
 
 * Informer
   Informer 主要基于 apiserver 提供的 *watch* 能力，通过 watch 方式和 apiserver 建立连接后，apiserver 在发现 watch 的资源变动后，会向该连接写入对应的变更事件，Informer 便可以根据变更时间执行相应的操作。
@@ -148,7 +149,8 @@
        
      #+end_src
 
-  #+HTML: <img src="//www.plantuml.com/plantuml/png/ZPD1Zzem48Nl_XK-WbJAtQgghUYY8bMYXLOzU-s1PDUne_6aknNYlzSx12SkQLK48lAyUHv_pxcBf96wnebMcoTz16bS3PuMnx14Y2HFGiYqfcEKk_lzjnLNqwfCdn-QJ3MRo-VN_xSRJu07RI3LpaAaxwqbXU3YqcXJ0NlKrnxvkOxfaHq1_yE_QDv131qQkFy9dZvfRrtssFeFrix2m-CWFvtdVUbxQpN1B3YxVNXy8pqyRwU57y41mPJDEVsAMVOK48gLZRVm0YZXXS3Rs2kI99DDzgJNc_LMrathe05F8nbh61036Md-JctTUQDaOhTuFuqlXme71uR2jTkD7TMmAo2NOrA2oeUKSjVvsRoqN0LF6DoGmTSEkelwTAZ1sRFyWi50Z4g-8kKX0J5WwPWDOwKHB6FS-4F01d04uL_frnVqwfe1Bruap3psEuqkgsxhHfkgze2_bktJSSdu_hYj6MQ_JngXSxIgj4_8torCUf0yJabcJmYwOPxb4OPmadfupvHYhLmaG4MloBaebVEMhBlf5ZbYfJW-bkKhDouNuRCixoE6L9NYG4kRejx7oug9y9GQHo347NZRDUut">
+  # //www.plantuml.com/plantuml/png/ZPD1Zzem48Nl_XK-WbJAtQgghUYY8bMYXLOzU-s1PDUne_6aknNYlzSx12SkQLK48lAyUHv_pxcBf96wnebMcoTz16bS3PuMnx14Y2HFGiYqfcEKk_lzjnLNqwfCdn-QJ3MRo-VN_xSRJu07RI3LpaAaxwqbXU3YqcXJ0NlKrnxvkOxfaHq1_yE_QDv131qQkFy9dZvfRrtssFeFrix2m-CWFvtdVUbxQpN1B3YxVNXy8pqyRwU57y41mPJDEVsAMVOK48gLZRVm0YZXXS3Rs2kI99DDzgJNc_LMrathe05F8nbh61036Md-JctTUQDaOhTuFuqlXme71uR2jTkD7TMmAo2NOrA2oeUKSjVvsRoqN0LF6DoGmTSEkelwTAZ1sRFyWi50Z4g-8kKX0J5WwPWDOwKHB6FS-4F01d04uL_frnVqwfe1Bruap3psEuqkgsxhHfkgze2_bktJSSdu_hYj6MQ_JngXSxIgj4_8torCUf0yJabcJmYwOPxb4OPmadfupvHYhLmaG4MloBaebVEMhBlf5ZbYfJW-bkKhDouNuRCixoE6L9NYG4kRejx7oug9y9GQHo347NZRDUut
+  #+HTML: <img src="https://user-images.githubusercontent.com/26481411/167287255-9bc04dc1-3fe2-432f-a689-c9fe7cc9a356.png">
 
   这是单个 Informer 接收事件到处理事件的流程，其中，Indexer 是一个本地的缓存，可以方便的从中取出监听对象的信息，这些对象的状态和 apiserver 中的是一致的（不考虑延迟）。
   
