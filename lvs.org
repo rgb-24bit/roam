@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       C3186682-7508-495C-8076-23ECC5D76251
+:END:
+#+TITLE: LVS
+
+LVS 是 Linux Virtual Server 的简称，也就是 Linux 虚拟服务器，是一个由章文嵩博士发起的自由软件项目，现在已经是 Linux 标准内核的一部分。
+

@@ -3,7 +3,7 @@
 :END:
 #+TITLE: iptables
 
-iptables 基于 [[id:9B50133E-FEB3-42C2-B35D-DAE5E6B46369][netfilter]]，是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 下的包过滤防火墙，也可以进行 [[id:2429468C-67CA-4AAE-9502-E13F0D01BBA8][NAT]] 操作，在 IP 层通过 PREROUTING、INPUT、OUTPUT、POSTROUTING 和 FORWARD 五个 hook 对本机的 IP 包进行处理。
+iptables 基于 [[id:9B50133E-FEB3-42C2-B35D-DAE5E6B46369][netfilter]]，是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 下的包过滤防火墙，也可以进行 [[id:2429468C-67CA-4AAE-9502-E13F0D01BBA8][NAT]] 操作，在 *IP 层* 通过 PREROUTING、INPUT(LOCAL_IN)、OUTPUT(LOCAL_OUT)、POSTROUTING 和 FORWARD 五个 hook 对本机的 IP 包进行处理。
 
 iptables 中存在很多的 rule，每个 rule 匹配一定的目标，执行相应的操作，根据 rule 生效的优先级和位置，iptables 抽象出了对应的 table 和 chain 概念：
 + table 用于表示规则集，每个 hook 节点上会挂对应的几张 table，不同 table 执行的优先级不同

@@ -1,0 +1,69 @@
+:PROPERTIES:
+:ID:       51B17724-55DC-4831-B52D-815462E8A9F8
+:END:
+#+TITLE: go map hash
+
+golang 中访问 =m[key]= 时，实际会使用 =unsafe.Pointer(&key)= 来计算 hash 值，其中，不同类型有不同的 hash 函数，这在构造 map 时确定：
+#+begin_src go
+  type maptype struct {
+    // function for hashing keys (ptr to key, seed) -> hash
+    hasher     func(unsafe.Pointer, uintptr) uintptr
+  }
+#+end_src
+
+而各个类型的 hash 函数则在 [[https://github.com/golang/go/blob/go1.18/src/runtime/alg.go][src/runtime/alg.go]] 下面：
+#+begin_src go
+  func typehash(t *_type, p unsafe.Pointer, h uintptr) uintptr {
+    if t.tflag&tflagRegularMemory != 0 {
+      // Handle ptr sizes specially, see issue 37086.
+      switch t.size {
+      case 4:
+        return memhash32(p, h)
+      case 8:
+        return memhash64(p, h)
+      default:
+        return memhash(p, h, t.size)
+      }
+    }
+    switch t.kind & kindMask {
+    case kindFloat32:
+      return f32hash(p, h)
+    case kindFloat64:
+      return f64hash(p, h)
+    case kindComplex64:
+      return c64hash(p, h)
+    case kindComplex128:
+      return c128hash(p, h)
+    case kindString:
+      return strhash(p, h)
+    case kindInterface:
+      i := (*interfacetype)(unsafe.Pointer(t))
+      if len(i.mhdr) == 0 {
+        return nilinterhash(p, h)
+      }
+      return interhash(p, h)
+    case kindArray:
+      a := (*arraytype)(unsafe.Pointer(t))
+      for i := uintptr(0); i < a.len; i++ {
+        h = typehash(a.elem, add(p, i*a.elem.size), h)
+      }
+      return h
+    case kindStruct:
+      s := (*structtype)(unsafe.Pointer(t))
+      for _, f := range s.fields {
+        if f.name.isBlank() {
+          continue
+        }
+        h = typehash(f.typ, add(p, f.offset()), h)
+      }
+      return h
+    default:
+      // Should never happen, as typehash should only be called
+      // with comparable types.
+      panic(errorString("hash of unhashable type " + t.string()))
+    }
+  }
+#+end_src
+
+而最终的实现则是在 =asm_*.s= 对应的汇编代码中，这就是看不懂的部分了_(:з」∠)_
+

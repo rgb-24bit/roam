@@ -3,5 +3,17 @@
 :END:
 #+TITLE: netfilter
 
+netfilter 是 [[id:B3AFABEA-45B9-4F06-84AE-A46857C3F65E][linux kernal]] 中用于过滤或修改进出内核协议栈的网络数据包框架，其工作在网络层（三层），将进出网络协议栈的数据包分为 PREROUTING、INPUT(LOCAL_IN)、OUTPUT(LOCAL_OUT)、POSTROUTING 和 FORWARD 五个不同的阶段：
+#+HTML: <img src="https://raw.githubusercontent.com/liexusong/linux-source-code-analyze/master/images/netfilter-hooks.png">
 
+各阶段为：
++ PER_ROUTING：路由前阶段，发生在内核对数据包进行路由判决前。
++ LOCAL_IN：本地上送阶段，发生在内核通过路由判决后。如果数据包是发送给本机的，那么就把数据包上送到上层协议栈。
++ FORWARD：转发阶段，发生在内核通过路由判决后。如果数据包不是发送给本机的，那么就把数据包转发出去。
++ LOCAL_OUT：本地发送阶段，发生在对发送数据包进行路由判决之前。
++ POST_ROUTING：路由后阶段，发生在对发送数据包进行路由判决之后。
+
+可以通过在这 5 个阶段注入钩子函数（Hooks Function）来实现对数据包的过滤和修改。
+
+参考：[[https://github.com/liexusong/linux-source-code-analyze/blob/master/lvs-principle-and-source-analysis-part2.md#netfilter][LVS 原理与实现 - 实现篇#Netfilter]]
 

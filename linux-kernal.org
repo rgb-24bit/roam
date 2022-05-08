@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       B3AFABEA-45B9-4F06-84AE-A46857C3F65E
+:END:
+#+TITLE: linux kernal
+
+
+

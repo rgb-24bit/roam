@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       B1E51999-123F-4AC7-8482-A6D690D842A1
+:END:
+#+TITLE: k8s semantic versions
+
+kubernetes 版本和 kubernetes 组件（如 apiserver、scheduler、client-go）之间的对应关系：
+#+begin_quote
+We recommend using the v0.x.y tags for Kubernetes releases >= v1.17.0 and kubernetes-1.x.y tags for Kubernetes releases < v1.17.0.
+#+end_quote
+
+

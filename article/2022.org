@@ -3,6 +3,7 @@
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#m03][M03]]
 - [[#m04][M04]]
+- [[#m05][M05]]
 
 * M03
   ☞ [[http://icyfenix.cn/immutable-infrastructure/network/linux-vnet.html][Linux 网络虚拟化 | 凤凰架构]]
@@ -30,4 +31,19 @@
   1) 迁移成本很高，之前的笔记太多了，不可能一次性迁移完成，目前状态还处于 copy on usage
   2) “搜索” 的体感比 “组织” 要好很多
   3) 将所有笔记放在了 roam 中，比之前分散在几个地方要舒服，不用纠结到底放在什么地方了
+
+* M05
+  ☞ [[https://www.infoq.cn/article/uiykpdhefgcdzivje9bp][Kubernetes 并发控制与数据一致性的实现原理_文化 & 方法_华为云产品与解决方案_InfoQ 精选文章]]
+
+  1) kube-apiserver 通过基于 ResourceVersion 的乐观锁来进行并发控制，在更新请求到达时如果版本不一致就拒绝更新
+  2) k8s 架构中 kube-apiserver 是唯一和 etcd 进行交互的组件，也就是说所有资源的更新都受乐观锁的控制
+  3) 这对于无状态组件来说是完美的，比如 kube-scheduler、kube-controller 这些，只需要基于 kube-apiserver 完成资源更新就行
+  4) 单对于有状态的组件来说，如何保证自身状态的正确是一个问题，也就是说需要确保提交到 kube-apiserver 的请求成功后才持久化自己的状态
+  5) 如果绕开提交到 apiserver 这一部，可能将状态关联到错误的资源版本
+
+  -----
+
+  ☞ [[https://jolynch.github.io/posts/use_fast_data_algorithms/][Use Fast Data Algorithms | Joey Lynch's Site]]
+
+  原来 hash 有加密哈希和非加密哈希的区别，加密哈希针对不可信的数据，更加防碰撞，可用于效验数据是否完整，被篡改之类，而非加密哈希速度往往更快，可用于 hashmap 这样的内部数据结构使用。
 

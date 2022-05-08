@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       08C54FF0-117B-4A06-8F0A-85C81F0C648F
+:END:
+#+TITLE: Kerberos
+
+Kerberos 可以看作是客户端和服务器之间的 [[id:C1AE0F2E-281F-48CC-B58D-3C405991B133][SSO]] 系统，在存在很多服务器时，可以通过构建 Kerberos 系统，客户端只需要在 Kerberos KDC 完成认证并获得 Ticket 后，就可以凭借 Ticket 在各个服务器上免密登录。
+
+Ticket 保存在客户端，获取 Ticket 可以通过 =kinit= 命令完成，也可以使用 =klist= 列出当前拥有的 Ticket。
+

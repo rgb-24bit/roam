@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       7F7235F2-BA33-48E6-93CC-B0C92A9F6A84
+:END:
+#+TITLE: ipvs
+
+IPVS 是 [[id:B3AFABEA-45B9-4F06-84AE-A46857C3F65E][linux kernal]] 实现的四层[[id:898066C9-2245-43D0-9F23-8BE9415AF213][负载均衡]]，是 [[id:C3186682-7508-495C-8076-23ECC5D76251][LVS]] 负载均衡模块的实现。其实现基于 [[id:9B50133E-FEB3-42C2-B35D-DAE5E6B46369][netfilter]] 的散列表，工作在 LOCAL_IN、FORWARD 和 POST_ROUTING 三个阶段：
+#+HTML: <img src="https://raw.githubusercontent.com/liexusong/linux-source-code-analyze/master/images/lvs-hooks.png">
+
+一般来说，数据的转发都发生在 LOCAL_IN 阶段，当数据包经过路由进入 LOCAL_IN 阶段后，会由 IPVS 注册的 =ip_vs_in()= 处理转发到真实服务器。
+
+参考：
++ [[https://github.com/liexusong/linux-source-code-analyze/blob/master/lvs-principle-and-source-analysis-part1.md][LVS原理与实现 - 原理篇]]
++ [[https://github.com/liexusong/linux-source-code-analyze/blob/master/lvs-principle-and-source-analysis-part2.md][LVS原理与实现 - 实现篇]]
+

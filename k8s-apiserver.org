@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       7009B8BD-26CB-463A-8A4A-D4CDC1A442EA
+:END:
+#+TITLE: k8s apiserver
+
+
+

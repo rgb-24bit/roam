@@ -1,0 +1,191 @@
+:PROPERTIES:
+:ID:       CAE73491-2C7B-4B6C-9C15-0A062806F6C9
+:END:
+#+TITLE: k8s client-go
+
+[[https://github.com/kubernetes/client-go][client-go]] 是 [[id:7009B8BD-26CB-463A-8A4A-D4CDC1A442EA][k8s apiserver]] 的 go 客户端实现，通常有两种使用姿势：
++ 基于 =Client= 访问 apiserver，获取、更新各个资源
++ 基于 =Informer= 监听 apiserver，处理资源变更事件
+
+* Client
+  client-go 中 RESTClient 是所有 Client 的基础，其封装了访问 apiserver 的基本功能，而 ClientSet、DynamicClient 和 DiscoveryClient 则在 RESTClient 的基础上封装了访问特定资源的接口：
+  + =ClientSet= 主要针对 k8s 内置资源，基于代码生成提供了方便使用的访问接口
+  + =DynamicClient= 可以获取任意 k8s 资源，但这里更多的是针对 CRD 使用，内置已有 ClientSet
+  + =DiscoveryClient= 可以访问 apiserver 查看目前 apiserver 中有哪些资源类型
+
+  #+HTML: <img src="//www.plantuml.com/plantuml/png/SoWkIImgAStDuU9ApaaiBbO8SWqESSx9JCqhWGf0EC6fCBvBPLvYRcOoYXgNpEBa_BBKeageA1TSauAkhXsocSYwCIJXnc2Nvd98pKi1EXK0">
+
+* Informer
+  Informer 主要基于 apiserver 提供的 *watch* 能力，通过 watch 方式和 apiserver 建立连接后，apiserver 在发现 watch 的资源变动后，会向该连接写入对应的变更事件，Informer 便可以根据变更时间执行相应的操作。
+
+  #+HTML: <img src="https://user-images.githubusercontent.com/26481411/167245854-9dada287-a0b0-4412-a777-6ae6c6dcdf68.png">
+
+  整体流程如上图：
+  1. Reflector 监听 apiserver 资源变动事件，收到事件后放入 DeltaFIFO
+  2. Informer 会不断从 DeltaFIFO 取出事件，然后会先将变更后对象的信息写入 Indexer 缓存，在将变更的对象发送给 ResourceEventHandler 处理
+
+  具体实现：
+  1. 使用 RESTClient 的 =Watch= 方法和 apiserver 建立连接，Watch 方法返回 StreamWatcher 对象，实现了 watch.Interface 接口。StreamWatcher 会不断读取连接，在读取到完整的事件后放入 ResultChan[fn:1]
+     #+begin_src go
+       // staging/src/k8s.io/client-go/rest/request.go
+       // Watch attempts to begin watching the requested location.
+       // Returns a watch.Interface, or an error.
+       func (r *Request) Watch(ctx context.Context) (watch.Interface, error) {
+         client := r.c.Client
+         if client == nil {
+           client = http.DefaultClient
+         }
+       
+         req, err := r.newHTTPRequest(ctx)
+         if err != nil {
+           return nil, err
+         }
+       
+         resp, err := client.Do(req)
+         if err == nil && resp.StatusCode == http.StatusOK {
+           return r.newStreamWatcher(resp)
+         }
+       }
+     #+end_src
+  2. Reflector 接收 ListerWatcher 参数，ListerWatcher 中的 WatchFunc 默认实现基本都是用 RESTClient 的 Watch 实现的，Run 起来后会不断取出 ResultChan 中的对象放入 Store
+     #+begin_src go
+       // staging/src/k8s.io/client-go/tools/cache/reflector.go
+       // watchHandler watches w and keeps *resourceVersion up to date.
+       func (r *Reflector) watchHandler(start time.Time, w watch.Interface, resourceVersion *string, errc chan error, stopCh <-chan struct{}) error {
+         for {
+           select {
+           case event, ok := <-w.ResultChan():
+             switch event.Type {
+             case watch.Added:
+               err := r.store.Add(event.Object)
+             case watch.Modified:
+               err := r.store.Update(event.Object)
+             case watch.Deleted:
+               err := r.store.Delete(event.Object)
+             }
+           }
+         }
+       }
+     #+end_src
+  3. Informer 使用 Controller 对象来管理操作 Reflector 和 DeltaFIFO，其中 DeltaFIFO 是 Store 的实现，Reflector 将对象放入 Store 也就是放入了 DeltaFIFO，Controller 会在一个协程中不断取出 DeltaFIFO 中的对象，调用 Process 函数处理
+     #+begin_src go
+       // staging/src/k8s.io/client-go/tools/cache/controller.go
+       // Run begins processing items, and will continue until a value is sent down stopCh or it is closed.
+       // It's an error to call Run more than once.
+       // Run blocks; call via go.
+       func (c *controller) Run(stopCh <-chan struct{}) {
+         r := NewReflector(
+           c.config.ListerWatcher,
+           c.config.ObjectType,
+           c.config.Queue,  // DeltaFIFO
+           c.config.FullResyncPeriod,
+         )
+       
+         var wg wait.Group
+       
+         wg.StartWithChannel(stopCh, r.Run)  // 放入 DeltaFIFO
+         wait.Until(c.processLoop, time.Second, stopCh)
+       
+         wg.Wait()
+       }
+       
+       // processLoop drains the work queue.
+       func (c *controller) processLoop() {
+         for {
+           obj, err := c.config.Queue.Pop(PopProcessFunc(c.config.Process))  // 取出 DeltaFIFO
+         }
+       }
+     #+end_src
+  4. 而 Process 函数对应的就是 sharedIndexInformer 的 HandleDeltas 方法，改方法会将变更的对象放入 Indexer，然后发送给 ResourceEventHandler 处理
+     #+begin_src go
+       // staging/src/k8s.io/client-go/tools/cache/shared_informer.o
+       func (s *sharedIndexInformer) HandleDeltas(obj interface{}) error {
+         s.blockDeltas.Lock()
+         defer s.blockDeltas.Unlock()
+       
+         if deltas, ok := obj.(Deltas); ok {
+           return processDeltas(s, s.indexer, s.transform, deltas)
+         }
+         return errors.New("object given as Process argument is not Deltas")
+       }
+       
+       // staging/src/k8s.io/client-go/tools/cache/controller.go
+       // Multiplexes updates in the form of a list of Deltas into a Store, and informs
+       // a given handler of events OnUpdate, OnAdd, OnDelete
+       func processDeltas(
+         // Object which receives event notifications from the given deltas
+         handler ResourceEventHandler,
+         clientState Store,
+         transformer TransformFunc,
+         deltas Deltas,
+       ) error {
+         // from oldest to newest
+         for _, d := range deltas {
+           obj := d.Object
+       
+           switch d.Type {
+           case Sync, Replaced, Added, Updated:
+             if old, exists, err := clientState.Get(obj); err == nil && exists {
+               if err := clientState.Update(obj); err != nil {
+                 return err
+               }
+               handler.OnUpdate(old, obj)
+             } else {
+               if err := clientState.Add(obj); err != nil {
+                 return err
+               }
+               handler.OnAdd(obj)
+             }
+           case Deleted:
+             if err := clientState.Delete(obj); err != nil {
+               return err
+             }
+             handler.OnDelete(obj)
+           }
+         }
+         return nil
+       }
+       
+     #+end_src
+
+  #+HTML: <img src="//www.plantuml.com/plantuml/png/ZPD1Zzem48Nl_XK-WbJAtQgghUYY8bMYXLOzU-s1PDUne_6aknNYlzSx12SkQLK48lAyUHv_pxcBf96wnebMcoTz16bS3PuMnx14Y2HFGiYqfcEKk_lzjnLNqwfCdn-QJ3MRo-VN_xSRJu07RI3LpaAaxwqbXU3YqcXJ0NlKrnxvkOxfaHq1_yE_QDv131qQkFy9dZvfRrtssFeFrix2m-CWFvtdVUbxQpN1B3YxVNXy8pqyRwU57y41mPJDEVsAMVOK48gLZRVm0YZXXS3Rs2kI99DDzgJNc_LMrathe05F8nbh61036Md-JctTUQDaOhTuFuqlXme71uR2jTkD7TMmAo2NOrA2oeUKSjVvsRoqN0LF6DoGmTSEkelwTAZ1sRFyWi50Z4g-8kKX0J5WwPWDOwKHB6FS-4F01d04uL_frnVqwfe1Bruap3psEuqkgsxhHfkgze2_bktJSSdu_hYj6MQ_JngXSxIgj4_8torCUf0yJabcJmYwOPxb4OPmadfupvHYhLmaG4MloBaebVEMhBlf5ZbYfJW-bkKhDouNuRCixoE6L9NYG4kRejx7oug9y9GQHo347NZRDUut">
+
+  这是单个 Informer 接收事件到处理事件的流程，其中，Indexer 是一个本地的缓存，可以方便的从中取出监听对象的信息，这些对象的状态和 apiserver 中的是一致的（不考虑延迟）。
+  
+  而 client-go 提供了 =sharedInformerFactory= 方便创建各个对象的 Informer，使用同一个 factory 创建 Informer 时，对于相同类型的对象不会创建重复的 Informer，而是共享，这就是 shared 的由来，毕竟每个 Informer 至少要维护一个和 apiserver 的连接，
+  创建太多也不好。
+
+  使用：
+  #+begin_src go
+    sharedInformerFactory := informers.NewSharedInformerFactory(client, 0)
+    
+    // 监听 Pod 资源，注册 Pod EventHandler
+    informerFactory.Core().V1().Pods().Informer().AddEventHandler(
+      cache.FilteringResourceEventHandler{
+        FilterFunc: func(obj interface{}) bool {
+          // ...
+        },
+        Handler: cache.ResourceEventHandlerFuncs{
+          UpdateFunc: func(oldObj, newObj interface{}) {
+            // ...
+          },
+        },
+      },
+    )
+    
+    // 获取 Pod 资源的 Lister，其实也就是 PodInformer 内的 Indexer 缓存对象
+    informerFactory.Core().V1().Pods().Lister()
+    
+    // 开启 informer 内部协程，List & Watch 资源
+    informerFactory.Start(ctx.Done())
+    
+    // 等待同步完成（List）
+    informerFactory.WaitForCacheSync(ctx.Done())
+  #+end_src
+
+  参考：[[https://jimmysong.io/kubernetes-handbook/develop/client-go-informer-sourcecode-analyse.html][client-go 中的 informer 源码分析 · Kubernetes 中文指南——云原生应用架构实战手册]]
+
+* Footnotes
+
+[fn:1] 代码主要基于 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24 简化 
+
