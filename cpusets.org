@@ -3,7 +3,7 @@
 :END:
 #+TITLE: cpusets
 
-cpusets 可以限制某一组进程只运行在某些 cpu 和内存节点上，可以使用 [[https://github.com/lpechacek/cpuset][cpuset]] 命令来进行创建、查询。
+cpusets 是基于 [[id:4A5E3169-E60E-4C81-AE7E-18D3BDE8B86A][cgroups]] 的可以限制某一组进程只运行在某些 cpu 和内存节点上，可以使用 [[https://github.com/lpechacek/cpuset][cpuset]] 命令来进行创建、查询。
 
 参考：
 + https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt

@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       41AB02F7-6E23-49B6-864E-67670B8F8D1D
+:END:
+#+TITLE: go inline
+
+编译器内联相关源码：https://github.com/golang/go/blob/go1.18/src/cmd/compile/internal/inline/inl.go
+
+内联规则：
+1. 没有使用 [[id:65357C80-1971-45E2-A89E-E8C94D9E27EF][go compiler directives]] 禁止内联
+2. 函数内部不包含 select，for，defer，go 等语句
+3. 函数内部不超过 80 个 AST 节点
+

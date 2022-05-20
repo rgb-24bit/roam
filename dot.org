@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       D216FB5F-1EF7-4373-801F-6F3F0DF151DA
+:END:
+#+TITLE: dot
+
+Dot 主要由 Node、Edge 和 Graph 三种对象组成，其中每个 Graph 可以包含多个 Node 和 SubGraph，每个 Node 可以通过 Edge 和其他 Node 建立连接：
+#+begin_example
+  strict digraph {
+      subgraph a {
+          node1 -> node2
+      }
+      subgraph b {
+          node3 -> node4
+      }
+  }
+#+end_example
+
+可以通过定义图、节点和连线的属性来控制它们的表现形式，常用的属性包括：
+|-------+------------------------------|
+| 属性  | 作用                         |
+|-------+------------------------------|
+| ~label~ | 定义图、节点、连线显示的文本 |
+| ~color~ | 定义节点、连线的颜色         |
+| ~shape~ | 定义节点的形状               |
+|-------+------------------------------|
+
+同时每个节点都隐藏自带方位端口，包括八个方向：北 n、东北 ne、东 e、东南 se、南 s、西南 sw、西 w 和西北 nw。
+
+
+参考：
++ [[https://github.com/uolcano/blog/issues/13#dot%E8%AF%AD%E6%B3%95][DOT 语言学习笔记 · uolcano/blog]]
++ [[https://graphviz.gitlab.io/_pages/doc/info/lang.html][The DOT Language]]
+

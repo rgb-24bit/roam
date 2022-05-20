@@ -1,0 +1,29 @@
+:PROPERTIES:
+:ID:       AE928D6C-2B47-4D68-BB5D-00B5CCF6E9C2
+:END:
+#+TITLE: top
+
+* 显示 Thread 使用的 CPU
+  1. 按 f 进入字段选择页面
+     #+begin_example
+       Fields Management for window 1:Def, whose current sort field is forest view
+          Navigate with Up/Dn, Right selects for move then <Enter> or Left commits,
+          'd' or <Space> toggles display, 's' sets sort.  Use 'q' or <Esc> to end!
+       
+       ,* PID     = Process Id
+       ,* USER    = Effective User Name
+       ,* PR      = Priority
+       ,* NI      = Nice Value
+       ,* VIRT    = Virtual Image (KiB)
+       ,* RES     = Resident Size (KiB)
+       ,* SHR     = Shared Memory (KiB)
+       ,* S       = Process Status
+       ,* %CPU    = CPU Usage
+       ,* %MEM    = Memory Usage (RES)
+       ,* TIME+   = CPU Time, hundredths
+       ,* COMMAND = Command Name/Line
+       ...
+       ,* P       = Last Used Cpu (SMP)
+     #+end_example
+  2. 选择 P 后 ESC 返回到展示页面即可
+

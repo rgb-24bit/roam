@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       65357C80-1971-45E2-A89E-E8C94D9E27EF
+:END:
+#+TITLE: go compiler directives
+
++ [[https://pkg.go.dev/cmd/compile#hdr-Compiler_Directives][Compiler Directives]]
+

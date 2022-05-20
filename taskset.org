@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       5A16D839-8F80-4FD8-BEE1-7ECA645015E5
+:END:
+#+TITLE: taskset
+
+在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 中可以用 taskset 命令来设置进程亲和的 CPU 列表，和基于 [[id:4A5E3169-E60E-4C81-AE7E-18D3BDE8B86A][cgroups]] 的 [[id:D65FCB30-A5E1-45F8-B91B-95A56389E35C][cpusets]] 不一样，cpusets 更多是隔离，将进程划分在不同的 group 下，不同 group 互不干扰，可以设置独占。
+而 taskset 只是设置了进程亲和的 CPU，不影响其他进程。
+
+参考：
++ [[https://serverfault.com/questions/625146/difference-between-taskset-and-cpuset][central processing unit - difference between taskset and cpuset - Server Fault]]
++ [[https://www.kimullaa.com/entry/2020/07/01/200102][taskset と cgroup は何が違うのか - SIerだけど技術やりたいブログ]]
++ [[http://niyanchun.com/taskset-command.html][Linux下的绑核命令——taskset - NYC's Blog]]
+

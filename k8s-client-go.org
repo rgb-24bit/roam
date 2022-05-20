@@ -189,5 +189,5 @@
 
 * Footnotes
 
-[fn:1] 代码主要基于 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24 简化 
+[fn:1] 代码主要基于 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24.0 简化 
 

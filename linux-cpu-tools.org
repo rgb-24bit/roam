@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       8D3E8BB2-5EBA-454E-838E-8296D9D858F3
+:END:
+#+TITLE: linux cpu tools
+
+1. 显示每个 CPU 的负载情况
+   #+begin_example
+     mpstat -P ALL
+   #+end_example
+
+参考：[[https://www.cyberciti.biz/tips/how-do-i-find-out-linux-cpu-utilization.html][How Do I Find Out Linux CPU Utilization? - nixCraft]]
+

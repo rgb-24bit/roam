@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       6EBC701C-DAFE-4B45-A17D-B4D360D2541D
+:END:
+#+TITLE: keps
+
+* 2395 Removing In-Tree Cloud Provider Code
+  定义了 *In-tree* 和 *Out-of-Tree* 两个概念，也就是代码在 Kubernetes repository 内部还是外部，目标是建立机制避免 In-tree 的代码。
+
