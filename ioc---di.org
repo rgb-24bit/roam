@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       1c3e893f-2fae-4056-a477-ccaf32667f11
+:END:
+#+TITLE: ioc & di
+
+#+begin_quote
+The Inversion-of-Control (IoC) pattern, is about providing any kind of callback (which controls reaction), instead of acting ourself directly (in other words, inversion and/or redirecting control to external handler/controller).
+#+end_quote
+
+IOC 将「控制」的权利交出去，开发人员遵循一定的规则编写在某些时候会被调用的代码，而不是自己主动去调用。
+
+#+begin_quote
+The Dependency-Injection (DI) pattern is a more specific version of IoC pattern, and is all about removing dependencies from your code.
+#+end_quote
+
+DI 是 IOC 的一种实现，将 Bean 的组装从手动转变为有框架控制完成。
+
+参考：[[https://stackoverflow.com/questions/3058/what-is-inversion-of-control][oop - What is Inversion of Control? - Stack Overflow]]
+

@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       aab98330-7ed5-45a6-85dd-35099763122a
+:END:
+#+TITLE: HTMLMediaElement
+
+HTMLMediaElement 通过一些属性和方法提供了基础的媒体操作相关的能力，比如播放、暂停、倍速播放等。
+
+其中属性 =playbackRate= 控制当前播放的倍速，可以通过如下代码来自由调整当前页面视频播放的速度：
+#+begin_src js
+  document.querySelector('video').playbackRate = 8
+#+end_src
+
+这在大部分场景下应该都是适用的。
+
