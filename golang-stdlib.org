@@ -24,3 +24,10 @@
   2. 请求到来时，根据当前时间和最后一次访问时间的间隔计算得到生成的 token 数量
   3. 根据 token 数量进行判断处理
 
+* io
+  #+begin_src go
+    pr, pw := io.Pipe()									 // pw 和 pr 是连通的，写入 pw 的数据可以在 pr 读取到
+    io.Copy(writer, reader)							 // 从 reader 不断读取数据写入 writer，同步
+    tr := io.TeeReader(reader, writer)	 // 从 reader 读取数据同时写入 writer
+  #+end_src
+

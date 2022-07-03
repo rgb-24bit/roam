@@ -27,15 +27,33 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
   | network.interfaces | 列出网络接口         |
   |--------------------+----------------------|
 
-  更多模块可参考：[[https://docs.saltproject.io/en/latest/ref/modules/all/index.html][EXECUTION MODULES]]。
+  参考：
+  + [[https://docs.saltproject.io/en/latest/ref/modules/all/index.html][EXECUTION MODULES]]
+  + [[https://docs.saltproject.io/en/latest/topics/execution/index.html][Remote Execution]]
+
+* Target
+  可以使用 -G 选项根据机器的 grains 信息指定目标机器范围：
+  #+begin_src sh
+    salt -G 'os:Ubuntu' test.version
+  #+end_src
+
+  使用 -E 根据正则匹配，或使用 -L 列表匹配：
+  #+begin_src sh
+    salt -E 'virtmach[0-9]' test.version
+    salt -L 'foo,bar,baz,quo' test.version
+  #+end_src
+
+  使用 -C 组合多个条件：
+  #+begin_src sh
+    salt -C 'G@os:Ubuntu and webser* or E@database.*' test.version
+  #+end_src
 
 * Grains
   可以通过 grains 获取底层系统的信息：
   #+begin_src sh
     # 获取所有信息
     $ salt '*' grains.items
-    
-    # 获取指定项信息
-    salt '*' grains.item xxx
-  #+end_src
 
+    # 获取指定项信息
+    $ salt '*' grains.item xxx
+  #+end_src

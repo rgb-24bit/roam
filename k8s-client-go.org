@@ -125,7 +125,7 @@
            obj := d.Object
        
            switch d.Type {
-           case Sync, Replaced, Added, Updated:
+           case Sync, Replaced, Added, Updated:  // handler 的事件类型是根据本地 store 的状态确定的，也就是说第一次 list 会被认为是 add 事件
              if old, exists, err := clientState.Get(obj); err == nil && exists {
                if err := clientState.Update(obj); err != nil {
                  return err

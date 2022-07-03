@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       AA0FD36B-724C-45B6-80AF-129AB2912A50
+:END:
+#+TITLE: pid
+
+* bash
+  + =$$= 表示当前 bash 进程的 pid
+
+* pidof
+  =pidof program= 获取 program 的 pid。
+
+* pstree
+  + =pstree= 以树状结构列出所有进程
+  + =pstree pid= 以 pid 为根节点列出所有进程
+

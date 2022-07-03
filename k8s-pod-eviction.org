@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       68520325-23DF-487A-A16E-F3EBA5D40B2F
+:END:
+#+TITLE: k8s pod eviction
+
+* DiskPressure Eviction
+  kubelet 会在 node 上内存、磁盘和可用进程标识符的负载很高或即将耗尽时对 node 上的 pod 进行驱逐，而在 DiskPressure 驱逐时常常可以看到这样的日志：
+  #+begin_example
+    The node was low on resource: ephemeral-storage. Container xxx was using xxxKi, which exceeds its request of 0.
+  #+end_example
+
+  这是因为 Pod 使用了 [[https://kubernetes.io/zh-cn/docs/concepts/storage/ephemeral-volumes/][临时卷（Ephemeral Volume）]]，比如 emptyDir、configMap、secret 等都属于临时卷，而大部分时候我们都不会指定 Pod 的 request.ephemeral-storage，
+  因此日志会显示 =exceeds its request of 0=.
+
+  在 Pod 的 Resource 中指定 ephemeral-storage 可以帮助 scheduler 将 pod 调度到更能满足 pod 临时存储需求的 node 上，但缺陷是如果 pod 使用的临时存储大小超过 limit，就会被驱逐。
+
+  参考：
+  + [[https://developer.aliyun.com/article/594066][体验 ephemeral-storage 特性来对 Kubernetes 中的应用做存储的限制和隔离-阿里云开发者社区]]
+  + [[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/node-pressure-eviction/][节点压力驱逐 | Kubernetes]]
+  + [[https://kubernetes.io/zh-cn/docs/concepts/storage/ephemeral-volumes/][临时卷 | Kubernetes]]
+

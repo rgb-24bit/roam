@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       42D2618D-F852-482C-8B8A-C15C3D7D6316
+:END:
+#+TITLE: linux kthreadd
+
+在 linux 系统中执行命令 =pstree -p 0= 时可以得到这样的一棵树：
+#+begin_example
+  ?()-+-kthreadd(2)-+-ata_sff(149)
+      |             |-cpuhp/0(14)
+      |             |-cpuhp/1(15)
+      |             |-cpuhp/2(20)
+      |             |-cpuhp/3(25)
+      |             |-cpuhp/4(30)
+      |             |-cpuhp/5(35)
+      |             |-cpuhp/6(40)
+      |             |-cpuhp/7(45)
+      |             |-...........
+      `-systemd(1)-+-acpid(774)
+                   |-agetty(1490)
+                   |-agetty(1494)
+                   |-atop(2301249)
+                   |-atopacctd(1194835)
+                   |-.............
+#+end_example
+
+从 =?()= 开始，分别划成了 =kthreadd(2)= 和 =systemd(1)= 两颗子树，其中：
++ systemd 为 init 进程，由 0 进程通过 kernel_thread 创建，完成系统的初始化。是系统中所有其它用户进程的祖先进程
++ kthreadd 进程由 0 进程通过 kernel_thread 创建，并始终运行在内核空间, 负责所有内核线程的调度和管理
+
+简单来说，就是一个负责用户空间，一个负责内核空间。
+
+参考：[[https://blog.csdn.net/gatieme/article/details/51566690][Linux下2号进程的kthreadd--Linux进程的管理与调度（七）_CHENG Jian的博客-CSDN博客_kthreadd]]
+

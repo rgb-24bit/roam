@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       00A99F42-14F2-4935-A000-43A8012E61ED
+:END:
+#+TITLE: Short-circuit evaluation
+
+短路求值（Short-circuit evaluation）指在 =and= 和 =or= 操作中，会根据第一个运算数的结果来判断是否计算第二个运算数的操作：
+#+begin_example
+  a and b  # a 为 true 才执行 b
+  a or b   # a 为 false 才执行 b
+#+end_example
+

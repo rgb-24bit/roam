@@ -4,11 +4,13 @@
 - [[#m03][M03]]
 - [[#m04][M04]]
 - [[#m05][M05]]
+- [[#m06][M06]]
+- [[#m07][M07]]
 
 * M03
   ☞ [[http://icyfenix.cn/immutable-infrastructure/network/linux-vnet.html][Linux 网络虚拟化 | 凤凰架构]]
 
- 这篇文章在我 Chrome Net 组中待了有一段时间了，买了本 《Kubernetes 网络权威指南》，不时对照着看，不得你说这篇文章写的真的好，从 underlay 到 overlay，一条线梳理下来能够清晰不少。 
+ 这篇文章在我 Chrome Net 组中待了有一段时间了，买了本 《Kubernetes 网络权威指南》，不时对照着看，不得你说这篇文章写的真的好，从 underlay 到 overlay，一条线梳理下来能够清晰不少。
 
 * M04
   ☞ [[https://help.aliyun.com/document_detail/412172.html][动态资源超卖]]
@@ -25,7 +27,7 @@
   - Do NOT migrate to new tools, even if they are really shiny and popular.
   - Try search instead of organisation.
   - Use fewer services, even if they are not the best tools for the job.
-  #+end_quote 
+  #+end_quote
 
   之前自己的笔记就从树状的目录结构迁移到了 roam 平铺图状结构，感受：
   1) 迁移成本很高，之前的笔记太多了，不可能一次性迁移完成，目前状态还处于 copy on usage
@@ -47,3 +49,13 @@
 
   原来 hash 有加密哈希和非加密哈希的区别，加密哈希针对不可信的数据，更加防碰撞，可用于效验数据是否完整，被篡改之类，而非加密哈希速度往往更快，可用于 hashmap 这样的内部数据结构使用。
 
+* M06
+  ☞ [[https://pureage.info/2015/12/22/thundering-herd.html][accept 与 epoll 惊群 - 纯真年代]]
+
+  之前一直在上层的系统中，没想到接近操作系统的这一层会存在这一的问题。
+
+* M07
+  ☞ [[https://www.cell-lang.net/faq.html][Why yet another programming language?]]
+
+  1) 挺有趣的设计，专门为有状态应用设计的编程语言
+  2) 现有的大部分编程语言确实更关注「计算」部分，状态通过和外部系统交互来保存

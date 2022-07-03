@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       DB6C8322-389A-48DA-B393-DAB9141CEF0A
+:END:
+#+TITLE: golang pprof
+
+Get profile:
+#+begin_example
+  curl -s http://ip:port/debug/pprof/profile > ./profile.out
+#+end_example
+
+Load profile:
+#+begin_example
+  go tool pprof -http=:8080 ./profile.out
+#+end_example
+
+Ref [[https://gist.github.com/slok/33dad1d0d0bae07977e6d32bcc010188][Go pprof cheat sheet]]
+

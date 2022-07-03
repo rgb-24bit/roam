@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       9B82F428-908F-42AF-9FC1-D52A2AA4DDD3
+:END:
+#+TITLE: RCU & COW
+
+RCU 和 COW 在更新时的策略一样，都是拷贝旧对象，然后在拷贝出来的新对象完成更新后修改指向旧对象的指针。
+
+区别在于 RCU 在修改指针后还会等待其他线程的读操作结束，然后释放旧对象的内存，相较 COW 多出来一个 sync 的过程。
+
+参考：
++ [[https://en.wikipedia.org/wiki/Read-copy-update][Read-copy-update - Wikipedia]]
++ [[https://en.wikipedia.org/wiki/Copy-on-write][Copy-on-write - Wikipedia]]
+

@@ -1,9 +1,14 @@
 :PROPERTIES:
-:ID:       982AFE8D-3846-410C-B4AD-D657E48F68B5
+:ID:       AE820A37-0701-4548-81A1-5C27C82BA16D
 :END:
-#+TITLE: go tool
+#+TITLE: go build, compiler
 
-+ Tag :: [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
+* Compiler Directives
+  #+begin_src go
+    //go:noinline  指定当前函数不要 inline
+  #+end_src
+  
+  + [[https://pkg.go.dev/cmd/compile#hdr-Compiler_Directives][Compiler Directives]]
 
 * Inject build-time variables
   go build 命令的 =-ldflags= 选项支持在编译时指定变量的值：
@@ -21,7 +26,7 @@
       Note that before Go 1.5 this option took two separate arguments.
   #+end_example
 
-* Customizing Go Binaries with Build Tags
+* Build constraints
   go build 命令的 =-tags= 选项可以指定若干 tag，通过在文件头加入对应注释来进行条件编译：
   #+begin_example
     -tags tag,list
@@ -57,3 +62,7 @@
     // +build ta,tb  ta && tb
     // +build ta tb  ta || tb
   #+end_src
+
+  在 go1.18 以后将 =+build= 换成了 =//go:build=, 可以参考：
+  + [[https://pkg.go.dev/cmd/go#hdr-Build_constraints][Build constraints]]
+

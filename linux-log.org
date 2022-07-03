@@ -1,0 +1,44 @@
+:PROPERTIES:
+:ID:       6AB9C680-E889-44FA-B79F-A9356E05233E
+:END:
+#+TITLE: linux log
+
+* /var/log
+  =/var/log= 是存放系统日志的目录，同时一些应用也会将日志放到这个目录下，算是大家在 Linux 下存放日志文件时的一个约定。
+
+* syslog
+  syslog 是一个协议，定义了日志信息的格式，在 Linux 中现在常用的实现为 rsyslog，默认情况下应用程序通过相应的 lib 将日志发送给 rsyslog，然后 rsyslog 持久化日志到 =/var/log/xxx= 文件。
+
+  常见的有：
+  #+begin_example
+    /var/log/auth.log
+    /var/log/syslog
+    /var/log/daemon.log
+    /var/log/lpr.log
+    /var/log/kern.log
+    /var/log/mail.log
+    /var/log/user.log
+  #+end_example
+
+  可以在 =/etc/rsyslog.conf= 配置 =facility= 对应的配置文件路径。
+
+* journald
+  journald 是 [[id:A8CACEAF-DE71-4AB0-8057-BECD5A9978E1][systemd]] 的日志服务，可以从内核、用户进程、标准输入和系统服务错误收集日志记录信息，同时也支持将日志转发给 syslog 持久化（默认情况下 journald 的日志不会持久化，重启就丢了）。
+
+  日志查看：
+  #+begin_src sh
+    $ journalctl     # 显示所有日志
+    $ journalctl -f  # 类似 tail -f
+    $ journalctl -e  # 显示所有日志，但是直接定位到日志末尾
+    $ journalctl -k  # 仅显示内核日志
+    $ journalctl -u  # 仅显示指定 systemd 单元的讯息
+  #+end_src
+
+  比如，只显示 containerd 的日志：
+  #+begin_example
+    journalctl -u containerd
+  #+end_example
+
+* dmesg
+  用于查看位于内核 ring buffer 中的信息，通常包括启动消息、驱动程序信息和硬件状态更新信息等。
+

@@ -3,5 +3,41 @@
 :END:
 #+TITLE: crontab
 
+crontab 默认的配置文件位置如下，其中 hourly、daily、weekly 和 monthly 提供了快捷的配置定时任务的方式，无需写 cron 表达式：
+#+begin_example
+  /etc/crontab
+  /etc/cron.d
+  /etc/cron.hourly
+  /etc/cron.daily
+  /etc/cron.weekly
+  /etc/cron.monthly
+#+end_example
 
+需要更自由地定义任务执行时间时，可以通过 cron 表达式来配置自己的任务，将配置文件放到 cron.d 目录。
+
+cron 表达式共六列，前五列用于指定执行时间，第六列为要执行的命令，其中，前五列的含义为：
+#+begin_example
+  field          allowed values
+  -----          --------------
+  minute         0-59
+  hour           0-23
+  day of month   1-31
+  month          1-12 (or names, see below)
+  day of week    0-7 (0 or 7 is Sun, or use names)
+#+end_example
+
+前五列的可行的值为：
++ 一个具体的值，如 6
++ 一个连续区间，如 9-12
++ 一个间隔时间，如秒 0/5 表示从 0 秒开始，每隔 5 秒执行一次
++ 一个列表，如 1,3,5，表示第 1,3,5 时间执行
++ 一个通配符，常用的如 ~*~ 代表所有值，每一秒、每一分之类的
+
+例子：
+#+begin_example
+  # 每小时的第3和第15分钟执行
+  3,15 * * * * command
+#+end_example
+
+参考：[[https://linuxtools-rst.readthedocs.io/zh_CN/latest/tool/crontab.html][19. crontab 定时任务 — Linux Tools Quick Tutorial]]
 

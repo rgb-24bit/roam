@@ -3,5 +3,31 @@
 :END:
 #+TITLE: systemd
 
+历史上，[[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 系统使用 initd(0) 进程作为启动进程，同时 initd 也是其他所有进程的父进程，此时，位于 =/etc/init.d= 下的服务脚本便可以以 initd(0) 作为父进程启动，作为守护进程运行：
+#+begin_src sh
+  $ sudo /etc/init.d/nginx start
+#+end_src
 
+而命令 =service= 是对 =/etc/init.d= 下服务脚本的一个封装，以下两个方式是等效的：
+#+begin_src sh
+  $ sudo /etc/init.d/nginx start
+  # eq
+  $ service nginx start
+#+end_src
+
+但是使用 initd(0) 来启动服务存在如下缺点：
+1. 启动时间长。init 进程是串行启动，只有前一个进程启动完，才会启动下一个进程。
+2. 启动脚本复杂。init 进程只是执行启动脚本，不管其他事情。脚本需要自己处理各种情况，这往往使得脚本变得很长。
+
+后来，systemd(1) 便诞生了，systemd 为系统的启动和管理提供了一套完整的解决方案，成为了现在 Linux 系统中新的 init 进程，同时兼容 initd(0)，也会在 =/etc/init.d= 下查看，执行相关程序，
+而通过 service 启动的服务其父进程也变成了 systemd(1)。
+
+#+begin_example
+  $ pstree -s `pidof -s sshd`
+  systemd───sshd───sshd───sshd───bash───pstree
+#+end_example
+
+参考：
++ [[https://segmentfault.com/a/1190000038458363][Linux init、service、systemctl 三者区别 - SegmentFault 思否]]
++ [[https://www.cnblogs.com/shijingjing07/p/9301590.html][Linux 服务管理两种方式service和systemctl - 迪米特 - 博客园]]
 

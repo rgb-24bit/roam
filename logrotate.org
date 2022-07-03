@@ -9,7 +9,39 @@ logrotate 程序是一个[[id:9249D292-C4B8-41D8-B073-6FCCC3344FB9][日志]]文�
 /etc/logrotate.d
 #+end_example
 
-logrotate 基于 [[id:40D771C9-496B-492C-B750-08AD21CEBB4B][crontab]] 运行，脚本是 /etc/cron.daily/logrotate。
+通常，自定义规则作为单独的文件放在 =/etc/logrotate.d= 下，配置的格式为：
+#+begin_src conf
+  /var/log/*/*.log {
+      daily
+      dateext
+      rotate 14
+      missingok
+      copytruncate
+      notifempty
+      compress
+      delaycompress
+  }
+#+end_src
 
-参考：[[https://wsgzao.github.io/post/logrotate/][Linux 日志切割神器 logrotate 原理介绍和配置详解 | HelloDog]]
+常用配置项：
+|-----------------------+--------------------------------------------------------------+----------------------|
+| 配置项                | 作用                                                         | 备注                 |
+|-----------------------+--------------------------------------------------------------+----------------------|
+| compress              | 压缩轮转后的日志文件                                         |                      |
+| delaycompress         | 将日志文件的压缩推迟到下一个轮转周期                         | 放在 compress 后面   |
+| hourly、daily、weekly | 按小时、天、周的频率轮转                                     |                      |
+| datetext              | 轮转后日志文件后缀使用 YYYYMMDD 的格式，而不是简单的数字后缀 |                      |
+| dateformat            | 指定 datetext 后缀的日期格式                                 | 放在 datetext 后面   |
+| rotate                | 最大轮转次数，会自动删除超过这个次数的旧日志文件             |                      |
+| missingok             | 没找到对应日志文件的时候忽略错误                             |                      |
+| copytruncate          | 轮转时原地 truncate 日志文件大小为 0，拷贝内容到新文件       | 避免文件描述符的变化 |
+|-----------------------+--------------------------------------------------------------+----------------------|
+
+可以使用 =logrotate -d= 模拟运行，使用 =logrotate -f= 强制运行。
+
+部分情况下一些应用会自己做日志的 rotate，但只做了切割，没做删除，这时 logrotate 就不太好使了，可以考虑自己添加 crontab 任务来删除这些日志：
+#+begin_src sh
+  # 删除超过 14 天为变动的日志文件
+  /usr/bin/find /path/to/log_dir -mtime +14 -name "*.log.*" -print -delete
+#+end_src
 

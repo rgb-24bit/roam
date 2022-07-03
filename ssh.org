@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       91EBB4FD-23BC-4B54-98A7-CA495A5DDA2E
+:END:
+#+TITLE: ssh
+
+* Configure SSH Key-Based Authentication
+  #+begin_example
+    ssh-keygen                                     # 生成公钥和私钥
+    ssh-copy-id -i <key.pub> username@remote_host  # 拷贝公钥到服务器
+    cat ~/.ssh/<key.pub> | ssh username@remote_host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"  # 不使用 ssh-copy-id 的拷贝方式
+  #+end_example
+
+
+* SendEnv & AcceptEnv
+  SSH 允许通过 SendEnv 和 AcceptEnv 在建立会话时传递客户端环境变量到服务端，支持通配符匹配。默认情况下会开启环境变量 =LANG LC_*= 的传递，偶尔会导致服务端出现编码错误的问题。
+
+  #+begin_src conf
+    # /etc/ssh/ssh_config
+    SendEnv LANG LC_*
+    
+    # /etc/ssh/sshd_config
+    AcceptEnv LANG LC_*
+  #+end_src
+
