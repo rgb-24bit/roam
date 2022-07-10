@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       07DAA63A-0DA8-4F8A-BF52-037B045D0EFC
+:END:
+#+TITLE: ng
+
+Next Generation, xx-ng xx next generation.
+

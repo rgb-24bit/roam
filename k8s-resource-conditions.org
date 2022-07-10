@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       6C6126F5-998B-43E7-977B-FB1007B4E3A2
+:END:
+#+TITLE: k8s resource conditions
+
+在 k8s 中常通过 =status.conditions= 来表示资源的状态，比如下面的 Conditions 表示这个 Pod 的状态为：Scheduled、Ready 和 Initialized：
+#+begin_src yaml
+  status:
+    conditions:
+    - lastProbeTime: null
+      lastTransitionTime: "2022-06-09T07:42:34Z"
+      status: "True"
+      type: Initialized
+    - lastProbeTime: null
+      lastTransitionTime: "2022-06-11T06:10:30Z"
+      status: "True"
+      type: Ready
+    - lastProbeTime: null
+      lastTransitionTime: "2022-06-11T06:10:30Z"
+      status: "True"
+      type: ContainersReady
+    - lastProbeTime: null
+      lastTransitionTime: "2022-06-09T07:42:34Z"
+      status: "True"
+      type: PodScheduled
+#+end_src
+
+conditions 的设计初衷是提供一种通用的数据结构表示资源的状态，通常能够提供比 status 其他字段更详细的信息（比如状态切换时间、更新时间），同时外部监控程序可以根据 conditions 无差别地监控各种资源的状态，
+而不必过分关注资源对象 status 中的其他信息。
+
+参考：[[https://renhongcai.gitbook.io/kubernetes/di-shi-liu-zhang-api-she-ji-yue-ding/1.2-api_convention_condition][16.2 condition设计约定 - 《Kubernetes设计与实现》]]
+

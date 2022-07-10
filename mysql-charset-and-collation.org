@@ -15,7 +15,7 @@ mysql 中字符集可以分为存储字符集和排序字符集，其中，常�
 
 可以通过如下语句查看表的字符集：
 #+begin_src sql
-  SHOW TABLE STATUS where name like 'TABLE_NAME'
+  SHOW TABLE STATUS where name like 'TABLE_NAME' \G;
 #+end_src
 
 参考：[[https://dev.mysql.com/doc/refman/8.0/en/charset-collation-names.html][MySQL :: MySQL 8.0 Reference Manual :: 10.3.1 Collation Naming Conventions]]

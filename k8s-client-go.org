@@ -36,12 +36,12 @@
          if client == nil {
            client = http.DefaultClient
          }
-       
+
          req, err := r.newHTTPRequest(ctx)
          if err != nil {
            return nil, err
          }
-       
+
          resp, err := client.Do(req)
          if err == nil && resp.StatusCode == http.StatusOK {
            return r.newStreamWatcher(resp)
@@ -81,15 +81,15 @@
            c.config.Queue,  // DeltaFIFO
            c.config.FullResyncPeriod,
          )
-       
+
          var wg wait.Group
-       
+
          wg.StartWithChannel(stopCh, r.Run)  // 放入 DeltaFIFO
          wait.Until(c.processLoop, time.Second, stopCh)
-       
+
          wg.Wait()
        }
-       
+
        // processLoop drains the work queue.
        func (c *controller) processLoop() {
          for {
@@ -103,13 +103,13 @@
        func (s *sharedIndexInformer) HandleDeltas(obj interface{}) error {
          s.blockDeltas.Lock()
          defer s.blockDeltas.Unlock()
-       
+
          if deltas, ok := obj.(Deltas); ok {
            return processDeltas(s, s.indexer, s.transform, deltas)
          }
          return errors.New("object given as Process argument is not Deltas")
        }
-       
+
        // staging/src/k8s.io/client-go/tools/cache/controller.go
        // Multiplexes updates in the form of a list of Deltas into a Store, and informs
        // a given handler of events OnUpdate, OnAdd, OnDelete
@@ -123,7 +123,7 @@
          // from oldest to newest
          for _, d := range deltas {
            obj := d.Object
-       
+
            switch d.Type {
            case Sync, Replaced, Added, Updated:  // handler 的事件类型是根据本地 store 的状态确定的，也就是说第一次 list 会被认为是 add 事件
              if old, exists, err := clientState.Get(obj); err == nil && exists {
@@ -146,21 +146,21 @@
          }
          return nil
        }
-       
+
      #+end_src
 
   # //www.plantuml.com/plantuml/png/ZPD1Zzem48Nl_XK-WbJAtQgghUYY8bMYXLOzU-s1PDUne_6aknNYlzSx12SkQLK48lAyUHv_pxcBf96wnebMcoTz16bS3PuMnx14Y2HFGiYqfcEKk_lzjnLNqwfCdn-QJ3MRo-VN_xSRJu07RI3LpaAaxwqbXU3YqcXJ0NlKrnxvkOxfaHq1_yE_QDv131qQkFy9dZvfRrtssFeFrix2m-CWFvtdVUbxQpN1B3YxVNXy8pqyRwU57y41mPJDEVsAMVOK48gLZRVm0YZXXS3Rs2kI99DDzgJNc_LMrathe05F8nbh61036Md-JctTUQDaOhTuFuqlXme71uR2jTkD7TMmAo2NOrA2oeUKSjVvsRoqN0LF6DoGmTSEkelwTAZ1sRFyWi50Z4g-8kKX0J5WwPWDOwKHB6FS-4F01d04uL_frnVqwfe1Bruap3psEuqkgsxhHfkgze2_bktJSSdu_hYj6MQ_JngXSxIgj4_8torCUf0yJabcJmYwOPxb4OPmadfupvHYhLmaG4MloBaebVEMhBlf5ZbYfJW-bkKhDouNuRCixoE6L9NYG4kRejx7oug9y9GQHo347NZRDUut
   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/167287255-9bc04dc1-3fe2-432f-a689-c9fe7cc9a356.png">
 
   这是单个 Informer 接收事件到处理事件的流程，其中，Indexer 是一个本地的缓存，可以方便的从中取出监听对象的信息，这些对象的状态和 apiserver 中的是一致的（不考虑延迟）。
-  
+
   而 client-go 提供了 =sharedInformerFactory= 方便创建各个对象的 Informer，使用同一个 factory 创建 Informer 时，对于相同类型的对象不会创建重复的 Informer，而是共享，这就是 shared 的由来，毕竟每个 Informer 至少要维护一个和 apiserver 的连接，
   创建太多也不好。
 
   使用：
   #+begin_src go
     sharedInformerFactory := informers.NewSharedInformerFactory(client, 0)
-    
+
     // 监听 Pod 资源，注册 Pod EventHandler
     informerFactory.Core().V1().Pods().Informer().AddEventHandler(
       cache.FilteringResourceEventHandler{
@@ -174,20 +174,47 @@
         },
       },
     )
-    
+
     // 获取 Pod 资源的 Lister，其实也就是 PodInformer 内的 Indexer 缓存对象
     informerFactory.Core().V1().Pods().Lister()
-    
+
     // 开启 informer 内部协程，List & Watch 资源
     informerFactory.Start(ctx.Done())
-    
+
     // 等待同步完成（List）
     informerFactory.WaitForCacheSync(ctx.Done())
   #+end_src
 
   参考：[[https://jimmysong.io/kubernetes-handbook/develop/client-go-informer-sourcecode-analyse.html][client-go 中的 informer 源码分析 · Kubernetes 中文指南——云原生应用架构实战手册]]
 
+* EventRecorder
+  在 k8s 中，资源对象常通过 meta 表示元信息，spec 表示自身的定义，而 status 表示自身的状态。而 Event，常用来记录和资源对象相关的事件，如果说 meta、spec 和 status 描述了资源现在的样子，
+  那么，Event 则记录了资源从过去到现在之间发生了什么。
+
+  可以使用 EventRecorder 来上报 Event 到 apiserver，apiserver 会将 Event 事件存在 etcd 集群中，同时为避免磁盘空间被填满，会在最后一次的事件发生后，删除 1 小时之前发生的事件：
+  #+begin_src go
+    // EventRecorder knows how to record events on behalf of an EventSource.
+    type EventRecorder interface {
+      // Eventf constructs an event from the given information and puts it in the queue for sending.
+      // 'regarding' is the object this event is about. Event will make a reference-- or you may also
+      // pass a reference to the object directly.
+      // 'related' is the secondary object for more complex actions. E.g. when regarding object triggers
+      // a creation or deletion of related object.
+      // 'type' of this event, and can be one of Normal, Warning. New types could be added in future
+      // 'reason' is the reason this event is generated. 'reason' should be short and unique; it
+      // should be in UpperCamelCase format (starting with a capital letter). "reason" will be used
+      // to automate handling of events, so imagine people writing switch statements to handle them.
+      // You want to make that easy.
+      // 'action' explains what happened with regarding/what action did the ReportingController
+      // (ReportingController is a type of a Controller reporting an Event, e.g. k8s.io/node-controller, k8s.io/kubelet.)
+      // take in regarding's name; it should be in UpperCamelCase format (starting with a capital letter).
+      // 'note' is intended to be human readable.
+      Eventf(regarding runtime.Object, related runtime.Object, eventtype, reason, action, note string, args ...interface{})
+    }
+  #+end_src
+
+  参考：[[https://cloud.tencent.com/developer/article/1731747][15.深入 k8s：Event 事件处理及其源码分析 - 腾讯云开发者社区-腾讯云]]
+
 * Footnotes
 
-[fn:1] 代码主要基于 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24.0 简化 
-
+[fn:1] 代码主要基于 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24.0 简化

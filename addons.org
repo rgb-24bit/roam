@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       26941A11-4B1C-4F4C-AA9B-416939D1B4EE
+:END:
+#+TITLE: addons
+
+插件，类似 plugins，界限不明显。
+

@@ -5,3 +5,9 @@
 
 + Tag :: [[id:0E7371A8-0238-46C3-AB65-102022402BDA][version control]]
 
+* export git file to target directory
+  #+begin_example
+    git checkout-index -a -f --prefix=/destination/path/
+  #+end_example
+
+  Ref: [[https://stackoverflow.com/questions/160608/do-a-git-export-like-svn-export][Do a "git export" (like "svn export")? - Stack Overflow]]

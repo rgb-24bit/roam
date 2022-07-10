@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       70D5BE15-0B8F-4F26-99D1-4F74CD1EA70B
+:END:
+#+TITLE: bonding
+
+bonding 是把多张物理网卡通过软件虚拟成一个虚拟的网卡技术， bonding 后，所有的物理网卡的 ip 和 mac 将会变成相同的。多网卡同时工作可以提高网络速度，还可以实现网卡的负载均衡、冗余。
+
+通过 bonding 得到的虚拟网卡常命名为 bondx。
+

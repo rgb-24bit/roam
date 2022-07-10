@@ -31,3 +31,5 @@
 * al
   装箱问题和背包问题
 
+* SIMD
+  [[https://zhuanlan.zhihu.com/p/55327037][SIMD简介 - 知乎]]

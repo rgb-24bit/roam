@@ -3,6 +3,61 @@
 :END:
 #+TITLE: k8s pod eviction
 
+* NodePressure Eviction
+  kubelet 根据驱逐信号、驱逐条件和监控间隔来进行节点压力驱逐，其中，驱逐信号是特定资源在特定时间点的当前状态：
+  |--------------------+----------------------------------|
+  | 驱逐信号           | 含义                             |
+  |--------------------+----------------------------------|
+  | memory.available   | 内存剩余可用量                   |
+  | nodefs.available   | 节点磁盘剩余可用                 |
+  | nodefs.inodesFree  | 节点磁盘 inodes 剩余可用         |
+  | imagefs.available  | 节点镜像文件系统所在磁盘剩余可用 |
+  | imagefs.inodesFree | 节点镜像文件系统 inodes 剩余可用 |
+  | pid.available      | 节点 pid 剩余可用                |
+  |--------------------+----------------------------------|
+
+  驱逐条件是节点上可用资源的最小量，在不满足这个最小量时会触发驱逐，驱逐条件分为软驱逐条件和硬驱逐条件：
+  + 软驱逐条件可以通过参数 =eviction-soft-grace-period= 和 =eviction-max-pod-grace-period= 定义驱逐的宽限期，在触发驱逐条件后，持续宽限期这么长的时间后才进行驱逐
+  + 硬驱逐条件触发后 kubelet 会立即驱逐 pod
+
+  监控间隔告诉 kubelet 间隔多久评估一次驱逐条件，可以通过参数 housekeeping-interval 配置，默认为 10s。
+
+  其他参数：
+  + =eviction-pressure-transition-period= 控制 kubelet 在将节点条件转换为不同状态之前必须等待的时间，避免节点在软驱逐条件上反复横跳，默认值为 5m。
+
+  例子：
+  #+begin_src yaml
+    # 硬驱逐条件
+    evictionHard:
+      imagefs.available: 10%
+      imagefs.inodesFree: '10'
+      memory.available: 100Mi
+      nodefs.available: 5%
+      nodefs.inodesFree: '5'
+    # 避免节点在软驱逐条件上反复横跳
+    evictionPressureTransitionPeriod: 3s
+    # 软驱逐条件
+    evictionSoft:
+      imagefs.available: 15%
+      imagefs.inodesFree: '100'
+      memory.available: 500Mi
+      nodefs.available: 10%
+      nodefs.inodesFree: '50'
+    # 软驱逐宽限期
+    evictionSoftGracePeriod:
+      imagefs.available: 2m
+      imagefs.inodesFree: 2m
+      memory.available: 30s
+      nodefs.available: 1m
+      nodefs.inodesFree: 1m
+  #+end_src
+
+  驱逐优先级：
+  + 首先考虑资源使用量超过其请求的 BestEffort 或 Burstable Pod。这些 Pod 会根据它们的优先级以及它们的资源使用级别超过其请求的程度被逐出
+  + 资源使用量少于请求量的 Guaranteed Pod 和 Burstable Pod 根据其优先级被最后驱逐
+
+  参考：[[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/node-pressure-eviction/][节点压力驱逐 | Kubernetes]]
+
 * DiskPressure Eviction
   kubelet 会在 node 上内存、磁盘和可用进程标识符的负载很高或即将耗尽时对 node 上的 pod 进行驱逐，而在 DiskPressure 驱逐时常常可以看到这样的日志：
   #+begin_example
