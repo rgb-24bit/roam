@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       084362f7-95dd-421f-98c8-8518d9501b65
+:END:
+#+TITLE: X-Y Problem
+
+☞ [[https://coolshell.cn/articles/10804.html][X-Y Problem | 酷 壳 - CoolShell]]
+
+简单来说就是为了解决 X 问题，却去问别人 Y 问题怎么解决（因为觉得 Y 问题可以解决 X 问题，但实际上不是），导致在一个根本错误的方向上浪费他人大量的时间和精力！
+
