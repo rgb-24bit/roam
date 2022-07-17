@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       cd9ed8a1-ebfe-41a0-97e0-a50ad38d28a2
+:END:
+#+TITLE: 市场出清
+#+filetags: :Economy:
+
+在经济学中，市场出清（英语：market clearing）是在市场中，任何使交易的供给等于需求的过程，即为「清理」多余的供给或需求。
+
+在完成出清后，商品的市场出清价格是供给量等于需求量的商品或服务的价格，也就是均衡价格。
+
+参考：[[https://zh.m.wikipedia.org/zh-hans/%E5%B8%82%E5%9C%BA%E5%87%BA%E6%B8%85][市场出清 - 维基百科，自由的百科全书]]
+
