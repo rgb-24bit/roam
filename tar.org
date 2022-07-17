@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       DEFAA82D-3868-4192-BE73-863DE335D2EE
+:END:
+#+TITLE: tar
+
+tar 解压时可以提前指定部分，只需要在最后指定目标就行：
+#+begin_example
+  $ tar -tvf foo.tar
+  a.txt
+  b.txt
+  c.txt
+  d/
+  d/d.txt
+  
+  $ tar -zxvf foo.tar d/d.txt
+  x d/d.txt
+  
+  $ ls d/
+  d.txt
+#+end_example
+

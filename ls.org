@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       7384A59A-D61C-4B3F-85FD-78734920452C
+:END:
+#+TITLE: ls
+
+#+begin_example
+  # To display files, sorted by size:
+  ls -S
+  
+  # To display files, sorted by time modified (most recently modified first)
+  ls -t
+  
+  # Reverse the order of the sort
+  ls -r
+#+end_example
+

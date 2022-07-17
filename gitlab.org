@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       B03FD710-E099-4136-B795-45EF0643989E
+:END:
+#+TITLE: gitlab
+
+* Access repository raw page by Personal access tokens
+  对于 Gitlab 私有仓库的 raw 页面，可以生成一个带有 =read_repository= 权限的 [[https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html][Personal access tokens]] 来访问：
+  #+begin_example
+    curl --header "PRIVATE-TOKEN: $TOKEN" <raw>
+  #+end_example
+

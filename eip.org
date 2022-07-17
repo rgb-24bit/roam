@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       17C55B0A-AEFE-4A61-AFD0-73AAA3669745
+:END:
+#+TITLE: EIP
+
+弹性公网IP（Elastic IP Address，简称EIP）是可以独立购买和持有的公网 IP 地址资源。其实现和一般的内网访问公网场景类似，一般的内网访问公网会通过 NAT 网关进行 IP 地址的转换，EIP 也类似。
+
+绑定到 ECS 的 EIP 并没有直接绑定到 ECS 的网卡上，而是在网关层建立了一个 EIP 到 ECS 的映射规则。当 ECS 访问公网 IP 时，NAT 负责将源 IP 替换为 EIP 进行访问，反过来访问 EIP 时通过 NAT 将目标 IP 替换为 ECS 的 IP。
+
+这种场景下 ECS 独占一个 EIP 资源，对于共享的场景，可以和内网访问公网那样，一个 EIP 映射到多个内网 IP。
+
+当然，也就是说如果 ECS 没有绑定 EIP，那么就没法访问公网了。
+
