@@ -6,6 +6,7 @@
 - [[#m05][M05]]
 - [[#m06][M06]]
 - [[#m07][M07]]
+- [[#m08][M08]]
 
 * M03
   ☞ [[http://icyfenix.cn/immutable-infrastructure/network/linux-vnet.html][Linux 网络虚拟化 | 凤凰架构]]
@@ -59,3 +60,10 @@
 
   1) 挺有趣的设计，专门为有状态应用设计的编程语言
   2) 现有的大部分编程语言确实更关注「计算」部分，状态通过和外部系统交互来保存
+
+* M08
+  ☞ [[https://www.morling.dev/blog/the-code-review-pyramid/][The Code Review Pyramid - Gunnar Morling]]
+
+  1) Code Style 和 Tests 尽量通过自动化 CI/CD 来覆盖，省事同时还可以避免争论
+  2) Review 将更多精力放在文档和实现和设计上
+

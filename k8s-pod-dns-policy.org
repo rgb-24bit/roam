@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       D23EB0B4-E18E-499A-9A9C-5DCBF2BF93D4
+:END:
+#+TITLE: k8s pod dns policy
+
+最近一个项目中遇到一个问题，k8s master 节点重启后 kube-proxy 设置 ipvs 规则还没设置好，导致 master 节点上的 apiserver 通过 svc 的 vip 调用 webhook 失败，vip 没转发到 rs。
+
+然后说把 svc 改成 headless 的，结果 apiserver 不干了，解析不了[fn:1]，经过一番折腾了解到了 pod dnsPolicy 配置：
++ =Default= Pod 使用从 Node 上继承过来的 resolve 配置，这个一般是没法解析 k8s 集群内的域名的
++ =ClusterFirst= Pod 使用 k8s 集群的 DNS，可以解析 k8s 集群内的域名
++ =ClusterFirstWithHostNet= 当 Pod 使用 HostNetwork 时也使用 k8s 集群的 DNS（也就是当策略为 ClusterFirst 时，Pod 使用 HostNetwork 就不会用集群 DNS）
++ =None= 忽略环境 DNS 配置，使用 dnsConfig 配置
+
+注：默认值是 ClusterFirst 不是 Default。
+
+参考：[[https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy][DNS for Services and Pods | Kubernetes]]
+
+* Footnotes
+
+[fn:1] 看代码可以发现 apiserver 对应 svc 走的不是 dns 解析，而是直接获取的 svc 的 ClusterIP 字段 [[https://github.com/kubernetes/kubernetes/blob/v1.24.0/staging/src/k8s.io/apiserver/pkg/util/proxy/proxy.go#L92][ResloveCluster]]
+

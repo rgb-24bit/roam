@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       6BC7058A-D2DA-4AC1-A96B-51E555F8BD22
+:END:
+#+TITLE: linux ca certificates
+
+默认情况下，Linux 主要发行版系统根证书存储位置：
+|------------------------+-------------------------------------------------------------------|
+| 操作系统               | 路径                                                              |
+|------------------------+-------------------------------------------------------------------|
+| Debian/Ubuntu/Gentoo   | /etc/ssl/certs/ca-certificates.crt                                |
+| Fedora/CentOS/RHEL 7.x | /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem                 |
+| Fedora/CentOS/RHEL 6.x | /etc/pki/tls/certs/ca-bundle.crt                                  |
+| Alpine Linux <=3.11    | /etc/ssl/cert.pem                                                 |
+| Alpine Linux >=3.12    | /etc/ssl/certs/ca-certificates.crt (/etc/ssl/cert.pem 是符号链接) |
+| OpenSUSE/SLES          | /var/lib/ca-certificates/ca-bundle.pem /etc/ssl/ca-bundle.pem     |
+|------------------------+-------------------------------------------------------------------|
+
+这些位置的证书通常并不是原始的证书文件，而是根据原始证书文件汇总生成的，查看文件内容可以发下里面其实有很多个证书。
+
+获得新的根证书后，可以通过特定命令将证书加到上面的文件中，比如 Debian 系系统可以：
+#+begin_src sh
+  # - 安装
+  sudo cp root_ca.crt /usr/local/share/ca-certificates/root_ca.crt
+  # update-ca-certificates 会添加 /etc/ca-certificates.conf 配置文件中指定的证书
+  # 另外所有 /usr/local/share/ca-certificates/*.crt 会被列为隐式信任
+  sudo update-ca-certificates
+
+  # - 删除
+  sudo rm /usr/local/share/ca-certificates/root_ca.crt
+  sudo update-ca-certificates --fresh
+#+end_src
+
+容器中可以选择挂载系统根证书或在生成镜像时将证书到到镜像中。
+
+参考：[[https://kompost.cn/posts/install-and-trust-self-signed-cert/#%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E6%88%96%E7%8E%AF%E5%A2%83][如何安装和信任自签名证书 · Kompost]]

@@ -27,7 +27,7 @@
   #+end_src
 
   + 优点：无需改动 scheduler 代码，维护方便，依赖问题少
-  + 缺点：扩展能力有限，需要引入而外的 HTTP 服务
+  + 缺点：扩展能力有限，需要引入额外的 HTTP 服务
   
 * scheduler framework
   scheduler framework 简单的使用方式是和 scheduler 一起编译，将自己实现的 plugin 作为参数传递给 scheduler，并通过配置启用[fn:1]：

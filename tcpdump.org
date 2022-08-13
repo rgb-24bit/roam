@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       7A552330-4DF3-40C2-8F04-8EDA734FD1D3
+:END:
+#+TITLE: tcpdump
+
+* 抓 VXLAN 包
+  #+begin_example
+    tcpdump -l -n -i <if> 'port 4789 and udp[8:2] = 0x0800 & 0x0800 and udp[11:4] = <vni> & 0x00FFFFFF'
+  #+end_example
+

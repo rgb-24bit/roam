@@ -3,5 +3,308 @@
 :END:
 #+TITLE: k8s scheduler
 
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#schedulingqueue][SchedulingQueue]]
+  - [[#eventhandlers][EventHandlers]]
+  - [[#clusterevent][ClusterEvent]]
+  - [[#scheduleone-failed][ScheduleOne Failed]]
+  - [[#preempt][Preempt]]
 
+* SchedulingQueue
+  Scheduler 通过 SchedulingQueue 循环来完成每个 Pod 的调度，SchedulingQueue 的结构为：
+  #+begin_src go
+    // pkg/scheduler/internal/queue/scheduling_queue.go:134
+    //
+    // PriorityQueue implements a scheduling queue.
+    // The head of PriorityQueue is the highest priority pending pod. This structure
+    // has two sub queues and a additional data structure, namely: activeQ,
+    // backoffQ and unschedulablePods.
+    // - activeQ holds pods that are being considered for scheduling.
+    // - backoffQ holds pods that moved from unschedulablePods and will move to
+    //   activeQ when their backoff periods complete.
+    // - unschedulablePods holds pods that were already attempted for scheduling and
+    //   are currently determined to be unschedulable.
+    type PriorityQueue struct {
+      // PodNominator abstracts the operations to maintain nominated Pods.
+      framework.PodNominator
+    
+      stop  chan struct{}
+      clock util.Clock
+    
+      // pod initial backoff duration.
+      podInitialBackoffDuration time.Duration
+      // pod maximum backoff duration.
+      podMaxBackoffDuration time.Duration
+      // the maximum time a pod can stay in the unschedulablePods.
+      podMaxInUnschedulablePodsDuration time.Duration
+    
+      lock sync.RWMutex
+      cond sync.Cond
+    
+      // activeQ is heap structure that scheduler actively looks at to find pods to
+      // schedule. Head of heap is the highest priority pod.
+      activeQ *heap.Heap
+      // podBackoffQ is a heap ordered by backoff expiry. Pods which have completed backoff
+      // are popped from this heap before the scheduler looks at activeQ
+      podBackoffQ *heap.Heap
+      // unschedulablePods holds pods that have been tried and determined unschedulable.
+      unschedulablePods *UnschedulablePods
+      // schedulingCycle represents sequence number of scheduling cycle and is incremented
+      // when a pod is popped.
+      schedulingCycle int64
+      // moveRequestCycle caches the sequence number of scheduling cycle when we
+      // received a move request. Unschedulable pods in and before this scheduling
+      // cycle will be put back to activeQueue if we were trying to schedule them
+      // when we received move request.
+      moveRequestCycle int64
+    
+      clusterEventMap map[framework.ClusterEvent]sets.String
+    
+      // closed indicates that the queue is closed.
+      // It is mainly used to let Pop() exit its control loop while waiting for an item.
+      closed bool
+    
+      nsLister listersv1.NamespaceLister
+    }
+  #+end_src
+
+  循环流程的简单概述：
+  1. 新创建的 Pod 会进入 activeQ，activeQ 中的 Pod 根据一定规则排序，同时 activeQ 中的 Pod 也会不断被取出进行调度
+  2. 调度成功后 Pod 会从 SchedulingQueue 中消失，调度失败则进入 unschedulablePods
+  3. unschedulablePods 中的 Pod 在等待 podMaxInUnschedulablePodsDuration 时长后被取出放入 backoffQ
+  4. backoffQ 中的 Pod 在等待 podMaxBackoffDuration 时长后被取出放入 activeQ
+  5. 在接受到 Pod 的更新、删除事件后，可能会让在 unschedulablePods 和 backoffQ 中的 Pod 提前进入 activeQ 或被删除
+
+  整体思路其实很简单，就是维护一个主队列 activeQ 让正常的 Pod 按照优先级逐个调度，调度失败的 Pod 进入后备队列等待恢复调度。
+  
+** EventHandlers  
+   Scheduler 通过 Informer EventHandler 来关注 Pod 相关的事件，并根据需要更新 SchedulingQueue：
+   #+begin_src go
+     // pkg/scheduler/eventhandlers.go:249
+     // addAllEventHandlers is a helper function used in tests and in Scheduler
+     // to add event handlers for various informers.
+     func addAllEventHandlers(
+       sched *Scheduler,
+       informerFactory informers.SharedInformerFactory,
+       dynInformerFactory dynamicinformer.DynamicSharedInformerFactory,
+       gvkMap map[framework.GVK]framework.ActionType,
+     ) {
+       // scheduled pod cache
+       informerFactory.Core().V1().Pods().Informer().AddEventHandler(
+         cache.FilteringResourceEventHandler{
+           FilterFunc: func(obj interface{}) bool {
+             switch t := obj.(type) {
+             case *v1.Pod:
+               return assignedPod(t)
+             }
+           },
+           Handler: cache.ResourceEventHandlerFuncs{
+             AddFunc:    sched.addPodToCache,
+             UpdateFunc: sched.updatePodInCache,
+             DeleteFunc: sched.deletePodFromCache,
+           },
+         },
+       )
+       // unscheduled pod queue
+       informerFactory.Core().V1().Pods().Informer().AddEventHandler(
+         cache.FilteringResourceEventHandler{
+           FilterFunc: func(obj interface{}) bool {
+             switch t := obj.(type) {
+             case *v1.Pod:
+               return !assignedPod(t) && responsibleForPod(t, sched.Profiles)
+             case cache.DeletedFinalStateUnknown:
+               if pod, ok := t.Obj.(*v1.Pod); ok {
+                 // The carried object may be stale, so we don't use it to check if
+                 // it's assigned or not.
+                 return responsibleForPod(pod, sched.Profiles)
+               }
+               return false
+             default:
+               return false
+             }
+           },
+           Handler: cache.ResourceEventHandlerFuncs{
+             AddFunc:    sched.addPodToSchedulingQueue,
+             UpdateFunc: sched.updatePodInSchedulingQueue,
+             DeleteFunc: sched.deletePodFromSchedulingQueue,
+           },
+         },
+       )
+     
+       // ...
+     }
+   #+end_src
+
+   可以看到两组 EventHandlers，其中一组针对 UnAssignedPod，一组针对 AssignedPod，对于 UnAssignedPod 来说很正常，因为没调度，所以根据新的状态更新 SchedulingQueue 中的 Pod，
+   而对于 AssignedPod 来说，则是为了将部分位于 unschedulablePods 和 backoffQ 中的 pod 取出，因为这些 Pod 调度失败的原因可能是没有满足 Pod 亲和性，而有新的 Pod 调度成功后，
+   这些不满足 Pod 亲和的 Pod 可能就满足了，因此把它们取出来进行调度，最终对应 SchedulingQueue 的 AssignedPodAdded 和 AssignedPodUpdated 方法
+   #+begin_src go
+     // pkg/scheduler/internal/queue/scheduling_queue.go:595
+     //
+     // AssignedPodAdded is called when a bound pod is added. Creation of this pod
+     // may make pending pods with matching affinity terms schedulable.
+     func (p *PriorityQueue) AssignedPodAdded(pod *v1.Pod) {
+       p.lock.Lock()
+       p.movePodsToActiveOrBackoffQueue(p.getUnschedulablePodsWithMatchingAffinityTerm(pod), AssignedPodAdd)
+       p.lock.Unlock()
+     }
+     
+     // AssignedPodUpdated is called when a bound pod is updated. Change of labels
+     // may make pending pods with matching affinity terms schedulable.
+     func (p *PriorityQueue) AssignedPodUpdated(pod *v1.Pod) {
+       p.lock.Lock()
+       p.movePodsToActiveOrBackoffQueue(p.getUnschedulablePodsWithMatchingAffinityTerm(pod), AssignedPodUpdate)
+       p.lock.Unlock()
+     }
+   #+end_src
+   
+   AssignedPod 删除和 Node 事件也一样，可能存在反亲和或其他调度失败的原因，这会把所有 unschedulablePods 取出来判断一下是否可以加入 activeQ。
+
+   最终效果就是在 SchedulingQueue 中添加、更新、删除 Pod，SchedulingQueue 根据 Pod 状态判断把 Pod 放到哪个内部 queue。
+
+** ClusterEvent
+   根据 Pod 调度失败的原因和 Pod 更新的原因，Scheduler 抽象出了 ClusterEvent 这个东西，SchedulingQueue 用来判断 Pod 应该放到哪个 Queue：
+   #+begin_src go
+     // pkg/scheduler/framework/types.go:80
+     //
+     // ClusterEvent abstracts how a system resource's state gets changed.
+     // Resource represents the standard API resources such as Pod, Node, etc.
+     // ActionType denotes the specific change such as Add, Update or Delete.
+     type ClusterEvent struct {
+       Resource   GVK
+       ActionType ActionType
+       Label      string
+     }
+   #+end_src
+
+   #+begin_src go
+     // pkg/scheduler/internal/queue/scheduling_queue.go:613
+     //
+     // MoveAllToActiveOrBackoffQueue moves all pods from unschedulablePods to activeQ or backoffQ.
+     // This function adds all pods and then signals the condition variable to ensure that
+     // if Pop() is waiting for an item, it receives the signal after all the pods are in the
+     // queue and the head is the highest priority pod.
+     func (p *PriorityQueue) MoveAllToActiveOrBackoffQueue(event framework.ClusterEvent, preCheck PreEnqueueCheck) {
+       p.lock.Lock()
+       defer p.lock.Unlock()
+       unschedulablePods := make([]*framework.QueuedPodInfo, 0, len(p.unschedulablePods.podInfoMap))
+       for _, pInfo := range p.unschedulablePods.podInfoMap {
+         if preCheck == nil || preCheck(pInfo.Pod) {
+           unschedulablePods = append(unschedulablePods, pInfo)
+         }
+       }
+       p.movePodsToActiveOrBackoffQueue(unschedulablePods, event)
+     }
+     
+     // NOTE: this function assumes lock has been acquired in caller
+     func (p *PriorityQueue) movePodsToActiveOrBackoffQueue(podInfoList []*framework.QueuedPodInfo, event framework.ClusterEvent) {
+       moved := false
+       for _, pInfo := range podInfoList {
+         // If the event doesn't help making the Pod schedulable, continue.
+         // Note: we don't run the check if pInfo.UnschedulablePlugins is nil, which denotes
+         // either there is some abnormal error, or scheduling the pod failed by plugins other than PreFilter, Filter and Permit.
+         // In that case, it's desired to move it anyways.
+         if len(pInfo.UnschedulablePlugins) != 0 && !p.podMatchesEvent(pInfo, event) {  // <========= here
+           continue
+         }
+         moved = true
+         pod := pInfo.Pod
+         if p.isPodBackingoff(pInfo) {
+           if err := p.podBackoffQ.Add(pInfo); err != nil {
+             klog.ErrorS(err, "Error adding pod to the backoff queue", "pod", klog.KObj(pod))
+           } else {
+             metrics.SchedulerQueueIncomingPods.WithLabelValues("backoff", event.Label).Inc()
+             p.unschedulablePods.delete(pod)
+           }
+         } else {
+           if err := p.activeQ.Add(pInfo); err != nil {
+             klog.ErrorS(err, "Error adding pod to the scheduling queue", "pod", klog.KObj(pod))
+           } else {
+             metrics.SchedulerQueueIncomingPods.WithLabelValues("active", event.Label).Inc()
+             p.unschedulablePods.delete(pod)
+           }
+         }
+       }
+       p.moveRequestCycle = p.schedulingCycle
+       if moved {
+         p.cond.Broadcast()
+       }
+     }
+     
+   #+end_src
+
+** ScheduleOne Failed
+   ScheduleOne 是调度的主流程，会从 SchedulingQueue 中取出一个 Pod 进行调度，每个 Pod 会经历如 Filter、Score、Bind 等 Plugin 的洗礼，这里主要关注调度失败的情况。
+
+   #+begin_src go
+     // pkg/scheduler/schedule_one.go:812
+     //
+     // handleSchedulingFailure records an event for the pod that indicates the
+     // pod has failed to schedule. Also, update the pod condition and nominated node name if set.
+     func (sched *Scheduler) handleSchedulingFailure(fwk framework.Framework, podInfo *framework.QueuedPodInfo, err error, reason string, nominatingInfo *framework.NominatingInfo) {
+       sched.Error(podInfo, err)
+     
+       // Update the scheduling queue with the nominated pod information. Without
+       // this, there would be a race condition between the next scheduling cycle
+       // and the time the scheduler receives a Pod Update for the nominated pod.
+       // Here we check for nil only for tests.
+       if sched.SchedulingQueue != nil {
+         sched.SchedulingQueue.AddNominatedPod(podInfo.PodInfo, nominatingInfo)
+       }
+     
+       pod := podInfo.Pod
+       msg := truncateMessage(err.Error())
+       fwk.EventRecorder().Eventf(pod, nil, v1.EventTypeWarning, "FailedScheduling", "Scheduling", msg)
+       if err := updatePod(sched.client, pod, &v1.PodCondition{
+         Type:    v1.PodScheduled,
+         Status:  v1.ConditionFalse,
+         Reason:  reason,
+         Message: err.Error(),
+       }, nominatingInfo); err != nil {
+         klog.ErrorS(err, "Error updating pod", "pod", klog.KObj(pod))
+       }
+     }
+   #+end_src
+
+   调度失败后最终都会由 handleSchedulingFailure 来处理，首先，会调用 sched.Error，它的实现为，效果是将 Pod 加入 unschedulablePods 或 backoffQ：
+   #+begin_src go
+     // pkg/scheduler/scheduler.go:343
+     //
+     // MakeDefaultErrorFunc construct a function to handle pod scheduler error
+     func MakeDefaultErrorFunc(client clientset.Interface, podLister corelisters.PodLister, podQueue internalqueue.SchedulingQueue, schedulerCache internalcache.Cache) func(*framework.QueuedPodInfo, error) {
+       return func(podInfo *framework.QueuedPodInfo, err error) {
+         pod := podInfo.Pod
+         if fitError, ok := err.(*framework.FitError); ok {
+           // Inject UnschedulablePlugins to PodInfo, which will be used later for moving Pods between queues efficiently.
+           podInfo.UnschedulablePlugins = fitError.Diagnosis.UnschedulablePlugins
+         }
+     
+         // Check if the Pod exists in informer cache.
+         cachedPod, err := podLister.Pods(pod.Namespace).Get(pod.Name)
+         if err != nil {
+           return
+         }
+     
+         // In the case of extender, the pod may have been bound successfully, but timed out returning its response to the scheduler.
+         // It could result in the live version to carry .spec.nodeName, and that's inconsistent with the internal-queued version.
+         if len(cachedPod.Spec.NodeName) != 0 {
+           return
+         }
+     
+         // As <cachedPod> is from SharedInformer, we need to do a DeepCopy() here.
+         podInfo.PodInfo = framework.NewPodInfo(cachedPod.DeepCopy())
+         podQueue.AddUnschedulableIfNotPresent(podInfo, podQueue.SchedulingCycle())
+       }
+     }
+   #+end_src
+   
+   然后会标记 Pod 调度失败的原因，并更新到 apiserver，中间还有 nominating 相关的逻辑，和抢占有关。
+
+** Preempt
+   抢占（Preempt）是运行在 SchedulingQueue 循环上的一段逻辑，当因为资源不足调度失败时，会尝试执行抢占逻辑，如果允许抢占，会缓存抢占的 Node 信息（nominatedInfo），
+   然后驱逐目标 node 上的部分 pod，腾出资源。
+
+   之后 pod 会进入 SchedulingQueue 的后备队列，下次进入 activeQ 后 node 上资源就可能腾出来了，没腾出来就继续失败，重复上述逻辑。
+
+   参考：[[https://cloud.tencent.com/developer/article/1698491][10.深入k8s：调度的优先级及抢占机制源码分析 - 腾讯云开发者社区-腾讯云]]
 

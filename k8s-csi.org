@@ -1,0 +1,47 @@
+:PROPERTIES:
+:ID:       D2ABFD7B-A753-482E-95DA-812D25002061
+:END:
+#+TITLE: k8s csi
+
+k8s csi 规范定义了 CSI Identity、CSI Controller 和 CSI Node 三组接口，其中，CSI Identity 用于获取插件信息，需要 CSI Controller 和 CSI Node 都实现，实际实现 CSI 功能的是 Controller 和 Node 这两组接口。
+
+两组接口的职责和 Volume 的生命周期相关，一个比较经典的生命周期为：
+#+begin_example
+     CreateVolume +------------+ DeleteVolume
+   +------------->|  CREATED   +--------------+
+   |              +---+----^---+              |
+   |       Controller |    | Controller       v
+  +++         Publish |    | Unpublish       +++
+  |X|          Volume |    | Volume          | |
+  +-+             +---v----+---+             +-+
+                  | NODE_READY |
+                  +---+----^---+
+                 Node |    | Node
+              Publish |    | Unpublish
+               Volume |    | Volume
+                  +---v----+---+
+                  | PUBLISHED  |
+                  +------------+
+#+end_example
+
+在这个生命周期中，一个 PV 被创建出来到挂载到 Pod 可以分为三个阶段（卸载同理）：
++ Provision 阶段（CreateVolume），在发现集群中新的 PVC 被创建后，调用 CSI Controller 创建新的 PV
++ Attatch 阶段（Controller Publish Volume），在发现 Pod 被调度到某个阶段后，调用 CSI Controller 将 PV Attatch 到目标 Node
++ Mount 阶段（Node Publish Volume），kubelet 在创建 Pod 时调用 CSI Node 将 PV Mount 到目标 Pod 的文件系统中
+
+三个阶段中，Mount 阶段是由 kubelet 完成，因此通常需要在每个 Node 上都运行 CSI Node 插件，让 kubelet 调用。而 Provision 和 Attatch 阶段则和 kubelet 无关，可以作为独立的组件运行。
+
+因此，根据需要，将 CSI 的接口划分为了 CSI Controller（Provision、Attatch）和 CSI Node（Mount）两组。
+
+而在实际的实现中，除了实现 CSI 接口，还需要关注 PVC、PV 等对象的创建、删除，插件的注册。因此，社区整了套比较通用的实现模式，其中比较核心的几个组件：
++ external-attacher：监听 VolumeAttachment 对象，并调用 CSI driver Controller 服务的 ControllerPublishVolume 和 ControllerUnpublishVolume 接口，用来将 volume 附着到 node 上，或从 node 上删除
++ external-provisioner：监听 PVC 对象，并调用 CSI driver Controller 服务的 CreateVolume 和 DeleteVolume 接口，用来提供一个新的 volume
++ node-driver-registrar：通过直接调用 CSI driver Node 服务的 NodeGetInfo 接口，将 CSI driver 的信息通过 kubelet 的插件注册机制在对应节点的 kubelet 上进行注册
+
+当然，并不是说就需要 attacher 一个 pod，provisioner 一个 pod，可以根据需要组合，比如下图，CSI Controller 同时实现 attacher 和 provisioner，内部完成 pvc 的监听到 pv 的创建和 attatch 工作，而 Node Plugin 运行在每个 Node 上，通过 registrar 注册到 kubelet 让 kubelet 来调用：
+#+HTML: <img src="https://blog.cdn.updev.cn/hdls/2021-07-11-mount.jpg">
+
+参考：
++ [[https://github.com/container-storage-interface/spec/blob/master/spec.md][spec/spec.md at master · container-storage-interface/spec]]
++ [[https://blog.hdls.me/16255765577465.html][浅析 CSI 工作原理 - 海的澜色]]
+

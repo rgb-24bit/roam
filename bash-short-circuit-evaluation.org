@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       E3893CFF-7DE1-4500-B1B2-72C25AC582A2
+:END:
+#+TITLE: bash short-circuit evaluation
+
++ Ref :: [[id:00A99F42-14F2-4935-A000-43A8012E61ED][Short-circuit evaluation]]
+
+Bash 中可以使用 =&&= 和 =||= 达到短路求值的效果，根据前一个命令的 exit code 来判断是否执行后续的逻辑：
+#+begin_src sh
+  grep -q <pattern> <file> || do ...  # 在发现 pattern 时执行
+  grep -q <pattern> <file> && do ...  # 在没发现 pattern 时执行
+#+end_src
+

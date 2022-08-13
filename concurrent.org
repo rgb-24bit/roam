@@ -3,5 +3,7 @@
 :END:
 #+TITLE: concurrent
 
-
+* Trick
+** Batching
+   缓存中不存在需要到 DB 中捞数据时，可以将一个时间片内的请求缓存批量去拉起，而不是一个一个拉取，减小 DB 压力，比如 [[https://github.com/graphql/dataloader#batching][graphql/dataloader]]。
 

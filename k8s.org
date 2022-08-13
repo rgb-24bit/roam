@@ -20,3 +20,6 @@ kubernetes 各个组件便主要基于 kube-apiserver 提供 list & watch 能力
 # //www.plantuml.com/plantuml/png/POxH2W8X44NVvok6VVSNOdzbqu6MN9LnZ2BwzqfiXl15lDV3zQnLDfPsH02VZv8J9K4I7y3YScrdSblPA_6DUC6jegQ9g_v2eSN1QPeudvDmZZ_G8e2Eesl5dOQF0kWYVLfJq4_GyVxt0Ya7mduy0T4SlWgHH3lpAfplZwxKR_026F2miVKEJ2sib48xuXi0
 #+HTML: <img src="https://user-images.githubusercontent.com/26481411/167984046-fccea6b9-335f-4f6c-8653-4c93e510d2d8.png">
 
+* References
+  + 源码版本 [[https://github.com/kubernetes/kubernetes][kubernetes]] v1.24.0 
+

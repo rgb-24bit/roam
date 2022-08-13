@@ -3,7 +3,7 @@
 :END:
 #+TITLE: mpsc queue
 
-+ Tag :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
++ Ref :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
 
 Multiple Producer, Single Consumer _Wait-Free_ Queue.
 

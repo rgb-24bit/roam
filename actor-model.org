@@ -3,7 +3,7 @@
 :END:
 #+TITLE: Actor model
 
-+ Tag :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
++ Ref :: [[id:C8E27275-38F1-4A3D-A69B-79EC526DB018][concurrent]]
 
 #+begin_quote
 An actor is the primitive unit of computation. It’s the thing that receives a message and do some kind of computation based on it.

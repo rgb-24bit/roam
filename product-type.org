@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       86FB0968-DB17-4DEB-B6F8-142D71FF36D9
+:END:
+#+TITLE: product type
+
+和 [[id:B5E92FEC-C717-4AA0-9AF0-29BC36D49399][sum type]] 不一样，积类型是通过类型的组合，进行复杂度的乘积，比如通过基础类型组合而成的结构体。
+
+参考：[[https://en.wikipedia.org/wiki/Product_type][Product type - Wikipedia]]
+

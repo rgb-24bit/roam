@@ -3,8 +3,6 @@
 :END:
 #+TITLE: bash io redirection
 
-+ Tag :: [[id:5DA94278-6314-4096-9F3E-648AA0DD938E][bash]]
-
 基于文件描述符的 I/O 重定向：
 #+begin_example
   M>N

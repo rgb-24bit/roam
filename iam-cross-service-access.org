@@ -1,0 +1,115 @@
+:PROPERTIES:
+:ID:       D983203E-4C79-4952-A99B-A51C3667FCA8
+:ROAM_ALIASES: "IAM 跨服务访问"
+:END:
+#+TITLE: iam cross-service access
+
+* 问题
+  跨服务访问用于解决如下问题：
+  #+begin_quote
+  在某些场景下，一个云服务为了完成自身的某个功能，需要获取其他云服务的访问权限。例如：配置审计（Config）服务要读取您的云资源信息，以获取资源列表和变更历史，就需要获取 ECS、RDS 等产品的访问权限。
+  #+end_quote
+
+  在这个问题中存在如下主体：
+  1. 用户 - 拥有操作云服务权限的 Account 或 User
+  2. 当前服务 - 用户正在操作的云服务，比如配置审计（Config）
+  3. 关联服务 - 当前服务需要访问的其他云服务，如 ECS、RDS 等
+  4. 关联服务的访问权限 - 当前服务需要的关联服务的访问权限集合
+
+  即：让用户将关联服务的访问权限赋予给当前服务。
+
+* 服务关联角色
+  出于合规考虑，需要让用户感知到「将关联服务的访问权限赋予给当前服务」这件事，并操作同意。这在 IAM 系统中通过服务关联角色（service-linked roles）来实现。
+
+  服务关联角色由服务预先定义，定义中需要明确谁访问（当前服务是谁），访问谁（关联服务有哪些），要怎样访问（需要授权的 Action 列表），访问范围（需要授权的资源列表）。
+  #+begin_src json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": "iam:CreateServiceLinkedRole",
+                "Resource": "arn:aws:iam::*:role/aws-service-role/SERVICE-NAME.amazonaws.com/SERVICE-LINKED-ROLE-NAME-PREFIX*",
+                "Condition": {"StringLike": {"iam:AWSServiceName": "SERVICE-NAME.amazonaws.com"}}
+            },
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "iam:AttachRolePolicy",
+                    "iam:PutRolePolicy"
+                ],
+                "Resource": "arn:aws:iam::*:role/aws-service-role/SERVICE-NAME.amazonaws.com/SERVICE-LINKED-ROLE-NAME-PREFIX*"
+            }
+        ]
+    }
+  #+end_src
+
+  预先定义好服务关联角色后，用户在操作当前服务时，便可以通过弹出单独的页面或其他方式提示用户需要授权创建服务关联角色，然后在用户同意后根据角色的定义在当前用户下进行创建。
+
+  创建成功后，服务便可以使用 AssumeRole 来扮演这个角色获取临时凭证，然后通过临时凭证来访问关联服务，操作关联服务的资源。
+
+* AssumeRole
+  在 IAM 中，使用 Policy 来完成如下定义：
+  #+begin_quote
+  谁（Principal）在什么条件下（Condition）可以或者不能（Allow or Deny）操作（Action）什么资源（Resource）。
+  #+end_quote
+
+  #+begin_src json
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Action": ["s3:ListBucket"],
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::mybucket"],
+                "Condition": {"StringLike": {"s3:prefix": ["David/*"]}}
+            },
+            {
+                "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject"
+                ],
+                "Effect": "Allow",
+                "Resource": ["arn:aws:s3:::mybucket/David/*"]
+            }
+        ]
+    }
+  #+end_src
+
+  而在 IAM 体系中，存在如下几种身份：
+  1. 主帐号 Account，拥有云平台的所有权限，拥有所有资源。拥有长期 AK/SK。
+  2. 子帐号 User，不拥有任何资源，并且所有操作均需要被授权，默认不具有任何权限。可以拥有长期 AK/SK。
+  3. 角色 Role，特定权限的集合，可以和 User 关联起来。
+  4. 服务 Service，在 IAM 中，云平台的 Service 也被当作是一种身份，具有自己的服务长期 AK/SK。
+
+  这些身份便可以充当 Policy 中的「谁（Principal）」，而一般来说，主帐号拥有所有权限，User 可以通过关联 Policy 来定义自身拥有的权限，而 Role，则设计用于「临时赋予某些权限」。
+
+  这里的区别在于是否「拥有」权限：
+  + User 在关联 Policy 时，User 便拥有了这些 Policy 对应的权限，可以使用 User 的 AK/SK 访问对应的接口
+  + Role 在关联 Policy 时，拥有这些权限的是 Role，其他身份可以扮演角色（AssumeRole）来临时获取这些权限
+
+  这和 RBAC 不同，在 RBAC 中用户可以属于某个角色，在用户被移出这个角色前，这个用户都一直拥有这些权限。
+
+  而在 IAM 中，User 和 Role 之间不是从属关系，而是扮演关系，扮演是存在时限的，通过 AssumeRole 获得的 AK/SK 存在有效时限。
+
+  这种设计感觉是为了区分「是否拥有权限」这件事，User 和 Service 都拥有长期 AK/SK，Account 是权限的拥有者，可以赋予 User 长期的权限，相当于 User 拥有了权限。
+
+  而 Service 本身不拥有其他服务的权限，所以在跨服务访问中，我们创建了服务关联角色，然后，服务通过 AssumeRole 接口来扮演这个角色获得短期的访问权限。
+
+* 服务资源审计
+  在跨服务访问中存在如下场景：
+  #+begin_quote
+  服务 a 需要服务 b、c、d 的能力进行支撑，并且 bcd 的资源并不属于用户，此时怎么对 bcd 的资源进行审计计费？
+  #+end_quote
+
+  在 IAM 中，资源被 Account 这个实体拥有，但现在 Account 之间拥有的是 a 的资源，bcd 的资源不直接拥有。一种做法是为服务 a 单独创建一个服务帐号，将 bcd 资源挂在服务帐号 a 上，
+  单独审计。
+
+  或者针对 service 进行特化，允许 service 拥有资源？
+
+* 参考
+  + [[https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_variables.html][IAM policy elements: Variables and tags - AWS Identity and Access Management]]
+  + [[https://docs.aws.amazon.com/IAM/latest/UserGuide/using-service-linked-roles.html][Using service-linked roles - AWS Identity and Access Management]]
+  + [[https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html][AssumeRole - AWS Security Token Service]]
+  + [[https://help.aliyun.com/document_detail/116820.htm?spm=a2c4g.11186623.0.0.74be3a5csKCM65#task-221553][使用 RAM 角色]]
+  + [[https://help.aliyun.com/document_detail/160674.html][服务关联角色]]

@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       9E311E91-C284-4B63-9BFB-755F4518D558
+:END:
+#+TITLE: vim
+
+* 常用操作
+  #+begin_example
+    # 复制粘贴
+    :set paste         # 关闭 autoindent，方便粘贴
+    :set mouse-=a      # 鼠标选择文本但不进入 VISUAL mode
+    
+    # 字符串替换 https://linuxize.com/post/vim-find-replace/
+    :s/foo/bar/        # 替换当前行第一个 foo 为 bar
+    :s/foo/bar/g       # 替换当前行所有 foo 为 bar
+    :%s/foo/bar/g      # 替换所有 foo 为 bar
+    :%s/foo/bar/gc     # 替换时进行确认
+    
+    # 编辑
+    C-v ... S-i        # 矩形编辑
+    dtc                # 删除到下一个 c 处
+    dfc                # 删除到下一个 c 处，包括 c 也被删除
+  #+end_example
+
