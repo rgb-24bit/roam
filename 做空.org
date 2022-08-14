@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       f2f72649-bc9b-41c8-b262-803c6d2af2b0
+:END:
+#+TITLE: 做空
+#+filetags: :Economy:
+
+做空就是在预期资产价格未来会跌的时候，借来资产高价卖出，然后低价买入偿还，赚取差价。
+
