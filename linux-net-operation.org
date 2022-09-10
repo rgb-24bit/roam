@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       9AB8A356-2F8D-4A01-A244-DE459977D851
+:END:
+#+TITLE: linux net operation
+
+获取 [[id:70D5BE15-0B8F-4F26-99D1-4F74CD1EA70B][bonding]] 口 bond 的网卡：
+#+begin_src sh
+  cat /proc/net/bonding/<bond if> | grep "Slave Interface"
+#+end_src
+
+查看网卡带宽：
+#+begin_src sh
+  ethtool <if> | grep -i speed
+#+end_src
+

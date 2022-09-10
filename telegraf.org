@@ -1,0 +1,30 @@
+:PROPERTIES:
+:ID:       78898056-5B14-4E54-B928-FC7CC6A91886
+:END:
+#+TITLE: telegraf
+
+* Metric Filtering
+  telegraf 可以给每个插件配置 Selectors 和 Modifiers 来选择或修改上报的指标。
+
+  参考：[[https://github.com/influxdata/telegraf/blob/master/docs/CONFIGURATION.md#metric-filtering][Metric Filtering]]
+  
+** Selectors
+   |----------+--------------------|
+   | 属性     | 作用               |
+   |----------+--------------------|
+   | namepass | 名称匹配的才上报   |
+   | namedrop | 名称不匹配的才上报 |
+   | tagpass  | Tag 匹配的才上报   |
+   | tagdrop  | Tag 不匹配的才上报 |
+   |----------+--------------------|
+
+** Modifiers
+   |------------+--------------------------|
+   | 属性       | 作用                     |
+   |------------+--------------------------|
+   | fieldpass  | 匹配的字段才上报         |
+   | fielddrop  | 不匹配的字段才上报       |
+   | taginclude | 只上报指定范围的 tag     |
+   | tagexclude | 只上报不在指定范围的 tag |
+   |------------+--------------------------|
+

@@ -5,3 +5,10 @@
 
 + Tag :: [[id:5b879c5a-b228-4631-8ea7-fdc43c5b7bbe][Service Discovery]]
 
+* 常用状态检查命令工具
+  #+begin_src bash
+    # 查看 cluster 状态
+    echo mntr | nc <zkhost> 2181
+  #+end_src
+
+  mntr 是 zookeeper 的一个 4 字符命令，zk 内置很多 4 字符命令，包括：stat，isro，ruok，mntr，srvr 等。

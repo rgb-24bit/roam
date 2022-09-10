@@ -3,13 +3,21 @@
 :END:
 #+TITLE: ssh
 
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#configure-ssh-key-based-authentication][Configure SSH Key-Based Authentication]]
+- [[#sendenv--acceptenv][SendEnv & AcceptEnv]]
+- [[#proxyjump][ProxyJump]]
+- [[#端口转发][端口转发]]
+  - [[#动态转发][动态转发]]
+  - [[#本地转发][本地转发]]
+  - [[#远程转发][远程转发]]
+
 * Configure SSH Key-Based Authentication
   #+begin_example
     ssh-keygen                                     # 生成公钥和私钥
     ssh-copy-id -i <key.pub> username@remote_host  # 拷贝公钥到服务器
     cat ~/.ssh/<key.pub> | ssh username@remote_host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"  # 不使用 ssh-copy-id 的拷贝方式
   #+end_example
-
 
 * SendEnv & AcceptEnv
   SSH 允许通过 SendEnv 和 AcceptEnv 在建立会话时传递客户端环境变量到服务端，支持通配符匹配。默认情况下会开启环境变量 =LANG LC_*= 的传递，偶尔会导致服务端出现编码错误的问题。
@@ -21,4 +29,66 @@
     # /etc/ssh/sshd_config
     AcceptEnv LANG LC_*
   #+end_src
+
+* ProxyJump
+  可以使用 ProxyJump 的功能简化 Local -> Jump Server -> Remote 登录的过程：
+  #+begin_src conf
+    Host jump
+        IdentityFile ~/.ssh/jump_key
+        User jump
+        Hostname jump_host
+    
+    Host 172.17.*
+        IdentityFile ~/.ssh/server_key
+        User root
+        Hostname %h
+        StrictHostKeyChecking no       # 不检查 host
+        UserKnownHostsFile=/dev/null   # 保存 host 到 /dev/null，也就是不保存
+        ProxyJump jump
+  #+end_src
+
+* 端口转发
+  端口转发中的几个角色：local - 本机、remote - 远程主机、target 要访问的目标地址。
+
+  常常一起用的选项：
+  + =-N= 不在 remote 执行远程命令，只进行端口转发
+  + =-f= 让 SSH 连接在后台运行
+
+** 动态转发
+   动态转发在 local 监听一个端口，使用协议为 SOCKS，对该端口的访问都通过 SSH 连接转发到 remote，在 remote 上执行实际的访问。命令格式为：
+   #+begin_example
+     ssh -D local-port remote-host
+   #+end_example
+
+   数据链路：
+   #+begin_example
+     local -> socks -> remote -> target
+   #+end_example
+   
+   使用：
+   #+begin_example
+     curl -x socks5://localhost:port http://www.example.com
+   #+end_example
+
+** 本地转发
+   本地转发和动态转发类似，只不过只针对单个 target，同时不需要 SOCKS 加密通道。其在 local 监听一个端口，该端口的访问都通过 SSH 连接转发到 remote，并在 remote 上转发到 target。命令格式为：
+   #+begin_example
+     ssh -L local-port:target-host:target-port remote-host
+   #+end_example
+   
+   数据链路：
+   #+begin_example
+     local -> remote -> target
+   #+end_example
+
+** 远程转发
+   远程转发和本地转发相反，其在 remote 监听一个端口，该端口的访问都通过 SSH 连接转发到 local，并在 local 上转发到 target。命令格式为：
+   #+begin_example
+     ssh -R remote-port:target-host:target-port remote-host
+   #+end_example
+
+   数据链路：
+   #+begin_example
+     remote -> local -> target
+   #+end_example
 

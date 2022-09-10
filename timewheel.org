@@ -1,0 +1,36 @@
+:PROPERTIES:
+:ID:       133BEE60-233C-4D7C-ABC3-20D36D5D7285
+:END:
+#+TITLE: timewheel
+
+之前研究 [[id:B42E496C-B889-4714-B3C8-EA90898C7461][tokio]] 的时候就了解到 async runtime 中时间相关的操作会通过时间轮来实现，最近因为一个需求又想起了时间轮，这次分清了时间轮本身是干啥的，在 runtime 中又如何工作。
+
+首先，在常见的实现中，时间轮就是一个拥有多个分层的[[id:8DAC0F37-18B4-4C48-841E-135F2F0A5CF0][环形缓冲区]]，缓冲区的每个格子表示一个时间刻度，不同层就和时钟一样表示不同单位，比如 tokio 中的实现：
+#+begin_src rust
+  /// The wheels are:
+  ///
+  /// * Level 0: 64 x 1 millisecond slots.
+  /// * Level 1: 64 x 64 millisecond slots.
+  /// * Level 2: 64 x ~4 second slots.
+  /// * Level 3: 64 x ~4 minute slots.
+  /// * Level 4: 64 x ~4 hour slots.
+  /// * Level 5: 64 x ~12 day slots.
+
+  https://github.com/tokio-rs/tokio/blob/master/tokio/src/time/driver/wheel/mod.rs#L32
+#+end_src
+
+最内层一个格子表示 1ms，第二层一个格子就是 64ms，这样通过多个分层就可以表示很长的时间跨度。
+
+时间轮在创建的时候拥有一个开始时间，然后根据时间的推移，时间轮的指针就在不同的格子上转动。我们可以在格子上存放需要在该时刻执行的任务，指针转到对应的格子上时，就取出来执行。
+
+这之中，之前比较让我困惑的就是「时间的推移」是怎么搞的，还以为时间轮自己就干了，但看了下，似乎不是，时间轮本身只承担根据当前时间执行对应刻度的存取的操作，而当前时间由外部的 Driver/Runtime 来确定：
++ 在异步编程中，通常有两种阻塞状态：因为异步 I/O 导致的阻塞或因为 time.Sleep() 导致的阻塞
++ Runtime 在通过 [[id:6B0198DB-E52F-491C-94AB-3C8569192A26][epoll]] 之类的系统调用进入 I/O Wait 前，通过在时间轮中检查最近一个任务到到期时间来作为 I/O Wait 的超时时间
++ 唤醒后，将当前时间传入时间轮，取出任务执行
+
+这个过程势必会存在精度上的问题，但也不是不能接受。
+
+参考：
++ [[http://www.cs.columbia.edu/~nahum/w6998/papers/sosp87-timing-wheels.pdf][Hashed and Hierarchical Timing Wheels]]
++ [[https://www.ihcblog.com/rust-runtime-design-3/][Rust Runtime 设计与实现-设计篇 Part2 | 下一站 - Ihcblog!]]
+

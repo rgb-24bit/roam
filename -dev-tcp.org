@@ -1,0 +1,29 @@
+:PROPERTIES:
+:ID:       B698EF88-7887-4096-BDD2-BF7FC30437F1
+:END:
+#+TITLE: /dev/tcp
+
+=/dev/tcp= 是 Linux 中的一个特殊文件，打开这个文件就类似于发出了一个 socket 调用，建立一个 socket 连接，读写这个文件就相当于在这个 socket 连接中传输数据。
+
+使用格式如下，其中 host 可以是域名：
+#+begin_src sh
+  /dev/tcp/${host}/${port}
+#+end_src
+
+同理类似的还有 =/dev/udp= 文件，可以在 shell 使用中的以下语法打开 TCP/UDP 套接字：
+#+begin_src sh
+  exec ${file-descriptor}<> /dev/${protocol}/${host}/${port} # rw
+  exec ${file-descriptor}> /dev/${protocol}/${host}/${port}  # w
+  exec ${file-descriptor}< /dev/${protocol}/${host}/${port}  # r
+#+end_src
+
+此时便可以使用常规的读写命令从文件描述符读取内容了。
+
+打开后，可以使用以下语法关闭读/写套接字，第一个命令关闭输入连接，后者关闭输出连接：
+#+begin_src sh
+  exec ${file-descriptor}<& -
+  exec ${file-descriptor}>& -
+#+end_src
+
+参考：[[https://www.jianshu.com/p/f10736931b93][【bash】关于 /dev/tcp/${HOST}/${PORT} - 简书]]
+

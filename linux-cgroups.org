@@ -1,7 +1,0 @@
-:PROPERTIES:
-:ID:       03CDDBBE-D1A4-43C8-B80D-5DC6DF56FB03
-:END:
-#+TITLE: linux cgroups
-
-
-

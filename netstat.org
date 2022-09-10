@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       0AD485B6-7F8D-4E69-BE99-85FA8921DB38
+:END:
+#+TITLE: netstat
+
+#+begin_src sh
+  # 显示监听端口的进程
+  # -l, --listening
+  #     Show only listening sockets.  (These are omitted by default.)
+  # -n, --numeric
+  #     Show numerical addresses instead of trying to determine symbolic host, port or user names.
+  # -p, --program
+  #    Show the PID and name of the program to which each socket belongs.
+  # -t --tcp
+  # -u --udp
+  netstat -lnptu
+  
+  # 只显示 ipv4
+  netstat -lnptu -4
+  
+  # 只显示 ipv6
+  netstat -lnptu -6
+#+end_src
+
+

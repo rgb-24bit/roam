@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       2E27D2C5-EE06-4FDC-AE48-FC58AC5435E4
+:END:
+#+TITLE: regexp
+
+* 正则
+  IPv4 地址
+  #+begin_example
+    ^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$
+  #+end_example
+
+  参考：[[https://stackoverflow.com/questions/5284147/validating-ipv4-addresses-with-regexp][regex - Validating IPv4 addresses with regexp - Stack Overflow]]
+

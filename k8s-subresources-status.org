@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       7FD35D36-64BB-4142-BEAA-C95750D81863
+:END:
+#+TITLE: k8s subresources status
+
+在 k8s 中，status 常常作为一个资源的 subresources 存在，直接更新 resource 本身时是不会更新 status 的，需要单独指定 subresources 才能完成更新。
+
+体现在资源路径上就是 =/api/version/resource/subresources= 或 =/apis/group/version/resource/subresources= 的格式。
+
+参考：[[https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#spec-and-status][Spec and Status]]。
+

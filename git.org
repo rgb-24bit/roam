@@ -11,3 +11,10 @@
   #+end_example
 
   Ref: [[https://stackoverflow.com/questions/160608/do-a-git-export-like-svn-export][Do a "git export" (like "svn export")? - Stack Overflow]]
+
+* get HEAD commit id
+  #+begin_example
+    git rev-parse HEAD
+    git rev-parse --short HEAD
+  #+end_example
+

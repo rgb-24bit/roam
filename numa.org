@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       D11E6DD5-AC75-49CE-B59F-ECD4D03402D2
+:END:
+#+TITLE: NUMA
+
+非一致性内存访问（Non-Uniform Memory Access、NUMA）是一种计算机内存的设计方式，设计上每个 NUMA 口有对应的 CPU 和内存，CPU 访问同 NUMA 上的内存时叫做 Local Access，
+访问不同口上的 NUMA 叫做 Remote Access，Local Access 比 Remote Access 速度更快。
+
+参考 [[https://serverfault.com/questions/1062690/latency-of-memory-accesses-via-interconnectors][Latency of memory accesses via interconnectors - Server Fault]] 中的数据：
+#+begin_quote
++ The latency of memory access directly connected to the CPU's socket is about 90ns.
++ The latency of memory access connected to other CPU's socket which is connected by UPI to the CPU's socket is about 140ns (so one "hop" of UPI adds about 50ns).
++ The latency of memory access via the considered NUMA interconnect is 370ns (so one "hop" of this interconnect adds about 280ns).
+#+end_quote
+
+在现在的计算机中，一个计算机可以有多个 CPU Socket（CPU 插槽），每个插槽上的 CPU 可以有多个，同时每个 CPU 可能又可以开超线程一核当两核用，而 NUMA 可以定义这些 CPU 访问内存时使用的方式是 Local 和 Remote。
+
+在希望通过「绑核」操作来提高程序性能时，一方面可以将程序不同线程绑定到不同的 CPU 核心上，利用「[[id:CE51393A-3B5A-4AC7-B464-7981A4F722D4][局部性原理]]」来提高缓存命中的概率，同时也可以考虑使用一些库按照 NUMA 分布来创建对象，
+让线程访问的对象总是在自己的 NUMA 上，避免 Remote Access。
+
+参考：
++ [[https://superuser.com/questions/916516/is-the-amount-of-numa-nodes-always-equal-to-sockets][cpu - Is the amount of NUMA nodes always equal to sockets? - Super User]]
++ [[https://draveness.me/whys-the-design-numa-performance/][为什么 NUMA 会影响程序的延迟 - 面向信仰编程]]
+

@@ -8,6 +8,8 @@
   [n]<<[-]word
           here-document
   delimiter
+  
+  If the redirection operator is <<-, then all leading tab characters are stripped from input lines and the line containing delimiter.
 #+end_example
 
 比如，通过如下方式创建文件：
@@ -15,6 +17,15 @@
   cat <<EOF | tee /etc/xxx/xxx.conf
   key1=val1
   key2=val2
+  EOF
+#+end_src
+
+或者多行字符串变量：
+#+begin_src sh
+  read -r -d '' VAR << EOF
+  This is line 1.
+  This is line 2.
+  Line 3.
   EOF
 #+end_src
 

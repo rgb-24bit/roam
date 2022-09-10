@@ -19,3 +19,15 @@
 + [[https://www.kimullaa.com/entry/2020/07/01/200102][taskset と cgroup は何が違うのか - SIerだけど技術やりたいブログ]]
 + [[http://niyanchun.com/taskset-command.html][Linux下的绑核命令——taskset - NYC's Blog]]
 
+* sched_setaffinity
+  sched_setaffinity 可能受 cgroup 的影响绑核失败，在 Linux 中可以通过 cgroup 将进程划分在不同的 group 下，sched_setaffinity 亲和 CPU 时只能亲和同组的 CPU，跨组会失败。
+
+  #+begin_quote
+  EINVAL The affinity bit mask mask contains no processors that are
+       currently physically on the system and permitted to the
+       thread according to any restrictions that may be imposed
+       by cpuset cgroups or the "cpuset" mechanism described in
+       cpuset(7).
+  [[https://man7.org/linux/man-pages/man2/sched_setaffinity.2.html][sched_setaffinity(2) - Linux manual page]]       
+  #+end_quote
+

@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       54E44E16-3865-40FF-900B-F861E699D17D
+:END:
+#+TITLE: client certificate
+
+客户端证书是 [[id:6AEEDF1F-BC2D-4D29-99E5-B68050E78994][X.509]] 证书，只不过由客户端提供，服务端通过效验客户端证书来确定客户端是否合法，而无需使用帐号密码等认证方式。
+
+#+begin_quote
+第一次使用客户端证书是在通过 =~/.kube/config= 中的证书访问 apiserver 的时候，没有输入帐号密码，也没有在 header 上携带 token 的操作，带上证书访问就 ok 了。
+#+end_quote
+
