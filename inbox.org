@@ -28,8 +28,20 @@
   + [[https://docs.microsoft.com/en-us/windows-hardware/drivers/network/introduction-to-receive-side-scaling][Introduction to Receive Side Scaling - Windows drivers | Microsoft Docs]]
   + [[https://www.cnblogs.com/whl320124/articles/10083203.html][浅谈NVMe的多队列技术和IO调度 - 海之心1213 - 博客园]]
 
-* al
-  装箱问题和背包问题
-
 * SIMD
   [[https://zhuanlan.zhihu.com/p/55327037][SIMD简介 - 知乎]]
+
+* 一致性
+  + [[https://www.cnblogs.com/xrq730/p/4944768.html][从分布式一致性谈到CAP理论、BASE理论 - 五月的仓颉 - 博客园]]
+  + [[https://juejin.cn/post/6854573216174702605#heading-7][分布式一致性算法，你确定不了解一下 - 掘金]]
+
+* PCI 和 Linux 设备模型
+  + [[https://utcc.utoronto.ca/~cks/space/blog/linux/NVMeSysfsData][Chris's Wiki  blog/linux/NVMeSysfsData]]
+  + [[https://www.cnblogs.com/LoyenWang/p/14165852.html][【原创】Linux PCI驱动框架分析（一） - LoyenWang - 博客园]]
+  + [[https://zhuanlan.zhihu.com/p/26172972][深入PCI与PCIe之一：硬件篇 - 知乎]]
+  + [[https://blog.csdn.net/kunkliu/article/details/94379567][PCIe扫盲——BDF与配置空间_kunkliu的博客-CSDN博客]]
+  + [[https://wiki.xenproject.org/wiki/Bus:Device.Function_(BDF)_Notation][Bus:Device.Function (BDF) Notation - Xen]]
+
+* SPDK
+  + [[https://spdk.io/doc/][SPDK: Storage Performance Development Kit]]
+

@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       AD44808F-4E50-41D6-9D51-F05CFA7A476E
+:END:
+#+TITLE: keepalived
+#+filetags: :ha:
+
+在某些场景下，程序本身是单机的，但又想提供高可用的能力。这时可以考虑通过 keepalived 来做前端的负载均衡和高可用：
++ keepalived 通过 VIP 暴露服务地址，后端的 RS 区分主从，keepalived 可进行探活，在主挂掉后自动切到从节点
++ 需要主从节点上的服务自己完成不同副本之间的同步工作
+
+前置条件：
++ keepalived 使用的 VIP 没被占用，同时可以被申请到
+
+应用：
++ 结合使用 [[id:499C7CD7-389A-4EFC-92A7-56DBCDDD0768][inotify-tools]] 做多节点高可用的离线源，keepalived 负责负载均衡和切换主从，inotify-tools 用来同步
+
+参考：[[https://juejin.cn/post/6844904127919554568][高可用——Keepalived安装部署使用详解 - 掘金]]
+

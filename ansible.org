@@ -34,3 +34,48 @@
 
   需要有 inventory 文件才行。
 
+* Inventory
+  Ansible Inventory 就是一个 INI 格式的配置文件，通过 group 来区分不同的 host，默认分组是 all 和 ungrouped，ungrouped 指只在 all 分组下面的 host，每个分组、每个 host 可以单独配置变量。
+
+  而 host 可以存在于不同的分组，不同分组配置的变量会按优先级合并：all group > parent group > child group > host，同级分组间的优先级按照分组名称的 ASCII 排序。
+
+  例子：
+  #+begin_src conf
+    [all:vars]
+    
+    variable_a=1
+    variable_b=1
+    variable_c=1
+    
+    [all]
+    
+    192.168.0.[1:10]     # 192.168.0.1..192.168.0.10
+    192.168.0.[11:20:2]  # 192.168.0.11、192.168.0.13、192.168.0.19
+    
+    [all:children]
+    
+    subgroup
+    
+    [subgroup:vars]
+    
+    variable_a=2
+    
+    [subgroup]
+    
+    192.168.0.1 variable_a=3
+    192.168.0.2
+  #+end_src
+
+  上面这个例子中，对于 192.168.0.1 来说 variable_a 的值是 3，192.168.0.2 的值是 2，其他的都是 1。
+
+  除了自定义变量外，ansible 自身也有一些变量决定怎么访问 remote host，常用的几个：
+  |------------------------------+-----------------------------------------------------------------------------|
+  | 变量                         | 作用                                                                        |
+  |------------------------------+-----------------------------------------------------------------------------|
+  | ansible_connection           | 访问远程主机的方式，值可以是 ssh、smart、paramiko，默认值是 smart，常用 ssh |
+  | ansible_user                 | 访问时使用的 user                                                           |
+  | ansible_password             | 访问时使用的密码                                                            |
+  | ansible_ssh_private_key_file | 访问时使用的 ssh key                                                        |
+  |------------------------------+-----------------------------------------------------------------------------|
+
+  参考：

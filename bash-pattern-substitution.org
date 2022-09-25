@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       C5F651A1-1F2C-48C9-9A2C-7D979362B048
+:END:
+#+TITLE: bash pattern substitution
+
+在 bash 中可以用 =${parameter/pattern/string}= 执行替换操作，如果 =/string= 是空，那么对应的就是替换为空（删除）操作。可以用于数组：
+#+begin_example
+  $ str="123456"
+  $ arr=(1 2 3 4 5 6)
+  
+  $ echo ${str/1/-}
+  -23456
+  
+  $ echo ${arr[@]/1/-}
+  - 2 3 4 5 6
+  
+  $ echo ${arr[@]/1}
+  2 3 4 5 6
+#+end_example
+
+#+begin_quote
+${parameter/pattern/string}
+        Pattern  substitution.   The  pattern  is expanded to produce a pattern just as in pathname expansion, Parameter is expanded and the longest
+        match of pattern against its value is replaced with string.  The match is performed using the rules described under Pattern Matching  below.
+        If  pattern  begins  with /, all matches of pattern are replaced with string.  Normally only the first match is replaced.  If pattern begins
+        with #, it must match at the beginning of the expanded value of parameter.  If pattern begins with %, it  must  match  at  the  end  of  the
+        expanded  value of parameter.  If string is null, matches of pattern are deleted and the / following pattern may be omitted.  If the nocase-
+        match shell option is enabled, the match is performed without regard to the case of alphabetic characters.  If parameter is @ or *, the sub-
+        stitution  operation  is  applied  to  each positional parameter in turn, and the expansion is the resultant list.  If parameter is an array
+        variable subscripted with @ or *, the substitution operation is applied to each member of the array in turn, and the expansion is the resul-
+        tant list.
+#+end_quote
+

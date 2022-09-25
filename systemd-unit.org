@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       562EE57C-A009-453B-B5EB-D991E82719B3
+:END:
+#+TITLE: systemd unit
+
+systemd unit 是 [[id:A8CACEAF-DE71-4AB0-8057-BECD5A9978E1][systemd]] 管理的基本单位，平时通过 systemd 管理的 service 就是很多个 service 类型的 unit，除了 service 以外，还有很多其他类型的 unit。
+
+unit 配置文件的优先级为：
+#+begin_example
+  Table 1.  Load path when running in system mode (--system).
+  ┌────────────────────┬─────────────────────────────┐
+  │Path                │ Description                 │
+  ├────────────────────┼─────────────────────────────┤
+  │/etc/systemd/system │ Local configuration         │
+  ├────────────────────┼─────────────────────────────┤
+  │/run/systemd/system │ Runtime units               │
+  ├────────────────────┼─────────────────────────────┤
+  │/lib/systemd/system │ Units of installed packages │
+  └────────────────────┴─────────────────────────────┘
+  
+  Table 2.  Load path when running in user mode (--user).
+  ┌────────────────────────────────┬────────────────────────────────────────────────────────┐
+  │Path                            │ Description                                            │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │$XDG_CONFIG_HOME/systemd/user   │ User configuration (only used when $XDG_CONFIG_HOME is │
+  │                                │ set)                                                   │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │$HOME/.config/systemd/user      │ User configuration (only used when $XDG_CONFIG_HOME is │
+  │                                │ not set)                                               │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │/etc/systemd/user               │ Local configuration                                    │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │$XDG_RUNTIME_DIR/systemd/user   │ Runtime units (only used when $XDG_RUNTIME_DIR is set) │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │/run/systemd/user               │ Runtime units                                          │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │$XDG_DATA_HOME/systemd/user     │ Units of packages that have been installed in the home │
+  │                                │ directory (only used when $XDG_DATA_HOME is set)       │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │$HOME/.local/share/systemd/user │ Units of packages that have been installed in the home │
+  │                                │ directory (only used when $XDG_DATA_HOME is not set)   │
+  ├────────────────────────────────┼────────────────────────────────────────────────────────┤
+  │/usr/lib/systemd/user           │ Units of packages that have been installed system-wide │
+  └────────────────────────────────┴────────────────────────────────────────────────────────┘
+#+end_example
+
+参考：[[https://man7.org/linux/man-pages/man5/systemd.unit.5.html][systemd.unit(5) - Linux manual page]]
+

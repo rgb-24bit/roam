@@ -3,5 +3,9 @@
 :END:
 #+TITLE: network
 
+网络是一个分层的架构，数据总是在不同层，不同 Endpoint 上流转，这个流转过程中的两个核心问题：
++ 数据怎么从一个 Endpoint 到另一个 Endpoint
++ 数据怎么在不同的层之间封包/解包
 
+路由表、ARP、协议栈、NAT、Overlay/Underlay 都和这两个问题有关。
 

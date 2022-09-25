@@ -11,6 +11,8 @@
   - [[#动态转发][动态转发]]
   - [[#本地转发][本地转发]]
   - [[#远程转发][远程转发]]
+- [[#配置优先级][配置优先级]]
+- [[#controlmaster--controlpersist][ControlMaster & ControlPersist]]
 
 * Configure SSH Key-Based Authentication
   #+begin_example
@@ -91,4 +93,60 @@
    #+begin_example
      remote -> local -> target
    #+end_example
+
+
+* 配置优先级
+  ssh 客户端配置加载的顺序为：命令行参数 -> ~/.ssh/config -> etc/ssh/ssh_config，除了命令行参数，后面两个配置文件中的配置格式通常为：
+  #+begin_src conf
+    Host <pattern>
+      parameter_1 value
+      parameter_2 value
+      parameter_3 value
+      ...
+  #+end_src
+
+  而客户端在应用配置时，只会使用第一次获取到的值（也就意味着命令行优先级最高），比如下面两个配置：
+  #+begin_src conf
+    Host *
+      ConnectTimeout 3
+      ServerAliveInterval 4
+      ServerAliveCountMax 5
+    
+    Host work
+      ServerAliveCountMax 6
+      ServerAliveInterval 7
+  #+end_src
+
+  那么在执行 =ssh work= 时，模式 =*= 匹配 work，因此 ServerAliveCountMax 和 ServerAliveInterval 都会使用 =*= 下面的值，
+  下面的 work 配置是无用的。
+
+  这种情况下可以将 work 部分配置上提：
+  #+begin_src conf
+    Host work
+      ConnectTimeout 2
+    
+    Host *
+      ConnectTimeout 3
+      ServerAliveInterval 4
+      ServerAliveCountMax 5
+    
+    Host work
+      ServerAliveCountMax 6
+      ServerAliveInterval 7
+  #+end_src
+
+  此时，work 的 ConnectTimeout 就会用 2 这个值了。
+
+* ControlMaster & ControlPersist
+  SSH 可以开启 ControlMaster 功能，开启后会使用 ControlPath 参数配置的路径创建 ssh 连接对应的 session 文件，这样只要这个连接还存在，再连接的时候，就不需要再输入密码了。
+
+  同时开启 ControlPersist 可以让最后一个连接关闭之后也不真正的关掉连接，这样后面再连接的时候就还是不用输入密码。
+
+  配置：
+  #+begin_src conf
+    Host *
+        ControlPersist yes
+        ControlMaster auto
+        ControlPath /tmp/ssh-session-%r@%h:%p
+  #+end_src
 

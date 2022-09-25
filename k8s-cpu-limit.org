@@ -1,0 +1,40 @@
+:PROPERTIES:
+:ID:       D464D557-DDF3-48CC-A484-D141D3B2E3BD
+:END:
+#+TITLE: k8s cpu limit
+
+[[id:62177F52-2A3D-4CA1-A44C-71C8B51F01EE][k8s]] 中使用 [[id:4A5E3169-E60E-4C81-AE7E-18D3BDE8B86A][cgroups]] 来限制 Pod 的 CPU 使用，其中 request 使用 cpu.shares 来表示，而 limit 通过 cfs_period_us & cfs_quota_us 表示。
+
+* cpu.shares
+  shares 用来设置 CPU 的相对值，并且是针对所有的 CPU（内核），默认值是 1024，假如系统中有两个 cgroup，分别是 A 和 B，A 的 shares 值是 1024，B 的 shares 值是 512，那么 A 将获得 1024/(1204+512)=66% 的 CPU 资源，而 B 将获得 33% 的 CPU 资源。shares 有两个特点：
+  + 如果 A 不忙，没有使用到 66% 的 CPU 时间，那么剩余的 CPU 时间将会被系统分配给 B，即 B 的 CPU 使用率可以超过 33%
+  + 如果添加了一个新的 cgroup C，且它的 shares 值是 1024，那么 A 的限额变成了 1024/(1204+512+1024)=40%，B 的变成了 20%
+
+  从上面两个特点可以看出：
+  + 在闲的时候，shares 基本上不起作用，只有在 CPU 忙的时候起作用
+  + 由于 shares 是一个绝对值，需要和其它 cgroup 的值进行比较才能得到自己的相对限额，而在一个部署很多容器的机器上，cgroup 的数量是变化的，所以这个限额也是变化的，自己设置了一个高的值，但别人可能设置了一个更高的值，所以这个功能没法精确的控制 CPU 使用率
+
+  关键：在 CPU 繁忙时，会根据 shares 的相对值按比例分配 CPU 时间，在负载高时，shares 值越大分到的时间越多。
+
+* cfs_period_us & cfs_quota_us
+  可以通过 cfs_period_us 和 cfs_quota_us 来现限制 CPU 的使用上限，两个文件的单位都是微秒（us），cfs_period_us 定义一个周期长度，取值范围为 1ms 到 1s，而 cfs_quota_us 限制一个周期内可用的 CPU 时间，
+  取值大于 1ms 即可。如果 cfs_quota_us 的值为 -1（默认值），表示不受 CPU 时间的限制。
+  
+  例子：
+  #+begin_example
+    # 1.限制只能使用 1 个 CPU（每 250ms 能使用 250ms 的 CPU 时间）
+    $ echo 250000 > cpu.cfs_quota_us /* quota = 250ms */
+    $ echo 250000 > cpu.cfs_period_us /* period = 250ms */
+    
+    # 2.限制使用 2 个 CPU（内核）（每 500ms 能使用 1000ms 的 CPU 时间，即使用两个内核）
+    $ echo 1000000 > cpu.cfs_quota_us /* quota = 1000ms */
+    $ echo 500000 > cpu.cfs_period_us /* period = 500ms */
+    
+    # 3.限制使用 1 个 CPU 的 20%（每 50ms 能使用 10ms 的 CPU 时间，即使用一个 CPU 核心的 20%）
+    $ echo 10000 > cpu.cfs_quota_us /* quota = 10ms */
+    $ echo 50000 > cpu.cfs_period_us /* period = 50ms */
+  #+end_example
+
+* 参考
+  + [[https://www.cnblogs.com/sunsky303/p/11544540.html][深入理解 Kubernetes 资源限制：CPU - sunsky303 - 博客园]]
+
