@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       2C6D5512-DC57-4DB1-A433-5FC4825D4454
+:END:
+#+TITLE: RAID
+
+RAID(独立冗余磁盘阵列)技术，全称为 redundant array of independent disks，可以将几个物理磁盘合并成一个更大的虚拟设备，在提高硬盘容量的同时，还能够充分提高硬盘的速度，使数据更加安全，更加易于磁盘的管理。
+
+参考：
++ [[https://segmentfault.com/a/1190000022734047][服务器 - RAID 基本原理_个人文章 - SegmentFault 思否]]
++ [[https://segmentfault.com/a/1190000006880282][raid - RAID（独立冗余磁盘阵列）技术_个人文章 - SegmentFault 思否]]
+

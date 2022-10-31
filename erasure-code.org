@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       9BA311EB-D0E4-42B8-BBAA-1D23A7CF7694
+:ROAM_ALIASES: EC
+:END:
+#+TITLE: Erasure Code
+
+Erasure Code（纠删码）是存储领域常见的一种数据冗余技术，它可以将 n 份原始数据，增加 m 份数据，并能通过 n+m 份中的任意 n 份数据，还原为原始数据。即如果有任意小于等于 m 份的数据失效，仍然能通过剩下的数据还原出来。
+
+其原理是利用数学的力量，时间换空间，以 RS 码 EC_5_3 为例：
+1. 编码时，对于原始的 5 份数据，我们乘上一个 /(n+m)n/ 的矩阵 B，矩阵上半是 /n/ 阶单位矩阵，这样乘出来的结果就是一个 /(n+m)/ 的矩阵，矩阵上半的 /n/ 个是原始数据，下面 /m/ 个是效验数据块
+   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/198525229-464423b7-788c-4484-ad40-006f28984af9.png">
+2. 解码时，假设丢失了 /m/ 份数据，那么我们可以删除矩阵 B 对应行得到 B'，此时 /B' * D = Survivors/
+   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/198525719-cc0ddb94-4a8c-403c-ad97-6e3f12c91a85.png">
+3. 计算得到 B' 的逆矩阵 B'^-1，两边同时乘上逆矩阵，此时 /I * D = B'^-1 * Survivors/
+   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/198526201-a31ffcf0-5c91-409d-ae79-905dbec313a3.png">
+   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/198526229-97b45679-7b0e-48e4-8c2b-02530fb2bde7.png">
+4. 这时，计算右式就可以得到左式的原始值了
+   #+HTML: <img src="https://user-images.githubusercontent.com/26481411/198526444-0a179f75-ce59-4216-9712-a52a859c47e2.png">
+
+可以使用 [[https://github.com/openstack/pyeclib][openstack/pyeclib]] 来体验 EC 的功能，通过 EC 编码生成的多个数据块，可以发现前 /n/ 份数据块都是原始数据 + header，后 /m/ 份都是计算得到的效验数据，解码时任意选择 /m/ 份数据都可以还原得到原数据。
+
+参考：[[https://www.jianshu.com/p/acf0f392bac9?utm_campaign=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com][纠删码 Erasure Coding （分布式存储系统） - 简书]]
+

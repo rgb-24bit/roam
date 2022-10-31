@@ -31,3 +31,10 @@
 + [[https://segmentfault.com/a/1190000038458363][Linux init、service、systemctl 三者区别 - SegmentFault 思否]]
 + [[https://www.cnblogs.com/shijingjing07/p/9301590.html][Linux 服务管理两种方式service和systemctl - 迪米特 - 博客园]]
 
+* The Container Interface
+  当 systemd 在 OS 容器内使用时，systemd 具有许多用于与容器管理器交互的接口，比如环境变量 container 可以告诉 systemd 当前运行在什么容器中。
+
+  参考：
+  + [[https://systemd.io/CONTAINER_INTERFACE/][Container Interface]]
+  + [[https://github.com/j8r/dockerfiles][j8r/dockerfiles]]
+

@@ -78,4 +78,38 @@
   | ansible_ssh_private_key_file | 访问时使用的 ssh key                                                        |
   |------------------------------+-----------------------------------------------------------------------------|
 
-  参考：
+  参考：[[https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html][How to build your inventory — Ansible Documentation]]
+
+* Playbook
+  在 Playbook 中，hosts 可以按照 Pattern 匹配目标 host，通常，我们可以将目标 hosts 作为变量传入：
+  #+begin_example
+    ansible-playbook -v -i inventory -e "hosts={pattern}" play.yaml
+  #+end_example
+
+  #+begin_src yaml
+    ---
+    - hosts: "{{ hosts }}"
+  #+end_src
+
+  这样，每次执行的时候可以根据 pattern 指定要在哪些 host 上执行，比如某个 ip，某个分组，等。
+
+  play 中，还可以使用各种条件来判断是否要在当前 host 上执行，比如：
+  #+begin_src yaml
+    ---
+    - hosts: "{{ hosts }}"
+    
+      tasks:
+    
+      - name: do something
+        shell: xxxx
+        when: {{ var }}
+    
+  #+end_src
+
+  在 host 属于某个分组时执行：
+  #+begin_src yaml
+    when: inventory_hostname in groups["<group name>"]
+  #+end_src
+
+  更多的根据特性执行某个任务，可以使用 roles 功能。
+

@@ -5,10 +5,27 @@
 
 + Tag :: [[id:5b879c5a-b228-4631-8ea7-fdc43c5b7bbe][Service Discovery]]
 
+* 安装模式
+  ZooKeeper 有三种安装模式：单机安装(standalone)、伪集群模式、集群模式：
+  + standalone 模式：只在一台机器上安装 ZooKeeper，并只启动一个 ZooKeeper 实例
+  + 伪集群：在一台机器上开启多个 ZooKeeper 实例来模拟集群。通过加载不同配置文件，分配不同数据目录来实现这种模式。因为在同一机器上运行，所以机器宕机，整个 ZooKeeper 就挂了。基本上不会布置这样的 ZooKeeper 集群
+  + 集群模式：在至少 3 台机器上安装 ZooKeeper 构成集群，只要故障节点数量在一定范围内就能保证 ZooKeeper 服务的可用性
+
 * 常用状态检查命令工具
+  + conf：输出相关服务配置的详细信息。比如端口、zk 数据及日志配置路径、最大连接数，session 超时时间、serverId 等
+  + cons：列出所有连接到这台服务器的客户端连接/会话的详细信息。包括“接受/发送”的包数量、session id 、操作延迟、最后的操作执行等信息
+  + crst：重置当前这台服务器所有连接/会话的统计信息
+  + dump：列出未经处理的会话和临时节点
+  + envi：输出关于服务器的环境详细信息
+  + ruok：测试服务是否处于正确运行状态。如果正常返回"imok"，否则返回空
+  + stat：输出服务器的详细信息：接收/发送包数量、连接数、模式（leader/follower）、节点总数、延迟。 所有客户端的列表
+  + srst：重置 server 状态
+  + wchs：列出服务器 watches 的简洁信息：连接总数、watching 节点总数和 watches 总数
+  + wchc：通过 session 分组，列出 watch 的所有节点，它的输出是一个与 watch 相关的会话的节点列表
+  + mntr：列出集群的健康状态。包括“接受/发送”的包数量、操作延迟、当前服务模式（leader/follower）、节点总数、watch 总数、临时节点总数
+
+  使用：
   #+begin_src bash
-    # 查看 cluster 状态
-    echo mntr | nc <zkhost> 2181
+    echo mntr | nc <zkhost> <zkport>
   #+end_src
 
-  mntr 是 zookeeper 的一个 4 字符命令，zk 内置很多 4 字符命令，包括：stat，isro，ruok，mntr，srvr 等。

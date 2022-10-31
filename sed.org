@@ -1,0 +1,62 @@
+:PROPERTIES:
+:ID:       239D2E2E-EAD4-4932-9F96-3F2014649C4F
+:END:
+#+TITLE: sed
+
+可以使用 sed 应用一个或多个 =command= 到标准输入或 file 上：
+#+begin_example
+  sed [-Ealn] command [file ...]
+  sed [-Ealn] [-e command] [-f command_file] [-i extension] [file ...]
+#+end_example
+
+其中，command 的格式如下，由 address、function 和 arguments 三部分组成：
+#+begin_example
+  [address[,address]]function[arguments]
+#+end_example
+
+address 用于表示需要应用 command 到哪些行（省略时表示所有行），其值可以是：「数字 - 第 XX 行」、「$ - 最后一行」和「/pattern/ - 匹配 pattern 的行」：
+#+begin_example
+  $ sed -n '1,$p' test.txt
+  a
+  b
+  c
+  
+  $ sed -n '1p' test.txt
+  a
+  
+  $ sed -n '$p' test.txt
+  c
+  
+  $ sed -n '/b/p' test.txt
+  b  
+#+end_example
+
+function 表示实际要执行的操作，而 arguments 就是 function 的参数，部分 function 有参数，部分没有，比如上面的 =p= 代表的就是打印，没有额外的参数，常用的 function 有：
++ d：删除，删除匹配行，无额外参数
++ p：打印，打印匹配行。通常 p 会与参数 sed -n 一起运行
++ s：替换，在匹配行上执行替换操作，参数为「s/regexp/replacement/flags」，其中，flags 的值可以是：「g - 替换所有」、「N - 替换第 N 个匹配的」。
+
+空格，sed 常用的 option：
++ -n - 默认情况下 sed 会将所有命令处理后的结果输出出来，-n 关闭这一输出，使用 =p= 时常用来避免重复输出
++ -i - 直接替换原文件内容
++ -E - 使用更加 modern 的正则
+
+例子：
+#+begin_src sh
+  sed 's/find/replace/' file         # 替换文件中首次出现的字符串并输出结果 
+  sed '10s/find/replace/' file       # 替换文件第 10 行内容
+  sed '10,20s/find/replace/' file    # 替换文件中 10-20 行内容
+  sed -r 's/regex/replace/g' file    # 替换文件中所有出现的字符串
+  sed -i 's/find/replace/g' file     # 替换文件中所有出现的字符并且覆盖文件
+  sed -i '/find/i\newline' file      # 在文件的匹配文本前插入行
+  sed -i '/find/a\newline' file      # 在文件的匹配文本后插入行
+  sed '/line/s/find/replace/' file   # 先搜索行特征再执行替换
+  sed -e 's/f/r/' -e 's/f/r' file    # 执行多次替换
+  sed 's#find#replace#' file         # 使用 # 替换 / 来避免 pattern 中有斜杆
+  sed -i -r 's/^\s+//g' file         # 删除文件每行头部空格
+  sed '/^$/d' file                   # 删除文件空行并打印
+  sed -i 's/\s\+$//' file            # 删除文件每行末尾多余空格
+  sed -n '2p' file                   # 打印文件第二行
+  sed -n '2,5p' file                 # 打印文件第二到第五行
+#+end_src
+

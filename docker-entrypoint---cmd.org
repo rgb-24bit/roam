@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       95A29664-4BD3-49B9-A49C-08B511E68085
+:END:
+#+TITLE: Docker ENTRYPOINT & CMD
+
+在 Dockerfile 中，容器的默认启动参数就是「ENTRYPOINT + CMD」拼出来的结果，比如：
+#+begin_example
+  ENTRYPOINT ["/bin/chamber", "exec", "production", "--"]
+  CMD ["/bin/service", "-d"]
+#+end_example
+
+容器默认启动参数就是 ["/bin/chamber", "exec", "production", "--", "/bin/service", "-d"]。
+
+在 K8S Pod 中，设置 =command= 时会覆盖 ENTRYPOINT 参数并重置 CMD 为空，设置 =args= 时会覆盖 CMD 参数。
+

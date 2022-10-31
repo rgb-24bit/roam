@@ -1,0 +1,22 @@
+:PROPERTIES:
+:ID:       1FD5B8D7-E606-483E-8353-A51B125627A7
+:END:
+#+TITLE: Zookeeper vs Etcd
+
+* 数据结构
+  存储数据时，zookeeper 使用树形结构，其中的每个节点称作 ZNode，访问一个 ZNode 时，需要提供从 root 开始的绝对路径。每个 ZNode 可以存储最多 1MB 的数据，用户可以：
+  + 创建 ZNode
+  + 删除 ZNode
+  + 存储数据到指定 ZNode
+  + 从 ZNode 中读取数据
+
+  同时，用户可以对一个 ZNode 设置 watch，当这个 ZNode 发生了变化时，例如 创建、删除、数据变更、添加或移除子节点，watch API 就会发出通知，但 zookeeper 的 watch 有一个缺点，就是这个 watch 只能被触发一次，
+  一旦发出了通知，如果还想对这个节点继续 watch，用户需要重新设置 watch。
+
+  而 ETCD 提供的一个分布式的 key-value 存储，用户可以：
+  + put - 添加一个新的 key-value 到存储中
+  + get - 获取一个 key 的 value
+  + range - 获取一个范围的 key 的 value，例如：key1 - key10
+  + transaction - 读、对比、修改、写的组合
+  + watch - 监控一个或一个范围的 key，发生变化后就会得到通知
+

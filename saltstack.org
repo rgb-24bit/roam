@@ -57,3 +57,7 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
     # 获取指定项信息
     $ salt '*' grains.item xxx
   #+end_src
+
+* Debug
+  执行时通过 =-l trace= 可以显示 trace 日志，方便排查执行失败的原因。
+
