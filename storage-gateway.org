@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       B8E5B240-C84E-4CE0-BDE4-E368E418DACA
+:END:
+#+TITLE: Storage Gateway
+
+存储网关（Storage Gateway）指这样一种技术，网关服务通常可以基于 NFS 提供文件系统、基于 iSCSI 提供块存储能力，用户直接读写文件系统或块存储，网关根据配置的策略将用户数据同步到云上的对象存储系统用作备份。
+
+相当于是一个分级的存储系统，优势在于不需要自己不断维护扩容备份设备，网关同时也能提供高性能的读写支持。
+
+参考：
++ [[https://developer.aliyun.com/article/773986?spm=a2c4g.11186623.0.0.66057483nAXUOj][云存储网关文件上传原理解析-阿里云开发者社区]]
++ [[https://www.alibabacloud.com/help/zh/cloud-storage-gateway/latest/product-introduction-features][阿里云 - 云存储网关 - 功能特性]]
++ [[https://www.alibabacloud.com/help/zh/cloud-storage-gateway/latest/scenarios][阿里云 - 云存储网关 - 使用场景]]
+

@@ -113,3 +113,55 @@
 
   更多的根据特性执行某个任务，可以使用 roles 功能。
 
+* Handlers
+  在 playbook 中 handlers 是和 tasks 平行的一级，handlers 中的任务默认不会执行，而是需要 tasks 中的 task *changed* 后 notify 对应的 handler 任务执行：
+  #+begin_src yaml
+    ---
+    - name: Verify apache installation
+      hosts: webservers
+      vars:
+        http_port: 80
+        max_clients: 200
+      remote_user: root
+      tasks:
+        - name: Ensure apache is at the latest version
+          ansible.builtin.yum:
+            name: httpd
+            state: latest
+    
+        - name: Write the apache config file
+          ansible.builtin.template:
+            src: /srv/httpd.j2
+            dest: /etc/httpd.conf
+          notify:
+          - Restart apache
+    
+        - name: Ensure apache is running
+          ansible.builtin.service:
+            name: httpd
+            state: started
+    
+      handlers:
+        - name: Restart apache
+          ansible.builtin.service:
+            name: httpd
+            state: restarted
+  #+end_src
+
+  使用于需要 changed 后才执行的后置任务，比如修改端口配置后重启服务，如果端口配置是预期的就不重启。
+
+  默认情况下 handlers 中的任务在所有 tasks 执行完后才会开始执行，当然也可以使用 meta 主动触发：
+  #+begin_src yaml
+    tasks:
+      - name: Some tasks go here
+        ansible.builtin.shell: ...
+    
+      - name: Flush handlers
+        meta: flush_handlers
+    
+      - name: Some other tasks
+        ansible.builtin.shell: ...
+  #+end_src
+
+  参考：[[https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html][Handlers: running operations on change — Ansible Documentation]]
+

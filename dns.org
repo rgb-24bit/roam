@@ -3,5 +3,46 @@
 :END:
 #+TITLE: DNS
 
+* DNS Query Classes & Query Types
+  DNS 查询时，Header 上会标识此次查询的 Classes 和 Types，其中 Classes 一般都是 *IN* 表示互联网（the Internet），而常用的 Query Types 则有：
+  |------------+------------------------------|
+  | Query Type | 含义                         |
+  |------------+------------------------------|
+  | A          | 查询主机 IP 地址             |
+  | AAAA       | 查询主机 IPv6 地址           |
+  | ALIAS      | 查询自动解析的别名           |
+  | CNAME      | 查询别名的权威名称           |
+  | MX         | 查询邮件交换服务器           |
+  | NS         | 查询域名服务器               |
+  | SRV        | 查询特定服务的 IP 地址和端口 |
+  |------------+------------------------------|
 
+  比如：
+  #+begin_example
+    $ dig www.baidu.com
+    
+    ; <<>> DiG 9.10.6 <<>> www.baidu.com
+    ;; global options: +cmd
+    ;; Got answer:
+    ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 54570
+    ;; flags: qr rd ra; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 1
+    
+    ;; OPT PSEUDOSECTION:
+    ; EDNS: version: 0, flags:; udp: 1408
+    ;; QUESTION SECTION:
+    ;www.baidu.com.                 IN      A
+    
+    ;; ANSWER SECTION:
+    www.baidu.com.          118     IN      CNAME   www.a.shifen.com.
+    www.a.shifen.com.       118     IN      A       110.242.68.3
+    www.a.shifen.com.       118     IN      A       110.242.68.4
+  #+end_example
+
+  返回的结果中：
+  1. www.baidu.com 的 CNAME 为 www.a.shifen.com
+  2. www.a.shifen.com 的 IP 地址为 110.242.68.3/4
+  3. 查询的 Query Classes 都是 IN
+
+  参考：
+  + [[https://www.site24x7.com/learn/dns-record-types.html][DNS Record Types: Defined and Explained - Site24x7]]
 

@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       C9522D92-2B12-47ED-83C8-A92BAC182E5C
+:END:
+#+TITLE: conntrack
+
+在 Linux 中，连接跟踪（connection tracking，conntrack，CT）用于跟踪（并记录）连接的状态，是许多网络应用的基础。比如 Kubernetes Service、ServiceMesh sidecar、软件四层负载均衡器 LVS/IPVS、Docker network、OVS、iptables 主机防火墙等等，都依赖连接跟踪功能。
+
+连接追踪基于 [[id:9B50133E-FEB3-42C2-B35D-DAE5E6B46369][netfilter]] 实现，它拦截数据包，根据协议、源 IP、目标 IP、源端口、目标端口等信息来标识一个连接，上层可以基于连接来做转发之类的操作。
+
+参考：[[https://arthurchiao.art/blog/conntrack-design-and-implementation-zh/#3-netfilter-conntrack-%E5%AE%9E%E7%8E%B0][连接跟踪（conntrack）：原理、应用及 Linux 内核实现]]
+
