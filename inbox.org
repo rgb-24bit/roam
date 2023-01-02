@@ -44,4 +44,6 @@
 
 * SPDK
   + [[https://spdk.io/doc/][SPDK: Storage Performance Development Kit]]
+* 存储
+  + [[https://zhuanlan.zhihu.com/p/491714514][存储技术从入门到精通必读书籍推荐 - 知乎]]
 
