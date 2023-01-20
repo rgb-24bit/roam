@@ -12,11 +12,8 @@
 + [[id:1A0467A7-7CD5-4F3D-8BF3-7CDAE39C30FB][java]]
   + [[https://tech.meituan.com/2020/04/02/java-pooling-pratice-in-meituan.html][Java 线程池实现原理及其在美团业务中的实践 - 美团技术团队]]
 
-+ [[id:06660642-7CC3-4116-8B42-A43EEB16137F][golang]]
-  + [[https://learnku.com/articles/41728][[典藏版] Golang 调度器 GMP 原理与调度全分析 | Go 技术论坛]]
-
-+ io
-  + https://zhuanlan.zhihu.com/p/96391501
+* async
+  + [[https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/][Asynchronous programming patterns | Microsoft Docs]]
 
 * mysql
   + https://mariadb.com/kb/en/show-engine-innodb-status/
@@ -46,4 +43,7 @@
   + [[https://spdk.io/doc/][SPDK: Storage Performance Development Kit]]
 * 存储
   + [[https://zhuanlan.zhihu.com/p/491714514][存储技术从入门到精通必读书籍推荐 - 知乎]]
+
+* Emacs
+  + [[https://manateelazycat.github.io/emacs/2022/11/07/how-i-use-emacs.html][我平常是怎么使用 Emacs 的？]]
 

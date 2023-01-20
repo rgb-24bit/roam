@@ -1,0 +1,10 @@
+#+TITLE:      article 2023
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#m01][M01]]
+
+* M01
+  ☞ [[https://mp.weixin.qq.com/s?spm=a2c6h.12873639.0.0.cadb37a5JMOx9N&__biz=MzUzNzYxNjAzMg==&mid=2247519934&idx=1&sn=e87d2ab211516965ae3ffb51297df767&chksm=fae68571cd910c67b203d0d95023357a29ef9cd1ff956b3784ac3ebf490edfeb1f1ac6d75f74&scene=21#wechat_redirect][让容器跑得更快：CPU Burst 技术实践]]
+
+  1) 感觉像是 [[id:613DACF0-34D0-474D-B8C7-1164DC479525][Leaky bucket]] 到 [[id:CE3CAC64-8ED2-48B6-81A0-AD37C507B327][Token bucket]]，允许一定程度的突发流量
+

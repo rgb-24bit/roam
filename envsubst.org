@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       DC39295D-A098-4B87-BE7C-DF1D2BE7107C
+:END:
+#+TITLE: envsubst
+
+envsubst 替换文本中的环境变量为对应的值：
+#+begin_example
+  $ export NAME='rgb-24bit'
+  
+  $ envsubst <<< 'The name is $NAME'
+  The name is rgb-24bit
+#+end_example
+

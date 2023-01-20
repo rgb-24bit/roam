@@ -30,6 +30,52 @@
        openssl pkcs12 -inkey cert.key -in cert.crt -export -out cert.pfx
      #+end_example
 
+* RSA
+  1. 生成 RSA Key 文件
+     #+begin_example
+       openssl genrsa -out mykey.pem 1024
+     #+end_example
+  2. 提取 Key 文件中的公钥
+     #+begin_example
+       openssl rsa -in mykey.pem -pubout > mykey.pub
+       openssl rsa -in mykey.pem -pubout -out mykey.pub
+       
+     #+end_example
+  3. 生成 ssh key 对应的公钥
+     #+begin_example
+       ssh-keygen -y -f key.pem > key.pub
+     #+end_example
+
+* 自签证书
+  #+begin_src sh
+    # Create csr conf
+    cat <<EOF >> csr.conf
+    [req]
+    req_extensions = v3_req
+    distinguished_name = req_distinguished_name
+    prompt = no
+    [req_distinguished_name]
+    CN = ${domain}
+    [ v3_req ]
+    basicConstraints = CA:FALSE
+    keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+    extendedKeyUsage = clientAuth, serverAuth
+    subjectAltName = @alt_names
+    [alt_names]
+    DNS.1 = *.${domain}
+    DNS.2 = *.sub.${domain}
+    EOF
+    
+    # Generate the CA cert and private key
+    openssl req -nodes -new -x509 -keyout ca.key -out ca.crt -subj "/CN=Self Signed CA" -days 36500
+    # Generate the private key for the webhook server
+    openssl genrsa -out server.key 2048
+    
+    # Generate a Certificate Signing Request (CSR) for the private key, and sign it with the private key of the CA.
+    openssl req -new -key server.key -subj "/CN=${domain}" -config csr.conf \
+      | openssl x509 -req -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -extensions v3_req -days 36500 -extfile csr.conf
+  #+end_src
+
 * Footnotes
 
 [fn:1] 可以用于排查证书链的问题，参考 [[https://help.aliyun.com/document_detail/212381.html][证书与密钥不匹配问题排查]]

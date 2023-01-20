@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       2917252B-575B-462A-AE15-DE058C5EE5EC
+:END:
+#+TITLE: jvm arguments
+
+
+

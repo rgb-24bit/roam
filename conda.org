@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       66F5982A-768C-498E-99BB-59289218A2D9
+:END:
+#+TITLE: conda
+
+常用 conda 来管理多套 Python 使用的环境，并且可以将环境打包方便复制，可以使用 [[https://docs.conda.io/en/latest/miniconda.html][Miniconda]] 作为最新的环境管理工具。
+
+* 安装/卸载
+  安装可以指定安装路径，默认路径为 =/root/miniconda3=, 打包的环境复制到其他机器使用时，应该保证 conda 的安装路径一致：
+  #+begin_example
+    bash install.sh -b -p /root/mini_anaconda3
+  #+end_example
+
+  卸载直接删除安装目录，然后清除 =~/.bashrc= 里面的配置就行。
+
+* 环境管理
+  #+begin_src sh
+    conda env create --name <env_name>  # 创建环境
+    conda env export > environment.yml  # 导出环境信息
+    conda env create -f environment.yml # 基于环境信息创建环境
+    conda env remove --name <env_name>  # 删除环境
+  #+end_src
+

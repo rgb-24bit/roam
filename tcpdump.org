@@ -8,3 +8,8 @@
     tcpdump -l -n -i <if> 'port 4789 and udp[8:2] = 0x0800 & 0x0800 and udp[11:4] = <vni> & 0x00FFFFFF'
   #+end_example
 
+* 输出文本
+  #+begin_example
+    tcpdump -A 以 ASCII 码方式显示每一个数据包
+  #+end_example
+

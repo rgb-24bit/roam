@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       A3AB29D5-FC81-436A-B023-6B315C977DBF
+:END:
+#+TITLE: python encoding
+
+在 Python3 中，str 存储的是 unicode，encode 为 bytes 时默认使用的编码是 utf-8，Python3 源文件的默认编码也是 utf-8，但是对于 =open= 这类 I/O 操作使用的默认编码还是系统默认编码，不一定是 utf-8，所以如果不指定编码还是可能遇到编码错误。
+
+而正在 python2 中，str 存储的是 bytes，decode 时默认编码为 ascii，源文件支持其他编码，但也需要通过文件头的注释指定编码。
+
+参考：
++ [[https://docs.python.org/3/howto/unicode.html#python-s-unicode-support][Unicode HOWTO — Python 3.11.0 documentation]]
++ [[https://docs.python.org/2/howto/unicode.html#python-2-x-s-unicode-support][Unicode HOWTO — Python 2.7.18 documentation]]
+

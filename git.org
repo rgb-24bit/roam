@@ -18,3 +18,11 @@
     git rev-parse --short HEAD
   #+end_example
 
+* delete merged local branch
+  #+begin_example
+    git branch --merged | egrep -v "(^\*|master|main|dev)" | xargs git branch -d
+    git fetch -p
+  #+end_example
+
+  Ref: [[https://stackoverflow.com/questions/6127328/how-do-i-delete-all-git-branches-which-have-been-merged][version control - How do I delete all Git branches which have been merged? - Stack Overflow]]
+

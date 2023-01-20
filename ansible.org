@@ -165,3 +165,28 @@
 
   参考：[[https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html][Handlers: running operations on change — Ansible Documentation]]
 
+
+* Tags
+  可以为 playbook 中的任务设置 tag，然后执行时通过类似 =--tags [tag1, tag2]= 选择要执行的任务：
+  #+begin_src yaml
+    tasks:
+    - name: Install the servers
+      ansible.builtin.yum:
+        name:
+        - httpd
+        - memcached
+        state: present
+      tags:
+      - packages
+      - webservers
+    
+    - name: Configure the service
+      ansible.builtin.template:
+        src: templates/src.j2
+        dest: /etc/foo.conf
+      tags:
+      - configuration
+  #+end_src
+
+  参考：[[https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html][Tags — Ansible Documentation]]
+

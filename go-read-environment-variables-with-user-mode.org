@@ -1,0 +1,68 @@
+:PROPERTIES:
+:ID:       1167C5FA-4681-45CA-9187-AD967834C2CD
+:END:
+#+TITLE: go read environment variables with user mode
+
+Golang 中 =os.GetEnv= 其实是在用户态完成操作的，程序启动时会将进程环境变量保存到 =envs= 变量中：
+#+begin_src go
+  var (
+    // env maps from an environment variable to its first occurrence in envs.
+    env map[string]int
+  
+    // envs is provided by the runtime. elements are expected to
+    // be of the form "key=value". An empty string means deleted
+    // (or a duplicate to be ignored).
+    envs []string = runtime_envs()
+  )
+  
+#+end_src
+
+然后在执行环境变量相关的操作时，会通过 =copyenv= 建立环境变量的索引：
+#+begin_src go
+  func copyenv() {
+    env = make(map[string]int)
+    for i, s := range envs {
+      for j := 0; j < len(s); j++ {
+        if s[j] == '=' {
+          key := s[:j]
+          if _, ok := env[key]; !ok {
+            env[key] = i // first mention of key
+          } else {
+            // Clear duplicate keys. This permits Unsetenv to
+            // safely delete only the first item without
+            // worrying about unshadowing a later one,
+            // which might be a security problem.
+            envs[i] = ""
+          }
+          break
+        }
+      }
+    }
+  }
+#+end_src
+
+读取时就可以直接通过索引读取本地的缓存，不需要切换到内核态了：
+#+begin_src go
+  func Getenv(key string) (value string, found bool) {
+    envOnce.Do(copyenv)
+    if len(key) == 0 {
+      return "", false
+    }
+  
+    envLock.RLock()
+    defer envLock.RUnlock()
+  
+    i, ok := env[key]
+    if !ok {
+      return "", false
+    }
+    s := envs[i]
+    for i := 0; i < len(s); i++ {
+      if s[i] == '=' {
+        return s[i+1:], true
+      }
+    }
+    return "", false
+  }
+#+end_src
+

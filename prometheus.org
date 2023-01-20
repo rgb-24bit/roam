@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       F253B7B8-4F0E-4399-8D87-3BD75E6AD34A
+:END:
+#+TITLE: Prometheus
+
+* remote_read & remote_write
+  Prometheus 本身具备存储采集到的 Metrics 数据的能力，但也可以使用远程存储，比如其他的 [[id:7E3881DE-E84A-4047-B145-FB5B234C92F9][TSDB]] 实现，此时可以使用 remote_read 和 remote_write 指定远程存储：
+  + Prometheus 支持通过 remote_read 指定远程存储，通过 Prometheus 查询指标时会汇总 remote_read 中指定的数据源数据
+  + Prometheus 也支持通过 remote_write 将采集的 Metrics 写入到指定的远程存储，配合 remote_read 可以让 Prometheus 变成无情的读写机器，自身不存储数据
+
+* scrape_config
+  Prometheus 的一个强大功能就是可以通过 scrape_config 配置多个 job 来定时拉去 metrics 数据写入存储，抓去的目标 endpoint 可以使用 static_config 指定 target，
+  也可以使用集成的服务发现能力来自动发现 endpoint。
+
+  比如 kubernetes_sd_config 可以发现 k8s 中的资源对象，比如 node、pod、service 等，做服务发现时通常会有很多 label 用于筛选发现的目标，比如发现 k8s node 时：
+  #+begin_quote
+  Available meta labels:
+  
+  + __meta_kubernetes_node_name: The name of the node object.
+  + __meta_kubernetes_node_provider_id: The cloud provider's name for the node object.
+  + __meta_kubernetes_node_label_<labelname>: Each label from the node object.
+  + __meta_kubernetes_node_labelpresent_<labelname>: true for each label from the node object.
+  + __meta_kubernetes_node_annotation_<annotationname>: Each annotation from the node object.
+  + __meta_kubernetes_node_annotationpresent_<annotationname>: true for each annotation from the node object.
+  + __meta_kubernetes_node_address_<address_type>: The first address for each node address type, if it exists.
+  #+end_quote
+
+  我们可以使用 *relabel_configs* 来指定某个 label 的匹配规则（虽说是 label，但感觉更像是参数）。
+  
+  参考：
+  + [[https://prometheus.io/docs/concepts/jobs_instances/][Jobs and instances | Prometheus]]
+  + [[https://prometheus.io/docs/prometheus/latest/configuration/configuration/][Configuration | Prometheus]]
+

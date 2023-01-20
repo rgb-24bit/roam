@@ -3,5 +3,13 @@
 :END:
 #+TITLE: org mode
 
+* drawer
+  =C-c C-x d=:
+  
+:Drawer:
 
++ item1
++ item2
+
+:END:
 

@@ -1,0 +1,110 @@
+:PROPERTIES:
+:ID:       FF0502FA-3042-4311-A287-8F4860F96AA5
+:END:
+#+TITLE: emacs regexp
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#regular-expression-syntax][Regular Expression Syntax]]
+- [[#idiosyncrasies-of-emacs-regular-expressions][Idiosyncrasies of Emacs Regular Expressions]]
+- [[#replace-regexp-with-lisp-expressions][Replace Regexp With Lisp Expressions]]
+- [[#query-replace][Query Replace]]
+- [[#re-builder][re-builder]]
+- [[#lookaround][Lookaround]]
+- [[#tips][Tips]]
+
+* Regular Expression Syntax
+  #+BEGIN_EXAMPLE
+    .        any character (but newline)
+    ,*        previous character or group, repeated 0 or more time
+    +        previous character or group, repeated 1 or more time
+    ?        previous character or group, repeated 0 or 1 time
+    ^        start of line
+    $        end of line
+    [...]    any character between brackets
+    [^..]    any character not in the brackets
+    [a-z]    any character between a and z
+    \        prevents interpretation of following special char
+    \|       or
+    \w       word constituent
+    \W       match any character that does not match \w
+    \b       word boundary
+    \B       match any character that does not match \b
+    \sc      character with c syntax (e.g. \s- for whitespace char)
+    \Sc      match any character that does not match \sc
+    \( \)    start/end of group
+    \&lt; \&gt;    start/end of word (faulty rendering: backslash + less-than and backslash + greater-than)
+    \_< \_>  start/end of symbol
+    \` \'    start/end of buffer/string
+    \1       string matched by the first group
+    \n       string matched by the nth group
+    \{3\}    previous character or group, repeated 3 times
+    \{3,\}   previous character or group, repeated 3 or more times
+    \{3,6\}  previous character or group, repeated 3 to 6 times
+    \=       match succeeds if it is located at point
+  #+END_EXAMPLE
+  
+  *NOTE:* Square brackets and curly braces need to be escaped.
+
+  Characters are organized by category:
+  #+BEGIN_EXAMPLE
+      \ca      ascii character
+      \Ca      non-ascii character (newline included)
+      \cl      latin character
+      \cg      greek character
+  #+END_EXAMPLE
+
+  #+HTML: <p>Use <kbd>C-u C-x =</kbd>to display the category of the character under the cursor.</p>
+
+  Syntax classes:
+  #+BEGIN_EXAMPLE
+      \s-   whitespace character        \s/   character quote character
+      \sw   word constituent            \s$   paired delimiter         
+      \s_   symbol constituent          \s'   expression prefix        
+      \s.   punctuation character       \s<   comment starter          
+      \s(   open delimiter character    \s>   comment ender            
+      \s)   close delimiter character   \s!   generic comment delimiter
+      \s"   string quote character      \s|   generic string delimiter 
+      \s\   escape character            
+  #+END_EXAMPLE
+
+  #+HTML: You can see the current syntax table by typing <kbd>C-h s</kbd>.
+
+* Idiosyncrasies of Emacs Regular Expressions
+  + 在交互式搜索环境中，空格字符可以选择是否代表任意数量的空白，默认为是，通过快捷键 ~M-s SPC~ 切换。
+
+    交互式搜索可以用快捷键 ~C-M-s~ 进入。
+
+  + 可以使用 ~C-o~, ~C-q C-j~, ~\n~ 表示换行符
+
+  + 在 ~Lisp~ 代码中，反斜杠 ~\~ 必须转义，即使用 ~\\~. 没有原始字符串真操蛋。
+
+  + 不支持 ~\d~, 请使用 ~[0-9]~ 或 ~[:digit:]~ 代替，真坑。
+
+* Replace Regexp With Lisp Expressions
+  通过这样的方式调用 elisp 表达式：
+  #+BEGIN_SRC elisp
+    M-x replace-regexp
+    Replace regexp:  \(\w+\)
+    Replace regexp with:  \,(capitalize \1)
+  #+END_SRC
+
+  其中， ~,(capitalize \1)~ 会执行 ~(capitalize)~ 来替换字符串。
+
+* Query Replace
+  在 Emacs 中使用 Query Replace 的时候，可以通过 =M-n/p= 选择之前使用过的匹配模式，顺序为：
+  #+begin_example
+    (from -> to) (from -> to) to from to from
+  #+end_example
+
+* re-builder
+  可以使用 re-builder 来构建正则表达式
+
+* Lookaround
+  环视只进行子表达式的匹配，不占有字符，匹配到的内容不保存到最终的匹配结果，是零宽度的。
+
+  Emacs 不支持这一特性。
+
+* Tips
+  + \Cc - 所有非中文字符
+  + \cc - 所有中文字符
+

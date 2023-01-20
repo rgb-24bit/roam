@@ -53,6 +53,12 @@
     lsblk -T/--tree # default view
   #+end_src
 
+* blkid
+  显示关于可用块设备的信息：
+  #+begin_src bash
+    blkid  # 输出所有可用的设备、它们的通用唯一识别码（UUID）、文件系统类型以及卷标
+  #+end_src
+
 * fdisk
   磁盘分区管理：
   #+begin_example

@@ -74,3 +74,8 @@
   + [[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/node-pressure-eviction/][节点压力驱逐 | Kubernetes]]
   + [[https://kubernetes.io/zh-cn/docs/concepts/storage/ephemeral-volumes/][临时卷 | Kubernetes]]
 
+
+* COMMENT Clean Evicted Pods
+  #+begin_src sh
+    kubectl get po -A|grep Evicted|awk '{system("kubectl delete po -n" $1 " " $2)}'
+  #+end_src

@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       1909E629-96D1-499E-8FD9-52EE412450DC
+:END:
+#+TITLE: k8s issues
+
+* liveness zombie process
+  如果 liveness 探针超时退出，执行的探测脚本还在执行，那么对应的探测进程可能成为 zombie 进程。这时可以重启 Pod 来回收这些进程。
+
+  参考 [[id:CA282EFB-0C09-4164-93EA-0D067645F701][Zombie and Orphan Process]]。
+

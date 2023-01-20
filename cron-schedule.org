@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       712A5FC6-2671-4406-A7F7-EC6A2B5AA6E1
+:END:
+#+TITLE: cron schedule
+
+之前一直没转过弯来的一个问题：定时任务调度时，如果已经根据最近要执行的任务设置了 sleep 时间，如果现在新来一个任务怎么办？在 [[id:133BEE60-233C-4D7C-ABC3-20D36D5D7285][timewheel]] 和 [[id:40D771C9-496B-492C-B750-08AD21CEBB4B][crontab]] 里面都有这样的疑惑。
+
+然后看到这个代码：https://github.com/robfig/cron/blob/master/cron.go#L279
+
+有新任务直接唤醒，然后重新计算 sleep 时间不就行了？！
+
+居然一直没想到这一点……
+

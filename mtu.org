@@ -15,3 +15,12 @@ Maximum Transmission Unit，缩写 MTU，中文名是：最大传输单元。MTU
 + [[https://developer.aliyun.com/article/222535][什么是 MTU？为什么 MTU 值普遍都是 1500？-阿里云开发者社区]]
 + [[https://support.huawei.com/enterprise/zh/doc/EDOC1100130741][跨 DC 间 VXLAN 互联的 MTU 规划建议 - 华为]]
 
+* Linux MTU 检测
+  #+begin_example
+    ping $REMOTE_HOSTNAME -c 10 -M do -s $(($MTU - 28))
+  #+end_example
+
+  解释：
+  + -M do 设置 DF 标志，不分片
+  + -s $(($MTU - 28)) 包大小，ping 数据包会加上大小为 28 的 header，所以减去 28
+
