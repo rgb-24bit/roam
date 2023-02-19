@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       CA798E31-6E8D-4CA6-B08D-87766EA42E0B
+:END:
+#+TITLE: btrfs
+
+btrfs 是一个写时复制（COW）的文件系统，也就是数据被修改后可以找回，同时单个文件的最大大小比 [[id:C20C8001-CE5E-45EC-9F2F-61B12AAFD5CE][ext4]] 大，缺点是数据会碎片化（写时复制）。
+

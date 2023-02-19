@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       04347D4C-3168-4122-A51D-DC00EF60412B
+:END:
+#+TITLE: SCSI
+
+小型计算机系统接口（SCSI，Small Computer System Interface）是一种用于计算机及其周边设备之间（硬盘、软驱、光驱、打印机、扫描仪等）系统级接口的独立处理器标准。
+
+SCSI 设备通过二级 [[id:4CB884B4-9CCC-4A78-847D-E9EA4879638C][PCI]] 总线连接到系统中，而基于 SCSI 接口的硬盘拥有比基于 ATA、IDE 接口的硬盘更好的性能，常用于服务器市场。
+
+SCSI 存在扩展性差、存储空间得不到有效利用等缺点，因此业界提出了存储区域网络（Storage Area Network，SAN）技术，可以基于 SAN 来扩展 SCSI。
+
+SAN 基于组网方式可以可以分为：
++ FC SAN，基于 FC（光迁）端口组网，使用 FC 协议
++ IP SAN，基于 ETH 接口组网，使用 iSCSI 协议，底层使用 IP 协议传输
++ FCoE SAN，基于 FCoE 接口组网
+

@@ -14,3 +14,8 @@ docker 是最早的 [[id:3A7A541A-195B-4C13-B397-25E14C9C99FE][Container]] 实�
 
   Ref [[https://stackoverflow.com/questions/44785585/docker-how-to-delete-all-local-docker-images][Docker: How to delete all local Docker images - Stack Overflow]]
 
+* 删除未使用的镜像
+  #+begin_example
+    docker image prune -a
+  #+end_example
+

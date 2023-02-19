@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       BDFE32CF-7EC2-4087-804D-7F9251648E17
+:END:
+#+TITLE: bus
+
+计算机通常由 CPU、Memory 和 I/O Devices 组成，而 bus 便用于连接这些组件。在设计上，以 Intel CPU 的体系结构为例：
++ CPU 和高速缓存、内存间有两种总线，其中 CPU-高速缓存间是高速本地总线（Local Bus），CPU-内存间是相对较慢的前端总线（Front-size Bus）
++ 前端总线和内存与 I/O 设备交互，也就是常说的系统总线，而 CPU 中的北桥芯片将前端总线一分为三，I/O 总线就在其中
+  #+HTML: <img src="https://user-images.githubusercontent.com/26481411/219936878-b68ad91b-c211-4df1-836a-f274970341ad.png">
++ I/O 总线则可以分的更细，比如 [[id:4CB884B4-9CCC-4A78-847D-E9EA4879638C][PCI]] 总线、[[id:04347D4C-3168-4122-A51D-DC00EF60412B][SCSI]] 总线等
+  #+HTML: <img src="https://user-images.githubusercontent.com/26481411/219936971-8afb7a64-8d80-45cd-bc1a-8df1a7e12d56.png">
+
+而总线内也不同的线路，比如传输数据的数据总线、传输控制信号的控制总线和传输地址的地址总线。
+
+参考：
++ [[https://www.zhihu.com/question/29723949/answer/2415520760][谁能给我解释一下什么叫计算机【总线】？ - 记得要让着本宝宝的回答 - 知乎]]
++ [[https://en.wikipedia.org/wiki/Bus_(computing)][Bus (computing) - Wikipedia]]
+

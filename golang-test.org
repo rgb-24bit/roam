@@ -1,0 +1,234 @@
+:PROPERTIES:
+:ID:       533383C7-6BC9-4BDD-A22E-00B59A3CF613
+:END:
+#+TITLE: golang test
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#gotestsum][gotestsum]]
+- [[#monkey][Monkey]]
+- [[#ginkgo][ginkgo]]
+- [[#golangci-lint][golangci-lint]]
+- [[#gomock][gomock]]
+  - [[#执行顺序][执行顺序]]
+- [[#assert][assert]]
+- [[#example][example]]
+- [[#benchmark][benchmark]]
+- [[#相关问题][相关问题]]
+  - [[#使用-go-test-测试所有包][使用 go test 测试所有包]]
+  - [[#测试在另一个协程的-panic][测试在另一个协程的 panic]]
+
+* gotestsum
+  #+begin_quote
+  gotestsum runs tests using go test --json, prints friendly test output and a summary of the test run. It is designed for both local development, and running tests in a CI system.
+  #+end_quote
+  
+  PS: 其实用 Ginkgo 的话这个感觉也没有使用的必要了
+
+  + [[https://github.com/gotestyourself/gotestsum][GitHub - gotestyourself/gotestsum: 'go test' runner with output optimized for humans, JUnit XML for CI integration, and a summary of the test results.]]
+
+* Monkey
+  NOTE：在 macOS Catalina 上该库似乎存在问题，谨慎使用。
+
+  函数/过程打桩：
+  #+begin_src go
+    guard := monkey.Patch(function, func(...) (...) {
+      // ...
+    })
+    defer guard.Unpatch()
+  #+end_src
+
+  方法打桩：
+  #+begin_src go
+    type Etcd struct {
+
+    }
+
+    func (e *Etcd) Get(id string) []string {
+      names := make([]string, 0)
+      // ...
+      return names
+    }
+
+    var e *Etcd
+    guard := PatchInstanceMethod(reflect.TypeOf(e), "Get", func(_ string) []string {
+      return []string{"LiLei", "HanMeiMei", "ZhangMing"}
+    })
+    defer guard.Unpatch()
+  #+end_src
+
+  + [[https://studygolang.com/articles/11296][Monkey框架使用指南 - Go语言中文网 - Golang中文社区]]
+  
+* ginkgo
+  使用 ginkgo 来编写 go 的测试用例时，需要在对应包下面执行 ginkgo bootstrap 命令，生成 suite_test 文件，类似：
+  #+begin_src go
+    package pkg_test
+
+    import (
+      "testing"
+
+      . "github.com/onsi/ginkgo"
+      . "github.com/onsi/gomega"
+    )
+
+    func TestPkg(t *testing.T) {
+      RegisterFailHandler(Fail)
+      RunSpecs(t, "Pkg Suite")
+    }
+  #+end_src
+
+  然后在其他测试文件中编写类似如下形式的测试用例：
+  #+begin_src go
+    import 	. "github.com/onsi/ginkgo"
+
+    var _ = Describe("test strings package", func() {
+      t := GinkgoT()
+
+      Context("strings.Contains()", func() {
+        When("the string contains the substring in the middle", func() {
+          It("returns `true`", func() {
+            // ...
+          })
+        })
+      })
+    })
+  #+end_src
+
+  需要注意的是，真正执行测试时，测试是从 suite_test 开始的，在 suite_test 开始前，其他测试文件中的 Describe、Context、When、It 的执行是在包初始化阶段完成的，而 It 注册的函数才是最终要执行的用例。
+
+  因此，注意依赖初始化的位置！！！
+
+  模板：
+  #+begin_example
+    import 	. "github.com/onsi/ginkgo"
+
+    var _ = Describe("$NAME$", func() {
+      t := GinkgoT()
+	
+      $END$
+    })
+  #+end_example
+
+  命令：
+  #+begin_example
+    echo "[+] run ginkgo"
+    ginkgo -noColor -timeout=30m                              \
+           -r -cover -coverprofile=coverage.out -outputdir=.  \
+           -coverpkg=./... ./...                              \
+           -covermode count
+  #+end_example
+
+  链接：[[https://github.com/onsi/ginkgo][onsi/ginkgo: BDD Testing Framework for Go]]
+
+* golangci-lint
+  简单使用方式：
+  #+begin_example
+    golangci-lint run -v --fix
+  #+end_example
+
+  可以使用如下注释关闭针对该行、函数、包的 lint 检测：
+  #+begin_src go
+    // nolint
+    // nolint:linter
+    // nolint // comment
+  #+end_src
+  
+  + [[https://github.com/golangci/golangci-lint][golangci/golangci-lint: Fast linters Runner for Go]]
+
+* gomock
+  gomock 的使用还是比较简单的，主要就是两步：
+  1. 生成 mock 文件，两种方式：
+     #+begin_example
+       mockgen -package <target_package_name> -destination <target_file_name> <package_path> <interface...>
+       mockgen -source=foo.go [other options]
+     #+end_example
+  2. 使用，就更简单了，直接 Any、Return、AnyTimes 走起：
+     #+begin_src go
+       controller := gomock.NewController(t)
+
+       mockXXX := mock.NewMockXXX(controller)
+
+       mockXXX.EXPECT().XXXMethod().Return(XXX).AnyTimes()
+     #+end_src
+
+  + [[https://github.com/golang/mock][golang/mock: GoMock is a mocking framework for the Go programming language.]]
+
+** 执行顺序
+   可以通过两种方式来设置单个函数多次调用的结果顺序：
+   #+begin_example
+     firstCall := mockObj.EXPECT().SomeMethod(1, "first")
+     secondCall := mockObj.EXPECT().SomeMethod(2, "second").After(firstCall)
+     mockObj.EXPECT().SomeMethod(3, "third").After(secondCall)
+
+     gomock.InOrder(
+         mockObj.EXPECT().SomeMethod(1, "first"),
+         mockObj.EXPECT().SomeMethod(2, "second"),
+         mockObj.EXPECT().SomeMethod(3, "third"),
+     )
+   #+end_example
+
+* assert
+  + [[https://github.com/stretchr/testify][GitHub - stretchr/testify: A toolkit with common assertions and mocks that plays nicely with the standard library]]
+    
+* example
+  *_test 文件中以 Example 开头的函数可以作为 godoc 的一部分提取出来，在存在 Output 注释的时候还可以被当作测试用例执行：
+  #+begin_src go
+    func ExampleFoo()     // 作为Foo函数或者类型例子
+    func ExampleBar_Qux() // 作为Bar类型的Qux函数例子
+    func Example()        // 作为整个库的例子
+
+    func ExampleReverse() {
+        fmt.Println(stringutil.Reverse("hello"))
+        // Output: golly
+    }
+  #+end_src
+  
+* benchmark
+  golang 可以通过编写 BentchmarkXXX 测试函数来进行性能测试，通常的形式为：
+  #+begin_src go
+    func BenchmarkSomething(b *testing.B) {
+      b.ResetTimer()
+      for i := 0; i < b.N; i++ {
+        // do something
+      }
+    }
+  #+end_src
+  
+  运行测试，-benchmem 选项可以统计每次操作分配内存的次数以及每次操作分配的字节数：
+  #+begin_example
+    go test -bench=. -benchmem
+  #+end_example
+
+  测试并发：
+  #+begin_src go
+    func BenchmarkSomething(b *testing.B) {
+      b.ResetTimer()
+      b.RunParallel(func(pb *testing.PB) {
+        for pb.Next() {
+          // do something
+        }
+      })
+    }
+  #+end_src
+  
+* 相关问题
+** 使用 go test 测试所有包
+   #+begin_src sh
+     go test -cover -coverprofile=profile.cov ./...
+     go tool cover -func profile.cov
+   #+end_src
+  
+   参考：
+   + [[https://stackoverflow.com/questions/16353016/how-to-go-test-all-tests-in-my-project][testing - How to `go test` all tests in my project? - Stack Overflow]]
+
+** 测试在另一个协程的 panic
+   类似于这样的代码会在另一个协程抛出 panic，此时，这个 panic 是不可测的，因为它不在当前协程，同时会导致测试进程异常退出：
+   #+begin_src go
+     func function() {
+       go func() {
+         panic(err)
+       }
+     }
+   #+end_src
+
+  对于这种情况，应该考虑将这个新协程包装在另一个函数中单独测试，并保证测试外部函数时不会导致 panic。
+

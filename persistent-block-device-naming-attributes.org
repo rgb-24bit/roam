@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       32BC554A-09BF-42EC-9AFE-A88871FB0979
+:END:
+#+TITLE: Persistent block device naming attributes
+
+在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 系统中，块设备拥有一些持久化的格式为 =name = value= 的属性，可以在 =/dev/disk/by-xxx= 下查看。这些属性可以分为两类：
++ 一类属于块设备本身，比如 WWID、Partition UUID 和 Serial number
++ 一类属于块设备上的文件系统，比如 UUID、Label
+
+当文件系统重建时，块设备的 UUID 属性值会变化，而 Partition UUID 不会。
+
+参考：
++ [[https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/deduplicating_and_compressing_storage/assembly_overview-of-persistent-naming-attributes_deduplicating-and-compressing-storage#con_disadvantages-of-non-persistent-naming-attributes_assembly_overview-of-persistent-naming-attributes][Chapter 6. Overview of persistent naming attributes Red Hat Enterprise Linux 8 | Red Hat Customer Portal]]
++ [[https://wiki.archlinux.org/title/persistent_block_device_naming][Persistent block device naming - ArchWiki]]
+

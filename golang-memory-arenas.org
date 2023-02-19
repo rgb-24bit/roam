@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       8DFC4651-4303-4C1E-AC01-D9DE4C11FF9D
+:END:
+#+TITLE: Golang memory arenas
+
+Golang 在 1.20 版本增加的实验特性，就是 [[id:5D8677C3-747E-41DA-A19C-B49564974F86][Arena Allocation]] 在 Golang 中的实现，通过 arena 创建多个对象，然后一次性释放降低 GC 压力。
+
+参考：[[https://uptrace.dev/blog/posts/go-memory-arena.html][Golang memory arenas [101 guide]​]]
+

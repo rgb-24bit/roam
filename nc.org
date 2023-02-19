@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       55C63FDC-2DC9-4A19-A15B-F1A6ED4893CB
+:END:
+#+TITLE: nc
+
+扫描端口：
+#+begin_example
+  nc -z -v 10.8.8.8 20-80
+#+end_example
+

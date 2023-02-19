@@ -33,8 +33,8 @@
   + [[https://juejin.cn/post/6854573216174702605#heading-7][分布式一致性算法，你确定不了解一下 - 掘金]]
 
 * PCI 和 Linux 设备模型
+  + [[https://www.cnblogs.com/LoyenWang/p/14165852.html][【原创】Linux PCI驱动框架分析（一） - LoyenWang - 博客园]] - 高质量
   + [[https://utcc.utoronto.ca/~cks/space/blog/linux/NVMeSysfsData][Chris's Wiki  blog/linux/NVMeSysfsData]]
-  + [[https://www.cnblogs.com/LoyenWang/p/14165852.html][【原创】Linux PCI驱动框架分析（一） - LoyenWang - 博客园]]
   + [[https://zhuanlan.zhihu.com/p/26172972][深入PCI与PCIe之一：硬件篇 - 知乎]]
   + [[https://blog.csdn.net/kunkliu/article/details/94379567][PCIe扫盲——BDF与配置空间_kunkliu的博客-CSDN博客]]
   + [[https://wiki.xenproject.org/wiki/Bus:Device.Function_(BDF)_Notation][Bus:Device.Function (BDF) Notation - Xen]]

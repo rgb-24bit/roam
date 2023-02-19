@@ -1,0 +1,159 @@
+:PROPERTIES:
+:ID:       FFC48171-BD57-4567-AC0D-4EBCF2FA344E
+:END:
+#+TITLE: Mutex
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#mutex][Mutex]]
+  - [[#cas][CAS]]
+  - [[#等待][等待]]
+  - [[#自旋spin][自旋（spin）]]
+  - [[#队列][队列]]
+  - [[#java-reentrantlock--abstractqueuedsynchronizer][Java ReentrantLock & AbstractQueuedSynchronizer]]
+- [[#条件队列condition][条件队列（Condition）]]
+- [[#无锁编程][无锁编程]]
+
+* Mutex
+** CAS
+   在最初的最初，还没有 Lock 存在的时侯（还在实现 Lock 的路上），原子 CAS 操作确保了多个线程同时操作一块共享内存时只有一个线程能成功修改它。
+
+** 等待
+   当锁只能被一个线程持有时，其他线程如果不能获取到锁，能么可以让出 CPU 时间进入等待状态，调度其他线程执行。直到重新调度获取锁。
+
+** 自旋（spin）
+   线程进入等待状态通常伴随着系统调用，上下文切换是一笔不小的开销，同时很多线程拿到锁后只会使用很小一段时间，因此，可以尝试通过自旋操作，
+   在一定循环次数内不断通过 CAS 操作获取锁。
+
+** 队列
+   多个线程同时获取一个锁时，没有获取到锁的线程可以通过一个队列来记录，当锁释放后可以从队列中取出一个线程唤醒，而不是等待到最后执行，
+   这样多个等待线程也就不需要频繁唤醒。
+
+** Java ReentrantLock & AbstractQueuedSynchronizer
+   ReentrantLock 获取锁的操作便是先通过 CAS 操作尝试直接获取锁：
+   #+begin_src java
+     public final void acquire(int arg) {
+         if (!tryAcquire(arg) &&
+             acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+             selfInterrupt();
+     }
+    
+     final boolean nonfairTryAcquire(int acquires) {
+         final Thread current = Thread.currentThread();
+         int c = getState();
+         if (c == 0) {
+             if (compareAndSetState(0, acquires)) {  // CAS 操作获取到锁
+                 setExclusiveOwnerThread(current);
+                 return true;
+             }
+         }
+         else if (current == getExclusiveOwnerThread()) {  // 重入
+             int nextc = c + acquires;
+             if (nextc < 0) // overflow
+                 throw new Error("Maximum lock count exceeded");
+             setState(nextc);
+             return true;
+         }
+         return false;
+     }
+   #+end_src
+
+   获取失败后加入内部等待队列：
+   #+begin_src java
+     private Node addWaiter(Node mode) {  // 创建 Node 对象加入队列尾
+         Node node = new Node(mode);
+     
+         for (;;) {
+             Node oldTail = tail;
+             if (oldTail != null) {
+                 node.setPrevRelaxed(oldTail);
+                 if (compareAndSetTail(oldTail, node)) {
+                     oldTail.next = node;
+                     return node;
+                 }
+             } else {
+                 initializeSyncQueue();
+             }
+         }
+     }
+     
+     final boolean acquireQueued(final Node node, int arg) {
+         boolean interrupted = false;
+         try {
+             for (;;) {
+                 final Node p = node.predecessor();  // 取出当前节点的前一个节点
+                 if (p == head && tryAcquire(arg)) {  // 当前节点是 head 的下一个，尝试获取锁
+                     setHead(node);
+                     p.next = null; // help GC
+                     return interrupted;
+                 }
+                 if (shouldParkAfterFailedAcquire(p, node))  // 不是 head，或者没拿到锁，判断进入 wait 状态
+                     interrupted |= parkAndCheckInterrupt();  // 进入 wait 等待唤醒
+             }
+         } catch (Throwable t) {
+             cancelAcquire(node);
+             if (interrupted)
+                 selfInterrupt();
+             throw t;
+         }
+     }
+   #+end_src
+
+   #+begin_quote
+   加入队列后当前线程其实就在 acquireQueued 这个函数里面等着的，唤醒的时候就继续执行获取锁的操作。之前一直以为加入队列后当前线程就接着执行了（真的就是加入个 item 到队列完事），
+   然后就在想这个线程怎么重新回到这个地方呢？
+
+   现在才反应过来，加入队列是将当前 node 加入链表，这样释放锁的时候可以通过这个链表找到当前 node 唤醒对应的线程。然后线程唤醒后接着循环执行获取锁的逻辑就可以了。
+
+   线程就是在 acquireQueued 里面等着的。
+   #+end_quote
+   
+   释放锁时唤醒队列中的节点：
+   #+begin_src java
+     public final boolean release(int arg) {
+         if (tryRelease(arg)) {
+             Node h = head;
+             if (h != null && h.waitStatus != 0)
+                 unparkSuccessor(h);
+             return true;
+         }
+         return false;
+     }
+     
+     private void unparkSuccessor(Node node) {
+         /*
+          ,* If status is negative (i.e., possibly needing signal) try
+          ,* to clear in anticipation of signalling.  It is OK if this
+          ,* fails or if status is changed by waiting thread.
+          ,*/
+         int ws = node.waitStatus;
+         if (ws < 0)
+             node.compareAndSetWaitStatus(ws, 0);
+     
+         /*
+          ,* Thread to unpark is held in successor, which is normally
+          ,* just the next node.  But if cancelled or apparently null,
+          ,* traverse backwards from tail to find the actual
+          ,* non-cancelled successor.
+          ,*/
+         Node s = node.next;
+         if (s == null || s.waitStatus > 0) {
+             s = null;
+             for (Node p = tail; p != node && p != null; p = p.prev)
+                 if (p.waitStatus <= 0)
+                     s = p;
+         }
+         if (s != null)
+             LockSupport.unpark(s.thread);  // 唤醒
+     }
+   #+end_src
+   
+* 条件队列（Condition）
+  建立在 Lock 基础上的条件队列，可以通过 wait 操作让出持有的锁等待条件满足，通过 notify 或 notifyAll 操作激活等待的线程。
+  
+  Lock 保护共享的内存，避免并发操作。Condition 表示可以操作内存的条件，获取到锁但不满足操作条件便让出等待。 
+
+* 无锁编程
+  无锁编程，也就是不使用 Lock，直接基于 Lock 实现的原理对共享内存进行操作，避免直接使用 Lock 使得线程进入等待状态。
+
+  适用于能够快速通过 CAS 操作完成对共享内存的操作的场景。如果老是频繁自旋等待老长时间，不如直接用 Lock 算了。
+
