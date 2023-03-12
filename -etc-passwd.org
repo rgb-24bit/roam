@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       1fe9d821-7775-4985-9540-7f687a5b49c5
+:END:
+#+TITLE: /etc/passwd
+
+Linux 中使用 =/etc/passwd= 记录了每一个用户的一些基本信息，格式为：
+#+begin_example
+  LOGNAME:PASSWORD:UID:GID:USERINFO:HOME:SHELL
+#+end_example
+
+各项含义为：
++ LOGNAME - 登录名，比如 root
++ PASSWORD - 密码，现在一般是 x，真的密码保存在另外的地方
++ UID - 用户 ID
++ GID - 用户组 ID
++ USERINFO - 注释性字段
++ HOME - 用户登录目录，像 ssh 登录后工作目录就是这个目录
++ SHELL - 用户登录后使用的 SHELL
+

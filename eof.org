@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       ce39831f-8412-48a0-becd-bdfc37c5db9f
+:END:
+#+TITLE: EOF
+
+以前一直比较迷惑的一点，就是在进行 I/O 操作时，返回的 EOF 是啥，看到不少教程说是读到末尾是操作系统返回的标识。
+
+现在看，实际情况是这样的，操作系统内核提供的系统调用，比如 read(2)，在读到文件末尾的时候返回的是 0 来标识到文件末尾了：
+#+begin_quote
+On  success, the  number  of bytes  read  is returned  (zero indicates end of file), and the file position is advanced by this number. 
+#+end_quote
+
+而 -1 用来表示读操作发生了错误。
+
+在上层，比如 C 语言标准库提供的 fgetc 等函数，则是在此基础上提供了 EOF 这一特殊返回值来表示读到末尾了。
+
+在在上层，这一习惯保留了下来，各个高级语言通过 EOF 来表示读完了这一状态。
+
+*并不是文件中真的有 EOF 这一个标识。*
+
