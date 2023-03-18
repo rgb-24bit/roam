@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       369c84ed-b7b5-486c-9dea-8bb96941d809
+:END:
+#+TITLE: multi process listen same port
+
+正常来说 TCP 连接是不允许这样的，但有两种情况：
+1. 这些进程中一个进程是其他进程的父进程，在 fork 出子进程前，父进程已经创建了 socket，是 socket 监听了端口，不同的进程间共享了同一个 socket。
+2. 使用了 =SO_REUSEPORT= 特性
+
