@@ -5,8 +5,125 @@
 
 + Tag :: [[id:CEA916CC-2871-4D97-BC56-E8A414278E52][MySQL]]
 
-* unix index next-key
-  在 MySQL 中，无论是 RC 还是 RR 的隔离级别，在插入数据时，如果存在二级唯一索引，都会使用间隙锁确保唯一索引不被破坏，如果不使用间隙锁而是简单使用插入意向锁，会出现 BUG：
-  + [[https://www.bookstack.cn/read/aliyun-rds-core/ea7a43cf992eca56.md#952rjc][数据库内核月报 － 2021/04 - MySQL · 内核分析 · InnoDB主键约束和唯一约束的实现分析 - 《数据库内核月报》 - 书栈网 · BookStack]]
-  + [[https://bugs.mysql.com/bug.php?id=68021][MySQL Bugs: #68021: Unexplainable InnoDB unique index locks on DELETE + INSERT with same values]]
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#共享锁和排它锁][共享锁和排它锁]]
+- [[#意向锁][意向锁]]
+- [[#记录锁][记录锁]]
+- [[#间隙锁][间隙锁]]
+- [[#next-key-lock][Next-Key Lock]]
+- [[#插入意向锁][插入意向锁]]
+- [[#特殊情况][特殊情况]]
+  - [[#unix-index-next-key][unix index next-key]]
+- [[#问题处理][问题处理]]
+  - [[#杀死死锁长事务][杀死死锁/长事务]]
+- [[#参考链接][参考链接]]
+- [[#footnotes][Footnotes]]
+
+* 共享锁和排它锁
+  共享锁(Shared Locks：S 锁)与排他锁(Exclusive Locks：X 锁)，InnoDB 允许拿到 S 锁的事务读一行，允许拿到 X 锁的事务更新或删除一行。
+   
+  锁兼容矩阵为[fn:1]：
+  |----+----------+------------+------------+------------|
+  |    | X        | IX         | S          | IS         |
+  |----+----------+------------+------------+------------|
+  | X  | Conflict | Conflict   | Conflict   | Conflict   |
+  | IX | Conflict | Compatible | Conflict   | Compatible |
+  | S  | Conflict | Conflict   | Compatible | Compatible |
+  | IS | Conflict | Compatible | Compatible | Compatible |
+  |----+----------+------------+------------+------------|
+
+* 意向锁
+  无论是共享锁还是互斥锁其实都只是对某一个数据行进行加锁，InnoDB 支持多种粒度的锁，也就是行锁和表锁，为了支持多粒度锁定，InnoDB 存储引擎引入了意向锁（Intention Lock），意向锁就是一种表级锁。
+   
+  意向锁同样分为两类：
+  + 意向共享锁 IS：事务想要在获得表中某些记录的共享锁，需要在表上先加意向共享锁
+  + 意向排它锁 IX：事务想要在获得表中某些记录的互斥锁，需要在表上先加意向互斥锁
+
+  锁兼容矩阵为：
+  |----+----------+------------+------------+------------|
+  |    | X        | IX         | S          | IS         |
+  |----+----------+------------+------------+------------|
+  | X  | Conflict | Conflict   | Conflict   | Conflict   |
+  | IX | Conflict | Compatible | Conflict   | Compatible |
+  | S  | Conflict | Conflict   | Compatible | Compatible |
+  | IS | Conflict | Compatible | Compatible | Compatible |
+  |----+----------+------------+------------+------------|
+
+  NOTE: 这里的 排他/共享锁指的都是表锁！！！意向锁不会与行级的共享/排他锁互斥！！！
+
+  意向锁其实不会阻塞全表扫描之外的任何请求，它们的主要目的是为了表示是否有人请求锁定表中的某一行数据。
+
+  如果没有意向锁，当已经有人使用行锁对表中的某一行进行修改时，如果另外一个请求要对全表进行修改，那么就需要对所有的行是否被锁定进行扫描，在这种情况下，效率是非常低的，不过，在引入意向锁之后，
+  当有人使用行锁对表中的某一行进行修改之前，会先为表添加意向互斥锁（IX），再为行记录添加互斥锁（X），在这时如果有人尝试对全表进行修改就不需要判断表中的每一行数据是否被加锁了，
+  只需要通过等待意向互斥锁被释放就可以了。
+
+  参考：
+  + [[https://juejin.im/post/5b85124f5188253010326360][详解 MySql InnoDB 中意向锁的作用 - 掘金]]
+
+* 记录锁
+  记录锁（Record Lock）是加到索引记录上的锁，通过确切的索引进行查询时便可以通过记录锁锁定单行数据。
+
+* 间隙锁
+  记录锁是在存储引擎中最为常见的锁，除了记录锁之外，InnoDB 中还存在间隙锁（Gap Lock），间隙锁是对索引记录中的一段连续区域的锁。当使用类似 =SELECT * FROM users WHERE id BETWEEN 10 AND 20 FOR UPDATE= 的 SQL 语句时，
+  就会阻止其他事务向表中插入 =id = 15= 的记录，因为整个范围都被间隙锁锁定了。
+
+* Next-Key Lock
+  默认情况下，InnoDB 使用 Next-Key Lock 来锁定记录，在锁定目标索引范围的情况下，还会用间隙锁锁定后面一段范围，用于解决幻读的问题。
+
+  但当查询的索引含有唯一属性的时候，Next-Key Lock 会进行优化，将其降级为 Record Lock，即仅锁住索引本身，不是范围。
+
+* 插入意向锁
+  Gap Lock 中存在一种插入意向锁，在 Insert 操作时产生。在多事务同时写入不同数据至同一索引间隙的时候，并不需要等待其他事务完成，不会发生锁等待。
+
+  假设有一个记录索引包含键值 4 和 7，不同的事务分别插入 5 和 6，每个事务都会产生一个加在 4-7 之间的插入意向锁，获取在插入行上的排它锁，但是不会被互相锁住，因为数据行并不冲突。
+
+* 特殊情况
+** unix index next-key
+   在 MySQL 中，无论是 RC 还是 RR 的隔离级别，在插入数据时，如果存在二级唯一索引，都会使用间隙锁确保唯一索引不被破坏，如果不使用间隙锁而是简单使用插入意向锁，会出现 BUG：
+   + [[https://www.bookstack.cn/read/aliyun-rds-core/ea7a43cf992eca56.md#952rjc][数据库内核月报 － 2021/04 - MySQL · 内核分析 · InnoDB主键约束和唯一约束的实现分析 - 《数据库内核月报》 - 书栈网 · BookStack]]
+   + [[https://bugs.mysql.com/bug.php?id=68021][MySQL Bugs: #68021: Unexplainable InnoDB unique index locks on DELETE + INSERT with same values]]
+
+* 问题处理
+** 杀死死锁/长事务
+   #+begin_example
+     mysql> show processlist;  # 获取正在执行 SQL 的线程
+     
+     mysql> SELECT * FROM information_schema.INNODB_TRX \G;  # 获取正在执行的事务
+     trx_id: 20866
+     trx_state: LOCK WAIT
+     trx_started: 2014-07-31 10:42:35
+     trx_requested_lock_id: 20866:617:3:3
+     trx_wait_started: 2014-07-30 10:42:35
+     trx_weight: 2
+     trx_mysql_thread_id: 9930577  # 执行线程
+     trx_query: delete from dltask where id=1
+     trx_operation_state: starting index read
+     trx_tables_in_use: 1
+     trx_tables_locked: 1
+     trx_lock_structs: 2
+     trx_lock_memory_bytes: 376
+     trx_rows_locked: 1
+     trx_rows_modified: 0
+     trx_concurrency_tickets: 0
+     trx_isolation_level: READ COMMITTED
+     trx_unique_checks: 1
+     trx_foreign_key_checks: 1
+     trx_last_foreign_key_error: NULL
+     trx_adaptive_hash_latched: 0
+     trx_adaptive_hash_timeout: 10000
+     trx_is_read_only: 0
+     trx_autocommit_non_locking: 0
+     
+     mysql> kill 9930577;  # 杀死线程
+   #+end_example
+
+* 参考链接
+  + [[https://blog.csdn.net/bigtree_3721/article/details/73277419][MySQL insert into ... select 的锁情况 【转】_mysql,insert,select_大树叶 技术专栏-CSDN博客]]
+  + [[https://dev.mysql.com/doc/refman/5.7/en/innodb-locking.html][MySQL 5.7 Reference Manual - 14.7.1 InnoDB Locking]]
+  + [[https://draveness.me/mysql-innodb][『浅入浅出』MySQL 和 InnoDB]]
+
+
+* Footnotes
+
+[fn:1] 横向是已经持有的锁，纵向是正在请求的锁 
 

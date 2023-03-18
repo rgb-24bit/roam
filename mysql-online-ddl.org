@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       CBE61755-10B7-4384-BA96-C5FD23272B36
+:END:
+#+TITLE: mysql online ddl
+
+在 MySQL 5.6 以前的版本在执行 DDL 时会导致锁表，禁止写操作，在 5.6 及以后的版本，MySQL 开始支持 Online DDL，允许在执行部分 DDL 语句时还可以并发执行 DML 语句。
+
+官方文档 [[https://dev.mysql.com/doc/refman/5.7/en/innodb-online-ddl-operations.html][Online DDL Operations]] 对支持并发 DML 的 DDL 进行了介绍，参考：
++ [[https://cloud.tencent.com/developer/article/1005177][MySQL Online DDL - 云+社区 - 腾讯云]]
+
+但似乎 DBA 们更喜欢第三方的 Online DDL 工具，参考：
++ [[https://zhuanlan.zhihu.com/p/115277009][MySQL 8.0 Online DDL和pt-osc、gh-ost深度对比分析 - 知乎]]
+

@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       86662CB0-D1AA-4AAD-AC40-571DCA7BD289
+:END:
+#+TITLE: x-hack
+
+类似这样的 [[id:0DC05289-45D7-47C0-8614-DA8202D80341][Shell]] 代码：
+#+begin_src sh
+  if [ "x${JAVA}" = "x" ]; then
+  if [ "x${server_ip}" = "xlocalhost" ]; then
+  if test x$1 = 'x--help' ; then
+#+end_src
+
+在某些 Shell 中，像下面这样直接判空可能存在问题：
+#+begin_src sh
+  if [ "${JAVA}" = "" ]; then
+#+end_src
+
+参考：[[https://www.vidarholen.net/contents/blog/?p=1035][What exactly was the point of [ “x$var” = “xval” ]? – Vidar's Blog]]
+

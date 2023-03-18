@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       DE101819-A2EB-4A2F-A453-834A888FAFBF
+:END:
+#+TITLE: golang method expressions
+
+Golang 里面类型 T 的方法 M 可以直接表示为 T.M，对应的函数签名为 func(receiver, args...)。一般 Golang 结构体没方法的时候 . 是 . 不出来东西的，所以一直都不知道还有这个特性……
+
+T 类型的变量 t 也可以 t.M，相当于 receiver 值固定了。
+
+参考：[[https://go.dev/ref/spec#Method_expressions][Method expressions]]
+

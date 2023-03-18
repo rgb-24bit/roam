@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       C66CCF52-4544-4D81-BDD7-4A55652E9FF9
+:END:
+#+TITLE: dd
+
+#+begin_example
+  # Read from {/dev/urandom} 2*512 Bytes and put it into {/tmp/test.txt}
+  # Note: At the first iteration, we read 512 Bytes.
+  # Note: At the second iteration, we read 512 Bytes.
+  dd if=/dev/urandom of=/tmp/test.txt count=2 bs=512  
+#+end_example
+

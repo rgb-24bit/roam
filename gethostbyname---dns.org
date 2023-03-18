@@ -1,0 +1,79 @@
+:PROPERTIES:
+:ID:       67D6426D-ADC9-4ED5-B037-253528AF608D
+:END:
+#+TITLE: gethostbyname & dns
+
+域名解析在 Linux 上主要使用 glibc 库函数 gethostbyname 或 getaddrinfo 来完成，其中 gethostbyname 已逐渐废弃（不支持 IPv6），更多的会转向使用 getaddrinfo。
+
+基本解析流程为：
+1. 读取 =/etc/nsswitch.conf= 配置中的 =hosts= 节获取解析顺序[fn:2]，常见的为 =files dns= 这个，也就是先读 =/etc/hosts= 后使用 =/etc/resolv.conf= 里面配置的 dns 服务器
+2. 读取 =/etc/host.conf= 获取 resolver 相关的配置
+3. 如果 =nsswitch.conf= 配置了 =files= 项，则读取 =/etc/hosts= 获取域名配置
+4. 如果 =nsswitch.conf= 配置了 =dns= 项，则根据 =/etc/resolv.conf= 中的配置访问 dns 服务解析域名配置
+
+在使用 glibc 中的 gethostbyname 和 getaddrinfo 函数时，会先尝试访问 nscd(Name Service Cache Daemon)[fn:1] 服务，如果 =/var/run/nscd/socket= 存在就将解析工作交给 nscd 服务完成。
+
+可以使用 strace 命令查看不太情况下执行的操作：
+1. 停止 uscd 服务，配置 nsswitch.conf 为 dns：
+   #+begin_example
+     strace -f -e open curl www.baidu.com
+     
+     strace: Process 1228339 attached
+     [pid 1228339] open("/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1228339] open("/etc/host.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1228339] open("/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+     ...
+     [pid 1228339] open("/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+     ...
+   #+end_example
+2. 停止 uscd 服务，配置 nsswitch.conf 为 dns：
+   #+begin_example
+     strace -f -e open curl www.baidu.com
+     
+     strace: Process 1232337 attached
+     [pid 1232337] open("/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1232337] open("/etc/host.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1232337] open("/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+     ...
+     [pid 1232337] open("/etc/hosts", O_RDONLY|O_CLOEXEC) = 3
+     ...
+   #+end_example
+3. 停止 uscd 服务，配置 nsswitch.conf 为 files dns：
+   #+begin_example
+     strace -f -e open curl www.baidu.com
+     
+     strace: Process 1230192 attached
+     [pid 1230192] open("/etc/nsswitch.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1230192] open("/etc/host.conf", O_RDONLY|O_CLOEXEC) = 3
+     [pid 1230192] open("/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+     ...
+     [pid 1230192] open("/etc/hosts", O_RDONLY|O_CLOEXEC) = 3
+     ...
+     [pid 1230192] open("/etc/resolv.conf", O_RDONLY|O_CLOEXEC) = 3
+     ...
+   #+end_example
+4. 开启 uncd 服务后就看不到 open 的调用了，只剩下 nscd 服务的访问
+   #+begin_example
+     strace -f -e open,connect curl www.baidu.com
+     
+     strace: Process 1233551 attached
+     [pid 1233551] connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = 0
+     [pid 1233551] connect(3, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = 0
+     ...
+   #+end_example
+
+其实可以看到在实际解析前还是读取了 =/etc/resolv.conf= 里面的配置，但实际解析是在第一次读取后。
+
+参考：
++ [[https://jameshfisher.com/2018/02/03/what-does-getaddrinfo-do/][What does `getaddrinfo` do?]]
++ [[https://blog.arstercz.com/linux-%E7%B3%BB%E7%BB%9F%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E5%90%8D%E7%A7%B0%E8%A7%A3%E6%9E%90/][Linux 系统如何处理名称解析 | arstercz’s blog]]
++ [[https://lfckop.github.io/gethostbyname-and-DNS/][gethostbyname与DNS – 底层小Javaer – 我希望每天都能进步一点点，哪怕一点点。]]
++ [[https://man7.org/linux/man-pages/man5/nsswitch.conf.5.html][nsswitch.conf(5) - Linux manual page]]
++ [[https://tldp.org/LDP/nag/node82.html][The host.conf File]]
++ [[https://sourceware.org/glibc/wiki/Glibc%20Timeline][Glibc Timeline - glibc wiki]]
+
+* Footnotes
+[fn:1] 在 Debian 中叫 unscd 
+
+[fn:2] 在 glibc 2.4 及以前的版本使用 host.conf 来配置顺序，但 2.4 是 2006-03-06 的版本了，现在一般都是更高的了 
+

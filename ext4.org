@@ -3,5 +3,5 @@
 :END:
 #+TITLE: ext4
 
-
+ext4 (fourth extended filesystem) is a [[id:4421BADD-7854-49D5-821D-266CB0DEE256][journaling file system]] for Linux, developed as the successor to ext3. ext4.
 

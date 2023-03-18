@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       4421BADD-7854-49D5-821D-266CB0DEE256
+:END:
+#+TITLE: Journaling file system
+
+
+

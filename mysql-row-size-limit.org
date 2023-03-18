@@ -1,0 +1,35 @@
+:PROPERTIES:
+:ID:       CA948631-82A1-4B65-8977-93907774FD41
+:END:
+#+TITLE: mysql row size limit
+
+MySQL 中 Table 每 Row 的最大大小限制为 65,535 bytes，Row Size 计算根据 Table 中每列的类型和长度得到，比如：
+#+begin_src sql
+  -- https://github.com/apolloconfig/apollo/blob/master/scripts/sql/apolloconfigdb.sql#L160
+  CREATE TABLE `GrayReleaseRule` (
+    `Id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `AppId` varchar(64) NOT NULL DEFAULT 'default' COMMENT 'AppID',
+    `ClusterName` varchar(32) NOT NULL DEFAULT 'default' COMMENT 'Cluster Name',
+    `NamespaceName` varchar(32) NOT NULL DEFAULT 'default' COMMENT 'Namespace Name',
+    `BranchName` varchar(32) NOT NULL DEFAULT 'default' COMMENT 'branch name',
+    `Rules` varchar(16000) DEFAULT '[]' COMMENT '灰度规则',
+    `ReleaseId` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '灰度对应的release',
+    `BranchStatus` tinyint(2) DEFAULT '1' COMMENT '灰度分支状态: 0:删除分支,1:正在使用的规则 2：全量发布',
+    `IsDeleted` bit(1) NOT NULL DEFAULT b'0' COMMENT '1: deleted, 0: normal',
+    `DeletedAt` BIGINT(20) NOT NULL DEFAULT '0' COMMENT 'Delete timestamp based on milliseconds',
+    `DataChange_CreatedBy` varchar(64) NOT NULL DEFAULT 'default' COMMENT '创建人邮箱前缀',
+    `DataChange_CreatedTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `DataChange_LastModifiedBy` varchar(64) DEFAULT '' COMMENT '最后修改人邮箱前缀',
+    `DataChange_LastTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+    PRIMARY KEY (`Id`),
+    KEY `DataChange_LastTime` (`DataChange_LastTime`),
+    KEY `IX_Namespace` (`AppId`,`ClusterName`,`NamespaceName`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='灰度规则表';
+#+end_src
+
+字符集为 utf8mb4，所以 varchar 每个字符最多可以是 4 字节，因此光 Rules 字段就需要 16000 * 4 + (bytes to store the length) = 64000+ 字节，算上其他字段，这张表的 Row Size 就已经很极限了。
+
+而 TEXT、BLOB 这类字段，本质上 Row 只保存了指针和必要信息，真实大小并不大。
+
+参考：[[https://dev.mysql.com/doc/refman/8.0/en/column-count-limit.html][MySQL :: MySQL 8.0 Reference Manual :: 8.4.7 Limits on Table Column Count and Row Size]]
+

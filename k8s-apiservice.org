@@ -1,0 +1,30 @@
+:PROPERTIES:
+:ID:       C5EEAFF6-7B1C-4EF4-813B-0AB6885E381B
+:END:
+#+TITLE: k8s apiservice
+
+[[id:7009B8BD-26CB-463A-8A4A-D4CDC1A442EA][k8s apiserver]] 由 aggregator 和 apiserver 组成，我们发往 apiserver 的请求先到达 aggregator，然后 aggregator 再根据资源类型转发到 apiserver。
+
+我看可以使用 =APIService= 来注册自己的服务到 aggregator，这样，就可以通过访问 apiserver 来访问我们的服务了，可以用来扩展 k8s：
+#+begin_src yaml
+  apiVersion: apiregistration.k8s.io/v1
+  kind: APIService
+  metadata:
+    name: v2beta1.auth.ilinux.io
+  spec:
+    insecureSkipTLSVerify: true
+    group: auth.ilinux.io
+    groupPriorityMinimum: 1000
+    versionPriority: 15
+    service:
+      name: auth-api
+      namespace: default
+    version: v2beta1
+#+end_src
+
+但需要注意的时，在删除 namespace 的时候，apiserver 会调注册上去的扩展 api 去清理资源，如果扩展 api 对应的服务也被删了，那么就无法清理完成，会一直卡在 Terminating。
+
+参考：
++ [[https://www.cnblogs.com/qiuhom-1874/p/14279850.html][容器编排系统K8s之APIService资源 - Linux-1874 - 博客园]]
++ [[https://imroc.cc/kubernetes/troubleshooting/cluster/namespace-terminating.html#metrics-server-%E8%A2%AB%E5%88%A0%E9%99%A4][Namespace 一直 Terminating - Kubernetes 实践指南]]
+

@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       8A3513BB-52F4-46E8-B681-D4EC20D2628F
+:END:
+#+TITLE: mysqldump
+
+导出满足指定条件的记录的 insert 语句：
+#+begin_example
+  mysqldump -h<host> -P<port> -u<user> -p<password> -t <database> <table> --complete-insert --where="<where>"
+#+end_example
+

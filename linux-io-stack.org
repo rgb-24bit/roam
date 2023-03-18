@@ -1,0 +1,28 @@
+:PROPERTIES:
+:ID:       B589519F-EE75-4543-86B4-87636E8A2E4A
+:END:
+#+TITLE: linux io stack
+
+[[https://www.thomas-krenn.com/en/wiki/Linux_Storage_Stack_Diagram][Linux Storage Stack Diagram - Thomas-Krenn-Wiki]] 中的图片：
+#+HTML: <img src="https://www.thomas-krenn.com/en/wikiEN/images/8/83/Linux-storage-stack-diagram_v6.2.png">
+
+从上图可以看到，Linux I/O Stack 可以大致分为 VFS Layer、Block Layer 和实际的设备，其中：
++ VFS Layer 屏蔽了不同文件系统的差异，为应用提供了统一的 I/O 操作接口
++ Block Layer 接受具体的 I/O 请求
+
+通常，默认使用的 I/O 是 Buffered I/O，读写操作首先发生在内核的 Page Cache 上，然后内核再定时将 Page Cache 刷新到磁盘。如果主机突然停电，理论上 Page Cache 上的修改存在丢失风险。
+
+而 Direct I/O 是跳过了 Page Cache，但也不能保证进入 Block Layer 的请求就已经成功落盘。
+
+因此，常常会用到 sync、fsync、fsyncdata 这样的系统调用确保数据落盘。当然，这存在性能上的代价。
+
+* fio ioengine=libaio
+  在 fio ioengine=libaio 参数解释上有这样一段话：
+  #+begin_quote
+  Linux native asynchronous I/O. Note that Linux may only support queued behavior with non-buffered I/O (set direct=1 or buffered=0).
+  This engine defines engine specific options.
+  #+end_quote
+
+  这句话的解释可以在 [[https://github.com/axboe/fio/issues/512][Is it valid to set direct=0 when using libaio? · Issue #512 · axboe/fio]] 找到，也就是：
+  + 使用 Buffered I/O 时，libaio 可能退化为同步 I/O，使得测试出来的结果并不是最大值
+

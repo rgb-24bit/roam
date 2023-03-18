@@ -13,7 +13,7 @@
      #+begin_example
        openssl x509 -in server.der -inform der -text
      #+end_example
-  3. 获取 server 的证书，With [[id:CBDD9DA2-35FB-45E5-8A5A-925035763603][SNI]][fn:1]
+  3. 获取 server 的证书，With [[id:CBDD9DA2-35FB-45E5-8A5A-925035763603][SNI]][fn:1]（在获取 k8s ingress 的域名证书时，应该使用 With SNI 的方式，不然会返回默认证书）
      #+begin_example
        openssl s_client -servername www.example.com -connect www.example.com:443 < /dev/null
      #+end_example
@@ -21,11 +21,15 @@
      #+begin_example
        openssl s_client -connect www.example.com:443 < /dev/null
      #+end_example
-  5. 转换格式，PEM -> DER，一般是 Java 需要
+  5. 获取 server 证书链
+     #+begin_example
+       openssl s_client -servername www.example.com -showcerts -connect www.example.com:443 < /dev/null
+     #+end_example
+  6. 转换格式，PEM -> DER，一般是 Java 需要
      #+begin_example
        openssl x509 -in cert.crt -inform PEM -outform DER -out cert.der
      #+end_example
-  6. # 转换格式 PEM -> PKCS12 ，一般是 IIS 需要
+  7. # 转换格式 PEM -> PKCS12 ，一般是 IIS 需要
      #+begin_example
        openssl pkcs12 -inkey cert.key -in cert.crt -export -out cert.pfx
      #+end_example

@@ -1,0 +1,34 @@
+:PROPERTIES:
+:ID:       8057C736-FFFA-46EC-B5D7-36716D9FA36C
+:END:
+#+TITLE: k8s pod termination
+
+常规 Pod 删除流程为：
+1. 执行删除命令后，apiserver 会更新 Pod Metadata 部分，增加删除时间和删除宽限期，此时使用 =kubectl describe= 命令查看会发现 Pod 状态变为了 =Terminating=
+   #+begin_src yaml
+     metadata:
+       deletionGracePeriodSeconds: 30
+       deletionTimestamp: "2023-03-18T08:23:42Z"
+   #+end_src
+2. kubelet 检测到 Pod 被标记删除，开始执行删除 Pod 的流程
+   1. 如果 Pod 定义了 preStop hook，会在容器中执行 preStop hook，如果到宽限期结束都没执行完，就延迟宽限期 2s
+   2. 向 Pod 中的每个容器中的 1 进程发送 TERM 信号
+3. 同时控制面会将 Pod IP 从 Service Endpoints 中删除
+4. 宽限期截止后，kubelet 向 Pod 中的每个容器中所有还在运行的进程发送 SIGKILL 信号，同时清理 pause 容器
+5. kubelet 通过将 deletionGracePeriodSeconds 设为 0 来从 apiserver 强制立即删除 Pod
+6. apiserver 中 pod 对象消失
+
+强制删除 Pod 流程：
+1. =kubectl delete --force --grace-period=0 po <pod>=
+2. kubelet 立即开始清理流程
+
+Pod 卡 Terminating 的可能原因：
+1. Pod 存在 Finalizers 然后没删掉
+2. 容器进程收到 TERM 或 SIGKILL 信号依然没退出，容器回收不了
+3. 容器出了问题，删不掉，比如 containerd-shim 进程无法回收
+
+这种情况下强制删除可以删除 apiserver 中的记录，但 Node 上的容器进程可能依然存在。
+
+参考：
++ [[https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination][Pod Lifecycle - Termination of Pods | Kubernetes]]
++ [[https://containersolutions.github.io/runbooks/posts/kubernetes/pod-stuck-in-terminating-state/][Pod Stuck In Terminating State – Runbooks]]

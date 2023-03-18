@@ -5,7 +5,7 @@
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#gotestsum][gotestsum]]
-- [[#monkey][Monkey]]
+- [[#mockey][mockey]]
 - [[#ginkgo][ginkgo]]
 - [[#golangci-lint][golangci-lint]]
 - [[#gomock][gomock]]
@@ -13,6 +13,7 @@
 - [[#assert][assert]]
 - [[#example][example]]
 - [[#benchmark][benchmark]]
+- [[#coverage][coverage]]
 - [[#相关问题][相关问题]]
   - [[#使用-go-test-测试所有包][使用 go test 测试所有包]]
   - [[#测试在另一个协程的-panic][测试在另一个协程的 panic]]
@@ -24,39 +25,12 @@
   
   PS: 其实用 Ginkgo 的话这个感觉也没有使用的必要了
 
+  PS: 感觉确实没使用必要好像
+
   + [[https://github.com/gotestyourself/gotestsum][GitHub - gotestyourself/gotestsum: 'go test' runner with output optimized for humans, JUnit XML for CI integration, and a summary of the test results.]]
 
-* Monkey
-  NOTE：在 macOS Catalina 上该库似乎存在问题，谨慎使用。
-
-  函数/过程打桩：
-  #+begin_src go
-    guard := monkey.Patch(function, func(...) (...) {
-      // ...
-    })
-    defer guard.Unpatch()
-  #+end_src
-
-  方法打桩：
-  #+begin_src go
-    type Etcd struct {
-
-    }
-
-    func (e *Etcd) Get(id string) []string {
-      names := make([]string, 0)
-      // ...
-      return names
-    }
-
-    var e *Etcd
-    guard := PatchInstanceMethod(reflect.TypeOf(e), "Get", func(_ string) []string {
-      return []string{"LiLei", "HanMeiMei", "ZhangMing"}
-    })
-    defer guard.Unpatch()
-  #+end_src
-
-  + [[https://studygolang.com/articles/11296][Monkey框架使用指南 - Go语言中文网 - Golang中文社区]]
+* mockey
+  + [[https://github.com/bytedance/mockey][bytedance/mockey: a simple and easy-to-use golang mock library]]
   
 * ginkgo
   使用 ginkgo 来编写 go 的测试用例时，需要在对应包下面执行 ginkgo bootstrap 命令，生成 suite_test 文件，类似：
@@ -210,6 +184,13 @@
     }
   #+end_src
   
+* coverage
+  使用 =-coverpkg= 指定获取覆盖率的包，可以解决 [[https://stackoverflow.com/questions/55200883/go-coverage-not-including-functions-in-other-package][Go Coverage not including functions in other package - Stack Overflow]]。
+
+  可能遇到问题：[[https://github.com/golang/go/issues/23910][cmd/go: -coverpkg packages imported by all tests, even ones that otherwise do not use it · Issue #23910 · golang/go]]
+
+  解决：替换 =./...= 为不会产生冲突的包，比如 =./pkg/...= 这样。
+
 * 相关问题
 ** 使用 go test 测试所有包
    #+begin_src sh

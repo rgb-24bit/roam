@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       D473F5C2-3EDC-4852-9655-B86D36AEC55D
+:END:
+#+TITLE: sysctl
+
+#+begin_example
+  $ sysctl variable           # 列出 variable 的值
+  $ sysctl variable=value     # 临时修改 variable 的值
+  $ sysctl -w variable=value  # 持久化修改 variable 的值
+  $ sysctl -p                 # load /etc/sysctl.conf 中的配置
+  $ sysctl -a                 # 列出所有的配置
+#+end_example
+

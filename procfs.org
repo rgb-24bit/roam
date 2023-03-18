@@ -20,6 +20,12 @@ procfs 是 [[id:2B12BF08-5425-4A54-B91C-03367CE557BB][linux filesystems]] 之一
 
   注意：进程在运行时修改的环境变量不会在这个文件中体现。
 
+* /proc/sys/kernel
+  这个目录下是全局的内核信息，常用的有：
+  + /proc/sys/kernal/pid_max - 可以分配的最大的 PID 值
+
+  参考：[[https://docs.kernel.org/admin-guide/sysctl/kernel.html][Documentation for /proc/sys/kernel/ — The Linux Kernel documentation]]
+
 * kernel data
   #+begin_example
     ..............................................................................
@@ -62,7 +68,7 @@ procfs 是 [[id:2B12BF08-5425-4A54-B91C-03367CE557BB][linux filesystems]] 之一
      softirqs    softirq usage
      stat        Overall statistics                                
      swaps       Swap space utilization                            
-     sys         See chapter 2                                     
+     sys         See chapter 2(https://docs.kernel.org/admin-guide/sysctl/index.html)                                     
      sysvipc     Info of SysVIPC Resources (msg, sem, shm)		(2.4)
      tty	     Info of tty drivers
      uptime      Wall clock since boot, combined idle time of all cpus

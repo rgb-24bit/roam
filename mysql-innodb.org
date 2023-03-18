@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       F47B84FC-ABC1-4E81-8B81-82636FF9D428
+:END:
+#+TITLE: mysql innodb
+
+* 相关问题
+** 当表没有主键时 InnoDB 会怎样做
+   InnoDB 底层存储数据时是通过聚集索引来保存数据的，即使没有显式创建主键，也会生成默认的聚集索引。
+
+   参考：
+   + [[https://blog.jcole.us/2013/05/02/how-does-innodb-behave-without-a-primary-key/][How does InnoDB behave without a Primary Key? – Jeremy Cole]]
+
+
