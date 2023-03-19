@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       906a480b-9765-45ff-af24-e90893120010
+:END:
+#+TITLE: umask
+
+在 Linux 中，进程创建文件的权限根据 (default_perm & ~umask) 得到，也就是 umask 置为 1 的位，会从创建的文件权限位中删除。
+
+一般，文件的默认权限为 0666，文件夹的默认权限为 0777。
+

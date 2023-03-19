@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       3362ecc1-9c37-4758-aaa0-b7097092ed76
+:END:
+#+TITLE: file stat
+
+在使用 stat 系统调用时，返回的 stat 结构中会包含 =st_blksize= 和 =st_blocks= 两个字段，分别表示：
++ st_blksize - 操作系统建议的 I/O 操作的块大小，比如 buffered io 时可以使用这个大小作为缓冲区的大小
++ st_block - 文件实际占用的 512[fn:1] 字节块块数
+
+* Footnotes
+
+[fn:1] 实际大小要看具体系统 
+
