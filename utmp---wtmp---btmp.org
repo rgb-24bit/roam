@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       67a20154-ae6f-42c4-bf2a-dbdf91678bff
+:END:
+#+TITLE: utmp & wtmp & btmp
+
+Linux 使用 =/var/run/utmp=, =/var/log/wtmp= 和 =/var/log/btmp= 来记录用户的登录信息：
++ utmp - 记录当前正在登录系统的用户信息，可以使用 who 查看
++ wtmp - 记录当前正在登录和历史登录系统的用户信息，可以使用 last 查看
++ btmp - 记录失败的登录尝试信息，可以使用 lastb 查看
+

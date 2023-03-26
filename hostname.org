@@ -3,9 +3,15 @@
 :END:
 #+TITLE: hostname
 
-hostname 作为主机的标识，可以在网络中作为 domain name 使用，比如可以在 [[id:73DC1E28-D066-44C3-B983-2080F1903B1D][resolv.conf(5)]] 中指定 search list，然后使用 hostname 作为 domain name 进行 dns 解析，只要对应的 dns server 能够解析成功，就可以直接通过 hostname 访问主机。
+hostname 本质上是 =/proc/sys/kernel/hostname= 中的值，可以直接修改该值达到修改运行时 hostname 的作用，也可以修改系统启动时读取的相关的配置文件，达到持久化的目的。
 
-这在 Kubernetes 的 [[id:5EF907B9-714E-4C61-8E65-BE0962ED3F53][Pod]] 有所使用。
+通常，修改 hostname 可以：
+1. 修改 =/etc/hostname= 中的值，确保下次启动时 hostname 为修改后的
+2. 修改 =/etc/hosts= 中的值，确保可以通过 hostname 访问本机，有不少程序依赖这个，或者部分系统可能会基于这个配置来设置 hostname
+3. 使用 =hostname <hostname>= 来修改运行时的 hostname，就不用重启了
+
+而 hostname 作为主机的标识，可以在网络中作为 domain name 使用，比如可以在 [[id:73DC1E28-D066-44C3-B983-2080F1903B1D][resolv.conf(5)]] 中指定 search list，然后使用 hostname 作为 domain name 进行 dns 解析，只要对应的 dns server 能够解析成功，
+就可以直接通过 hostname 访问主机。这在 Kubernetes 的 [[id:5EF907B9-714E-4C61-8E65-BE0962ED3F53][Pod]] 有所使用。
 
 参考：
 + [[https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/][DNS for Services and Pods | Kubernetes]]

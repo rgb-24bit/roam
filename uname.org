@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       1d619cc3-39db-43ff-925c-744d4fdefbf0
+:END:
+#+TITLE: uname
+
+在 linux 系统中可以通过 =uname= 系统调用获取当前内核的一些信息：
+#+begin_src c
+  struct utsname {
+    char sysname[];     /* Operating system name (e.g., "Linux") */
+    char nodename[];    /* Name within "some implementation-defined network" */
+    char release[];     /* Operating system release (e.g., "2.6.28") */
+    char version[];     /* Operating system version */
+    char machine[];     /* Hardware identifier */
+  #ifdef _GNU_SOURCE
+    char domainname[]; /* NIS or YP domain name  */
+  #endif
+  };
+#+end_src
+
+其中，除了 machine 以外，其他对应文件：
+#+begin_quote
+/proc/sys/kernel/{ostype,   hostname,  osrelease,   version,   domainname}.
+#+end_quote
+
