@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       c711d909-c123-4017-84ae-16255f0a1abf
+:END:
+#+TITLE: python pattern matching
+
+在 3.10 版本开始支持 [[https://peps.python.org/pep-0636/][PEP 636 – Structural Pattern Matching: Tutorial | peps.python.org]]，例子：
+#+begin_src python
+  match command.split():
+      case ["quit"]:
+          print("Goodbye!")
+          quit_game()
+      case ["look"]:
+          current_room.describe()
+      case ["get", obj]:
+          character.get(obj, current_room)
+      case ["go", direction]:
+          current_room = current_room.neighbor(direction)
+#+end_src
+

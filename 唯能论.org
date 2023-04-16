@@ -1,0 +1,55 @@
+:PROPERTIES:
+:ID:       d056a180-f9bc-428c-bbb6-9072e6907e5a
+:END:
+#+TITLE: 唯能论
+#+filetags: :Philosophy:
+
+在[[id:dbcb0f06-b0ed-4b79-8021-0a7ff74b9bd3][辩证法唯物论]]中，关于物质和运动的观点是：
+#+begin_quote
+物质是运动的主体，而运动是物质的存在形式和固有属性。没有离开运动的物质，也没有离开物质的运动。
+#+end_quote
+
+唯能论由[[https://zh.wikipedia.org/wiki/%E5%A8%81%E5%BB%89%C2%B7%E5%A5%A5%E6%96%AF%E7%89%B9%E7%93%A6%E5%B0%94%E5%BE%B7#%E8%83%BD%E9%87%8F%E5%AD%A6][奥斯特瓦尔德]]提出，其观点为：
+#+begin_quote
+认为能量是唯一真实的实在，物质并不是能量的负载者，而只是能量的表现形式。主张物质和原子、分子的概念都是多余的，各种现象能够用能量及其转化来满意地加以解释。
+#+end_quote
+
+从过去获取到的信息来看，唯能论的观点似乎很有道理：
+1. 质能方程 E = mc^2 仿佛告诉我们质能可以互相转换，在一些科幻小说中也有神级文明通过能量凭空造物的设定
+2. 过去看到的有关于[[https://zh.wikipedia.org/wiki/%E9%9C%8D%E9%87%91%E8%BC%BB%E5%B0%84][霍金辐射]]的科普：
+   #+begin_quote
+   根据海森堡的不确定性原理，场的能量和时间在任何瞬间都无法得知。场的振会在视界边缘生成虚粒子对，由于黑洞的引力场很强，导致配对诞生的正反粒子被扯开，有可能有一个跌入事件视界，而另一个没有。
+
+   为了保留总能量，落入黑洞的粒子必须具有负能量（对于远离黑洞的观察者而言）。这导致黑洞失去质量，并且对于外部观察者来说，黑洞似乎刚刚发射了粒子。
+
+   在另一种模型中，该过程是量子隧穿效应，由此将在真空中形成粒子对反粒子对，并且将在事件视界之外隧穿。
+   #+end_quote
+
+   这里看上去就像能量从真空中凭空出现，然后转换黑洞辐射。
+
+但如果结合[[https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%9C%AC%E7%B2%92%E5%AD%90][基本粒子]]的[[https://zh.wikipedia.org/wiki/%E6%A0%87%E5%87%86%E6%A8%A1%E5%9E%8B][标准模型]]来看，能量是必然有物质载体的，光子可以传递能量，但光子本身也是一种基本粒子，并不存在独立于物质的能量，都有物质载体：
+1. 虽然核弹确实可以基于质能方程获得巨大的能量释放，但在这个过程中，复合粒子（质子、中子）并没有消失，质量亏损了，但是能量本身还是由[[https://zh.wikipedia.org/wiki/%E7%8E%BB%E8%89%B2%E5%AD%90][玻色子]]承载传递，并没有脱离物质载体的能量出现
+2. 正反物质的湮灭同理，湮灭时释放的巨量能量也是通过光子（玻色子）承载，物质只是从一种形态变成能另一种形态，不存在纯的能量
+
+也就是说，从辩证法唯物论的观点来看，就算科幻小说中神级文明通过能量凭空造物的设定成立，这些能量还是通过某种物质承载，凭空造物只是掌握了随意转换物质形态的能力。
+
+参考：
++ [[https://zh.wikipedia.org/wiki/%E5%85%89%E5%AD%90][光子 - 维基百科，自由的百科全书]]
++ [[https://zhuanlan.zhihu.com/p/113249788][霍金辐射（Hawking radiation） - 知乎]]
++ [[https://zhuanlan.zhihu.com/p/417305701][量子场论中的虚粒子是什么？它是如何体现数学和现实之间的区别的 - 知乎]]
++ [[https://baike.baidu.com/item/%E6%B9%AE%E7%81%AD/720344][湮灭（物理学概念）_百度百科]]
++ [[https://baike.baidu.com/item/%E5%8F%8D%E7%89%A9%E8%B4%A8/115035][反物质（正常物质的反状态）_百度百科]]
++ [[https://www.zhihu.com/topic/20632898/hot][质量亏损 - 知乎]]
++ [[https://zhuanlan.zhihu.com/p/24987503][黑体辐射这朵乌云 - 知乎]]
++ [[https://www.zhihu.com/question/19753084][「熵」是什么？ 怎样以简单易懂的方式向其他人解释？ - 知乎]]
++ [[https://www.zhihu.com/search?q=%E9%87%8F%E5%AD%90%E9%9A%A7%E7%A9%BF&search_source=Entity&type=content][量子隧穿 - 搜索结果 - 知乎]]
++ [[https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%9C%AC%E7%B2%92%E5%AD%90][基本粒子 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E5%B8%8C%E6%A0%BC%E6%96%AF%E7%8E%BB%E8%89%B2%E5%AD%90][希格斯玻色子 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E5%B8%8C%E6%A0%BC%E6%96%AF%E5%A0%B4][希格斯场 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E7%8E%BB%E8%89%B2%E5%AD%90][玻色子 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E9%9B%BB%E7%A3%81%E5%8A%9B][电磁力 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E5%A8%81%E5%BB%89%C2%B7%E5%A5%A5%E6%96%AF%E7%89%B9%E7%93%A6%E5%B0%94%E5%BE%B7#%E8%83%BD%E9%87%8F%E5%AD%A6][威廉·奥斯特瓦尔德 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E9%9C%8D%E9%87%91%E8%BC%BB%E5%B0%84][霍金辐射 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E5%9F%BA%E6%9C%AC%E7%B2%92%E5%AD%90][基本粒子 - 维基百科，自由的百科全书]]
++ [[https://zh.wikipedia.org/wiki/%E6%A0%87%E5%87%86%E6%A8%A1%E5%9E%8B][标准模型 - 维基百科，自由的百科全书]]
+
