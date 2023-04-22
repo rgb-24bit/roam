@@ -2,7 +2,7 @@
 :ID:       46b581a6-f083-4273-a19a-af46f9a09eea
 :END:
 #+TITLE: 家庭、私有制和国家的起源
-#+filetags: :Philosophy:
+#+filetags: :philosophy:
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#家庭][家庭]]

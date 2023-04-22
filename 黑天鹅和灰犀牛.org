@@ -2,7 +2,7 @@
 :ID:       f99f6ca9-02e3-4b5c-85a2-8191a44b9a9b
 :END:
 #+TITLE: 黑天鹅和灰犀牛
-#+filetags: :Economy:
+#+filetags: :economy:
 
 「黑天鹅」一般是指那些出乎意料发生的小概率高风险事件，一旦发生影响足以颠覆以往任何经验，具有不可预测性。
 #+begin_quote

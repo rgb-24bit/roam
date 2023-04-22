@@ -2,7 +2,7 @@
 :ID:       ad32c2bb-3495-4b0c-a4da-7e723af78a72
 :END:
 #+TITLE: 比较优势
-#+filetags: :Economy:
+#+filetags: :economy:
 
 * 生产可能性边界
   ☞ [[https://en.wikipedia.org/wiki/Production%E2%80%93possibility_frontier][Production–possibility frontier - Wikipedia]]

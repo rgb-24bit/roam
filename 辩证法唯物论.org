@@ -3,7 +3,7 @@
 :ROAM_ALIASES: 唯物辩证法
 :END:
 #+TITLE: 辩证法唯物论
-#+filetags: :Philosophy:
+#+filetags: :philosophy:
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#哲学的基本问题][哲学的基本问题]]

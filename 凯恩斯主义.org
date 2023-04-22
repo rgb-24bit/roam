@@ -2,7 +2,7 @@
 :ID:       5e04632d-08bd-446f-81ab-8106bfe9678c
 :END:
 #+TITLE: 凯恩斯主义
-#+filetags: :Economy:
+#+filetags: :economy:
 
 凯恩斯经济学（英语：Keynesian economics），或凯恩斯主义（英语：Keynesianism），凯恩斯理论（英语：Keynesian theory），是根据英国经济学家约翰·梅纳德·凯恩斯的著作《就业、利息和货币通论》的思想基础上的经济理论，主张国家应采用扩张性的经济政策，透过增加总需求来促进经济增长。
 

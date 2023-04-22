@@ -2,7 +2,7 @@
 :ID:       64114716-e655-49f0-99f2-9b9a9f325c69
 :END:
 #+TITLE: 价格控制和税收
-#+filetags: :Economy:
+#+filetags: :economy:
 
 * 价格控制
   + 价格下限：增加供给、减少需求，引起过剩

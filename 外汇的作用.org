@@ -2,7 +2,7 @@
 :ID:       f96805b5-fbf1-4714-8c4a-a53a81e4cca9
 :END:
 #+TITLE: 外汇的作用
-#+filetags: :Economy:
+#+filetags: :economy:
 
 在宏观经济学中，外汇市场和可贷资金市场相关联，其中可贷资金市场中的可达资金量和「国民储蓄」相关。
 

@@ -2,7 +2,7 @@
 :ID:       d056a180-f9bc-428c-bbb6-9072e6907e5a
 :END:
 #+TITLE: 唯能论
-#+filetags: :Philosophy:
+#+filetags: :philosophy:
 
 在[[id:dbcb0f06-b0ed-4b79-8021-0a7ff74b9bd3][辩证法唯物论]]中，关于物质和运动的观点是：
 #+begin_quote

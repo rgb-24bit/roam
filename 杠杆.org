@@ -2,7 +2,7 @@
 :ID:       7b49df3a-f933-4081-817e-62c4e0ee6b9f
 :END:
 #+TITLE: 杠杆
-#+filetags: :Economy:
+#+filetags: :economy:
 
 杠杆（英语：Leverage, Gearing)，将借到的钱用于投资，以一个银行的 T 型账户为例：
 |------------+------------|

@@ -2,7 +2,7 @@
 :ID:       2a3882fb-fa2e-4d2d-8f2a-be4f02bef64e
 :END:
 #+TITLE: 美联储加息和缩表
-#+filetags: :Economy:
+#+filetags: :economy:
 
 #+begin_quote
 货币是央行的负债，央行的资产负债表必须均衡。要释放出更多的货币，是需要更多的资产的，而不是凭空捏造的。

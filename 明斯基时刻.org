@@ -2,7 +2,7 @@
 :ID:       6dc1904b-457e-43b2-a136-60fd858f3f17
 :END:
 #+TITLE: 明斯基时刻
-#+filetags: :Economy:
+#+filetags: :economy:
 
 简单来说就是[[id:039a3f3a-1544-4073-8ee8-b1ebb1fa6f5d][信贷和经济发展]]中提到的「去杠杆周期」的开始时间。
 

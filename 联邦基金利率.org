@@ -2,7 +2,7 @@
 :ID:       ba4b58db-9566-493e-ba12-b3750b7421b8
 :END:
 #+TITLE: 联邦基金利率
-#+filetags: :Economy:
+#+filetags: :economy:
 
 美联储加息/降息是针对的「联邦基金利率」，而联邦基金利率指：
 #+begin_quote
