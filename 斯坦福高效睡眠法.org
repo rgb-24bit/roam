@@ -2,6 +2,7 @@
 :ID:       290edaad-623f-434a-8919-0f68b2f90698
 :END:
 #+TITLE:      斯坦福高效睡眠法
+#+filetags: :book:health:
 
 + Tag :: [[id:e5dc6165-806f-4756-82a5-d34062f99bee][健康]]
 

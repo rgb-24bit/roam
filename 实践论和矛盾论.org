@@ -2,7 +2,7 @@
 :ID:       6afa6464-c81a-480e-a6c7-602af2210034
 :END:
 #+TITLE: 实践论和矛盾论
-#+filetags: :philosophy:
+#+filetags: :book:philosophy:
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#实践论][实践论]]

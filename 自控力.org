@@ -3,6 +3,7 @@
 :ROAM_REFS: https://book.douban.com/subject/10786473/
 :END:
 #+TITLE: 自控力
+#+filetags: :book:psychology:
 
 + Tag :: [[id:c0b28bba-a1b1-440e-ac70-842045bae981][心理学]]
 
