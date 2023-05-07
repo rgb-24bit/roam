@@ -2,7 +2,6 @@
 :ID:       AD44808F-4E50-41D6-9D51-F05CFA7A476E
 :END:
 #+TITLE: keepalived
-#+filetags: :ha:
 
 在某些场景下，程序本身是单机的，但又想提供高可用的能力。这时可以考虑通过 keepalived 来做前端的负载均衡和高可用：
 + keepalived 通过 VIP 暴露服务地址，后端的 RS 区分主从，keepalived 可进行探活，在主挂掉后自动切到从节点
