@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       AD8C376C-22AD-4FF6-BE8C-30AA14BE29D0
+:END:
+#+TITLE: containerd
+
+* troubleshooting
+** no such file or directory
+   containerd root 目录下文件损坏，停止 containerd 服务，删除 root 目录重启。
+

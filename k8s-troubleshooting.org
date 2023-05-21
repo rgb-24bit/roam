@@ -14,7 +14,7 @@
 * 根据 PID 获取 Pod 名称
   #+begin_src sh
     podinfo() {
-        CID=$(cat /proc/$1/cgroup | awk -F '/' '{print $NF}')
+        CID=$(cat /proc/$1/cgroup | grep kubepods | awk -F '/' '{print $NF}')
         CID=$(echo ${CID:0:8})
         crictl inspect -o go-template --template='{{index .status.labels "io.kubernetes.pod.name"}}' $CID
     }

@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       F63768D3-F5BB-4281-80C0-8E19A5A4F947
+:END:
+#+TITLE: pcap-filter
+
+使用类似 [[id:7A552330-4DF3-40C2-8F04-8EDA734FD1D3][tcpdump]] 这样抓包工具时，可以通过 pcap-filter 表达式来指定抓包范围：
+#+begin_quote
+The filter expression consists of one or more primitives. Primitives usually consist of an id (name or number) preceded by one or more qualifiers. There are three different kinds of qualifier:
++ type ::
+  type qualifiers say what kind of thing the id name or number refers to. Possible types are host, net, port and portrange. E.g., `host foo', `net 128.3', `port 20', `portrange 6000-6008'. If there is no type qualifier, host is assumed.
+
++ dir  ::
+  dir qualifiers specify a particular transfer direction to and/or from id. Possible directions are src, dst, src or dst, src and dst, ra, ta, addr1, addr2, addr3, and addr4. E.g., `src foo', `dst net 128.3', `src or dst port ftp-data'. If there is no dir qualifier, `src or dst' is assumed. The ra, ta, addr1, addr2, addr3, and addr4 qualifiers are only valid for IEEE 802.11 Wireless LAN link layers.
+
++ proto ::
+  proto qualifiers restrict the match to a particular protocol. Possible protocols are: ether, fddi, tr, wlan, ip, ip6, arp, rarp, decnet, sctp, tcp and udp. E.g., `ether src foo', `arp net 128.3', `tcp port 21', `udp portrange 7000-7009', `wlan addr2 0:2:3:4:5:6'. If there is no proto qualifier, all protocols consistent with the type are assumed. E.g., `src foo' means `(ip6 or ip or arp or rarp) src foo', `net bar' means `(ip or arp or rarp) net bar' and `port 53' means `(tcp or udp or sctp) port 53' (note that these examples use invalid syntax to illustrate the principle).
+#+end_quote
+
+参考：[[https://www.tcpdump.org/manpages/pcap-filter.7.html][pcap-filter(7) man page | TCPDUMP & LIBPCAP]]
+

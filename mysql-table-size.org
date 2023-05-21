@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       DEAE23F5-AA33-48AC-8F21-291D5D8923B6
+:END:
+#+TITLE: mysql table size
+
+#+begin_src sql
+  SELECT 
+       table_schema as `Database`, 
+       table_name AS `Table`, 
+       round(((data_length + index_length) / 1024 / 1024), 2) `Size in MB` 
+  FROM information_schema.TABLES 
+  ORDER BY (data_length + index_length) DESC;
+#+end_src
+
+Ref: [[https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database][How to get the sizes of the tables of a MySQL database? - Stack Overflow]]
+

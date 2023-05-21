@@ -11,3 +11,7 @@
   $ sysctl -a                 # 列出所有的配置
 #+end_example
 
+sysctl 的配置通常还放在 =/etc/sysctl.d/= 下面，可以使用 =sysctl --system= 查看读取顺序，配置的值使用第一次读取到的值。
+
+一般 =/etc/sysctl.conf= 是最后一个读取的。
+

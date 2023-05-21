@@ -32,3 +32,6 @@ lscpu 从 =/proc/cpuinfo= 收集 cpu 体系结构信息，再以易读的格式�
 #+begin_example
   逻辑 CPU 数 = 物理 CPU 数 * 每颗物理 CPU 核数 * 每个核的超线程数
 #+end_example
+
+参考：[[https://unix.stackexchange.com/questions/218074/how-to-know-number-of-cores-of-a-system-in-linux][cpu - How to know number of cores of a system in Linux? - Unix & Linux Stack Exchange]]
+

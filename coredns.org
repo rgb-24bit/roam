@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       711FC40B-9614-4D2F-B328-2B32EB87E415
+:END:
+#+TITLE: coredns
+
+* Plugins
+  CoreDNS Plugins 执行顺序由 [[https://github.com/coredns/coredns/blob/master/plugin.cfg][plugin.cfg]] 决定，一般 [template > file > etcd > forward]。
+

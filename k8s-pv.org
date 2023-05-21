@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       ED6F2C02-7BF0-41C1-BB66-90342C8A4A14
+:END:
+#+TITLE: k8s pv
+
+* capacity
+  pv capacity 值仅起到标识的作用，k8s 本身并不会对 Pod 实际使用的容量作出限制，因此 Pod 使用的 Local PV 的大小是可能超出限制的，实际的限制有提供 PV 的服务作出。
+
+  参考：[[https://stackoverflow.com/questions/62137031/capacity-in-local-persistant-volume][kubernetes - Capacity in Local Persistant Volume - Stack Overflow]]
+

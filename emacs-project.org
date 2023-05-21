@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       E8A54A98-A5C2-4C79-B0B1-F17506407E86
+:END:
+#+TITLE: emacs project
+
+* projectile
+  可以使用 =projectile-discover-projects-in-directory= 寻找目录下的所有项目并添加到项目列表。
+

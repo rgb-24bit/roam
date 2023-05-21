@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       D83DB189-D61D-4436-BEDC-CA86B69C89E4
+:END:
+#+TITLE: chattr
+
+在 Linux 中，除了可以使用 chmod、chgrp、chown 来修改文件的权限属性外，还可以使用[[https://man7.org/linux/man-pages/man1/chattr.1.html][chattr(1)]]来修改文件在文件系统上的属性。
+
+相应的可以使用 lsattr 来查看属性。
+

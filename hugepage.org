@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       3826C1C0-8574-47CC-9B7D-14532339F23E
+:END:
+#+TITLE: hugepage
+
+操作系统默认页大小为 4K，对于会使用大量内存的应用程序来说，就会存在很多的页，这些页的换入换出会带来一些性能消耗。因此，可以使用大页来减少页的数量，增加性能。
+#+begin_quote
+When a process uses RAM, the CPU marks it as used by that process. For efficiency, the CPU allocates RAM in chunks—4K bytes is the default value on many platforms. Those chunks are named pages. Pages can be swapped to disk, etc.
+
+Since the process address space is virtual, the CPU and the operating system need to remember which pages belong to which process, and where each page is stored. The more pages you have, the more time it takes to find where memory is mapped. When a process uses 1GB of memory, that's 262144 entries to look up (1GB / 4K). If one page table entry consume 8 bytes, that's 2MB (262144 * 8) to look up.
+
+Most current CPU architectures support larger-than-default pages, which give the CPU/OS less entries to look-up. Operating system have different names for them—Huge pages on Linux, Super Pages on BSD, or Large Pages on Windows—but they are all the same thing.
+
+[[https://wiki.debian.org/Hugepages][Hugepages - Debian Wiki]]
+#+end_quote
+

@@ -1,0 +1,20 @@
+:PROPERTIES:
+:ID:       25863C07-0C93-4941-8975-0AB750DB8223
+:ROAM_ALIASES: ntp
+:END:
+#+TITLE: chrony
+
+chronyd 通过配置的 ntp-server 来调整主机的时间，可以通过配置 initstepslew、maxupdateskew 等参数来配置误差范围来控制调整的幅度，避免远程 ntp-server 误差影响自己。
+
+Ref [[https://chrony.tuxfamily.org/doc/3.2/chrony.conf.html][chrony.conf(5)]]
+
+* 手动同步
+  #+begin_example
+    chronyc -a makestep
+  #+end_example
+
+* 检查 ntp 服务器
+  #+begin_example
+    chronyd -q 'server 192.168.11.145 iburst'
+  #+end_example
+
