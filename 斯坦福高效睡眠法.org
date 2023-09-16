@@ -4,7 +4,7 @@
 #+TITLE:      斯坦福高效睡眠法
 #+filetags: :book:health:
 
-+ Tag :: [[id:e5dc6165-806f-4756-82a5-d34062f99bee][健康]]
+《斯坦福高效睡眠法》
 
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#认知][认知]]

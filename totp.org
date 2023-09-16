@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       81267a9a-1f88-474e-83e1-0e90935df7a9
+:ROAM_ALIASES: "Time-Based One-Time Password Algorithm"
+:ROAM_REFS: https://datatracker.ietf.org/doc/html/rfc6238
+:END:
+#+TITLE: TOTP
+
+OTP(One-Time Password), TOTP(Time-Based One-Time Password).
+
+TOTP 基于预先共享的密钥和时间来计算得到一次性密码，通常为 6 位数字。近期 Github 就开启了 2FA 验证，第一步就是通过扫描二维码获得共享密钥，然后类似 1Password 的程序就可以使用该密钥和当前时间生成 OTP。
+

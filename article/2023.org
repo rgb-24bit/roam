@@ -3,6 +3,7 @@
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#m01][M01]]
 - [[#m02][M02]]
+- [[#m05][M05]]
 
 * M01
   ☞ [[https://mp.weixin.qq.com/s?spm=a2c6h.12873639.0.0.cadb37a5JMOx9N&__biz=MzUzNzYxNjAzMg==&mid=2247519934&idx=1&sn=e87d2ab211516965ae3ffb51297df767&chksm=fae68571cd910c67b203d0d95023357a29ef9cd1ff956b3784ac3ebf490edfeb1f1ac6d75f74&scene=21#wechat_redirect][让容器跑得更快：CPU Burst 技术实践]]
@@ -20,4 +21,16 @@
      几千年私有制的存在和发展，使得在意识形态领域中占统治地位的剥削阶级的自私自利思想，逐步影响到劳动人民。自私自利、利己主义思想的普遍化是私有制长期统治的结果，而不是人的不可改变的“本性”。随着私有制的消灭、公有制的建立和发展，人们必然会逐步摆脱自私自利这种剥削阶级思想的束缚，树立起与公有制相适应的大公无私的观念。
      #+end_quote
   3) 人的本质是矛盾的，有好有坏，有自私也有无私。经济基础决定上层建筑，私有公有，人的境遇都会影响一个人的思想。脱离这些简单定义人的本质是错误的做法。
+
+* M05
+  ☞ [[https://kobzol.github.io/rust/python/2023/05/20/writing-python-like-its-rust.html][Writing Python like it’s Rust | Kobzol’s blog]]
+
+  1) 原来从 3.7 开始 Python 有 @dataclasses.dataclass 这个东西了
+  2) 确实有 Rust 的感觉了
+     #+begin_src python
+       def find_item(
+         records: List[Item],
+         check: Callable[[Item], bool]
+       ) -> Optional[Item]:
+     #+end_src
 

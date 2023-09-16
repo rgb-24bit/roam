@@ -4,6 +4,8 @@
 #+TITLE: 家庭、私有制和国家的起源
 #+filetags: :book:philosophy:
 
+《家庭、私有制和国家的起源》
+
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#家庭][家庭]]
 - [[#国家][国家]]

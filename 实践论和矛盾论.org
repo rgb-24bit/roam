@@ -4,6 +4,8 @@
 #+TITLE: 实践论和矛盾论
 #+filetags: :book:philosophy:
 
+《实践论和矛盾论》
+
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#实践论][实践论]]
 - [[#矛盾论][矛盾论]]
