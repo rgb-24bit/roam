@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       a0f238bd-1c2b-4916-a221-58bfefd6e2ce
+:END:
+#+TITLE: linux session & daemon
+
+Linux 中每个进程都属于某个 Session，每个 Session 有多个进程组，当 Session 退出时，会为 Session 中每个进程发送 SIGHUP 信号，这一般会杀死大多数属于该 Session 的进程。
+
+通常，Linux 的守护进程在启动后会调用 fork 函数，然后父进程执行 exit 退出，fork 出来的子进程执行 setsid 创建新的 Session，这样，这个守护进程就不受创建它的 Session 影响了。
+
+同时，守护进程因为不和控制终端交互，因此标准输入输出会重定向到 =/dev/null=, 确保使用标准输入输出的库函数不报错，同时使用 [[id:6AB9C680-E889-44FA-B79F-A9356E05233E][syslog]] 来打印日志。
+
+在 Shell 中使用的 setsig 命令就是这一原理。而 nohup 命令不会修改进程的 Session，而是忽略 SIGHUP 信号。
+
+参考：[[https://www.cnblogs.com/sparkdev/p/12146305.html][Linux session(会话) - sparkdev - 博客园]]
+

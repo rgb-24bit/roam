@@ -22,6 +22,8 @@
 
   可以在 =/etc/rsyslog.conf= 配置 =facility= 对应的配置文件路径。
 
+  linux 守护进程通常将标准输入输出重定向到 =/dev/null=, 使用 syslog 调用来输出日志。
+
 * journald
   journald 是 [[id:A8CACEAF-DE71-4AB0-8057-BECD5A9978E1][systemd]] 的日志服务，可以从内核、用户进程、标准输入和系统服务错误收集日志记录信息，同时也支持将日志转发给 syslog 持久化（默认情况下 journald 的日志不会持久化，重启就丢了）。
 
