@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       1E1B8696-DD33-4126-A6BE-28A1413E4AA9
+:END:
+#+TITLE: ES
+
+* 删除所有数据
+  #+begin_example
+    curl -X DELETE http://ip:port/_all 
+  #+end_example
+

@@ -3,6 +3,15 @@
 :END:
 #+TITLE: ansible
 
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#ad-hoc][Ad-Hoc]]
+- [[#pattern][Pattern]]
+- [[#inventory][Inventory]]
+- [[#playbook][Playbook]]
+- [[#handlers][Handlers]]
+- [[#tags][Tags]]
+- [[#本地执行][本地执行]]
+
 * Ad-Hoc
   命令格式：
   #+begin_example
@@ -189,4 +198,18 @@
   #+end_src
 
   参考：[[https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html][Tags — Ansible Documentation]]
+
+* 本地执行
+  #+begin_src sh
+    ansible-playbook test.yaml
+  #+end_src
+
+  #+begin_src yaml
+    ---
+    - name: run local
+      hosts: localhost
+      connection: local
+      tasks:
+        ...
+  #+end_src
 

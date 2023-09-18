@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       30781AD2-F340-424F-816C-C117590D3AE5
+:END:
+#+TITLE: Python Binary distribution format
+
+#+begin_example
+{distribution}-{version}(-{build tag})?-{python tag}-{abi tag}-{platform tag}.whl
+#+end_example
+
+参考：[[https://packaging.python.org/en/latest/specifications/binary-distribution-format/][Binary distribution format — Python Packaging User Guide]]
+

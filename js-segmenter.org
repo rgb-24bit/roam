@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       C20FEA30-94CC-46F3-A9E9-CF9D6D2006BA
+:END:
+#+TITLE: js segmenter
+
+浏览器自带分词，页面上鼠标双击选择文本的结果和分词结果一致：
+#+begin_example
+  f = str => [...new Intl.Segmenter('zh', {granularity: 'word'}).segment(str)].map(e => e.segment)
+#+end_example

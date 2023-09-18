@@ -3,7 +3,7 @@
 :END:
 #+TITLE: Zombie and Orphan Process
 
-在 Linux 中，新进程通常通过 fork/exec 创建，而原进程则是这些新进程的父进程，可以通过 wait/waitpid 系统调用取得子进程的终止状态。因此，在子进程终止后而父进程没有调用 wait/waitpid 前，内核中还会在进程表中保留这个进程的信息，确保如果后面父进程调用 wait/waitpid 时能够获取到终止状态。
+在 Linux 中，新进程通常使用 fork/exec 创建，而原进程则是这些新进程的父进程，可以通过 wait/waitpid 系统调用取得子进程的终止状态。因此，在子进程终止后而父进程没有调用 wait/waitpid 前，内核中还会在进程表中保留这个进程的信息，确保如果后面父进程调用 wait/waitpid 时能够获取到终止状态。
 
 这种进程已经终止但父进程还没调用 wait/waitpid 前的状态就叫僵尸进程，在 ps 中看到的状态就是 defunct。
 

@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       B6E39D59-A722-4FE7-B959-B500C0DAD29C
+:END:
+#+TITLE: nscd.conf
+
+配置 =/etc/nscd.conf= 指定 [[id:67D6426D-ADC9-4ED5-B037-253528AF608D][dns]] 缓存过期时间：
++ positive-time-to-live 查询成功结果的过期时间，单位秒
++ negative-time-to-live 查询失败结果的过期时间，单位秒
+

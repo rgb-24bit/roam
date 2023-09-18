@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       2A57EBF9-2E02-4E32-B121-13B2D832C5E6
+:END:
+#+TITLE: k8s addon-resizer
+
+可以使用 addon-resizer 自动垂直扩缩容当前 deployment 里面的其他 container，使用：
+#+begin_example
+  Usage of ./pod_nanny:
+        --acceptance-offset=20: A number from range 0-100. The dependent's resources are rewritten when they deviate from expected by a percentage that is higher than this threshold. Can't be lower than recommendation-offset.
+        --alsologtostderr[=false]: log to standard error as well as files
+        --container="pod-nanny": The name of the container to watch. This defaults to the nanny itself.
+        --cpu="MISSING": The base CPU resource requirement.
+        --deployment="": The name of the deployment being monitored. This is required.
+        --extra-cpu="0": The amount of CPU to add per node.
+        --extra-memory="0Mi": The amount of memory to add per node.
+        --extra-storage="0Gi": The amount of storage to add per node.
+        --log-flush-frequency=5s: Maximum number of seconds between log flushes
+        --log_backtrace_at=:0: when logging hits line file:N, emit a stack trace
+        --log_dir="": If non-empty, write log files in this directory
+        --logtostderr[=true]: log to standard error instead of files
+        --memory="MISSING": The base memory resource requirement.
+        --namespace="": The namespace of the ward. This defaults to the nanny pod's own namespace.
+        --pod="": The name of the pod to watch. This defaults to the nanny's own pod.
+        --poll-period=10000: The time, in milliseconds, to poll the dependent container.
+        --recommendation-offset=10: A number from range 0-100. When the dependent's resources are rewritten, they are set to the closer end of the range defined by this percentage threshold.
+        --stderrthreshold=2: logs at or above this threshold go to stderr
+        --storage="MISSING": The base storage resource requirement.
+        --v=0: log level for V logs
+        --vmodule=: comma-separated list of pattern=N settings for file-filtered logging
+#+end_example
+

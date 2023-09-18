@@ -1,5 +1,6 @@
 :PROPERTIES:
 :ID:       46C89E7D-9BA4-4ED0-B82F-6FCBA489E7F0
+:ROAM_ALIASES: ptmx
 :END:
 #+TITLE: pty
 
@@ -7,3 +8,12 @@ Ref [[id:F12B6144-DE9C-473A-9837-69782AF63E19][Linux TTY/PTS]]
 
 * /proc/sys/kernel/pty/max
   内核属性 =/proc/sys/kernel/pty/max= 限制可以打开的虚拟终端的最大数量，属性 =/proc/sys/kernel/pty/nr= 记录当前已经打开的终端的数量。
+
+  3.4 之后的内核增加了 =kernel.pty.reserve= 参数用于配置预留值。
+
+  #+begin_example
+    kernel.pty.max = 4096       - global limit
+    kernel.pty.reserve = 1024   - reserved for filesystems mounted from the initial mount namespace
+    kernel.pty.nr               - current count of ptys
+  #+end_example
+

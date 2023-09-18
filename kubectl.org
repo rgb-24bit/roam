@@ -1,0 +1,33 @@
+:PROPERTIES:
+:ID:       6C1A7F33-FDA6-4DA1-808D-5934111F5160
+:END:
+#+TITLE: kubectl
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#tls-secret][tls secret]]
+- [[#rollout][rollout]]
+
+* tls secret
+  create or update tls secret:
+  #+begin_example
+    kubectl create secret tls <secret name> --key=<key file> --cert=<cert file> --dry-run=client -o yaml | kubectl apply -f -
+  #+end_example
+
+* rollout
+  #+begin_example
+    # View the rollout history of a deployment
+    kubectl rollout history deployment/abc
+    
+    # View the details of daemonset revision 3
+    kubectl rollout history daemonset/abc --revision=3
+    
+    # Rollback to the previous deployment
+    kubectl rollout undo deployment/abc
+    
+    # Rollback to daemonset revision 3
+    kubectl rollout undo daemonset/abc --to-revision=3
+    
+    # Rollback to the previous deployment with dry-run
+    kubectl rollout undo --dry-run=server deployment/abc
+  #+end_example
+

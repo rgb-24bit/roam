@@ -5,3 +5,12 @@
 
 可以将 =load average / cup nums= 简单看作每个 CPU 的负载情况，1 表示 100%，大于 1 表示有其他任务等待 CPU 资源，小于 1 表示有空闲 CPU 资源。
 
+* High System Load with Low CPU Utilization on Linux?
+  在 Linux 上，系统负载包括处于可运行状态（R）和无法中断的休眠状态（D）（通常是磁盘 I/O）的线程。因此，在 Linux 上，除了 CPU 需求之外，如果有大量线程处于无法中断睡眠（D）状态，也可能导致异常高的负载数字。
+  ☞ [[https://tanelpoder.com/posts/high-system-load-low-cpu-utilization-on-linux/][High System Load with Low CPU Utilization on Linux? | Tanel Poder Consulting]]
+
+  列出 RD 状态的进程：
+  #+begin_example
+    ps -eo s,user,cmd | grep ^[RD] | sort | uniq -c | sort -nbr | head -20
+  #+end_example
+

@@ -22,3 +22,11 @@
     proxy_set_header X-Real-IP $remote_addr;
   #+end_src
 
+* Permission
+  如果 nginx 没有访问 web 目录的权限，日志里面会出现 13: Permission denied 报错，同时返回 403，此时可以修改 web 目录读写权限：
+  #+begin_example
+    chmod -R 755 <dir>
+  #+end_example
+
+  参考：[[https://www.cnblogs.com/huchong/p/10031523.html][解决Nginx出现403 forbidden (13: Permission denied)报错的四种方法 - 听风。 - 博客园]]
+

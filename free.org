@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       AB685527-7D44-4236-9C4B-92F7028810A9
+:END:
+#+TITLE: free
+
+#+begin_example
+  $ free -h
+                total        used        free      shared  buff/cache   available
+  Mem:            94G         27G         14G        3.5G         51G         64G
+  Swap:            0B          0B          0B
+#+end_example
+
+free 显示的内容中：
+- total 是总的内存
+- used 是已经被应用使用的
+- free 是为分配的内存
+- buff/cache 是内核为了提升磁盘操作的性能，消耗的一部分内存用于缓存磁盘数据。这部分内存可以很快地被释放，所以一般也算做可用内存
+- available 大约是 free + buff/cache
+

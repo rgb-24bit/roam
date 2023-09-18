@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       7196EB0C-5E30-49BB-803D-BC9C28F91892
+:END:
+#+TITLE: golang concurrent write map
+
+golang runtime 在 1.16 版本增加了一个对 map 并发使用的检查，如果检查到并发读写的存在会直接终止程序，无法使用 revocer 捕获。
+
+参考：
++ [[https://stackoverflow.com/questions/39288741/how-to-recover-from-concurrent-map-writes][dictionary - How to recover from concurrent map writes? - Stack Overflow]]
++ [[https://go.dev/doc/go1.6#runtime][Go 1.6 Release Notes - The Go Programming Language]]
+

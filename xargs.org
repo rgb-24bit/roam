@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       D3A8013F-E4C6-4C94-9104-DDE9FDFA08A0
+:END:
+#+TITLE: xargs
+
+#+begin_src bash
+  # If find returns no result, do not run rm
+  find -name "*.pdf" | xargs --no-run-if-empty rm
+  
+  # Use at most max-lines nonblank input lines per command line.
+  xargs -L max-lines
+#+end_src
+

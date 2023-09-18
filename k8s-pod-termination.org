@@ -24,7 +24,7 @@
 
 Pod 卡 Terminating 的可能原因：
 1. Pod 存在 Finalizers 然后没删掉
-2. 容器进程收到 TERM 或 SIGKILL 信号依然没退出，容器回收不了
+2. 容器进程收到 TERM 或 SIGKILL 信号依然没退出，容器回收不了[fn:1]
 3. 容器出了问题，删不掉，比如 containerd-shim 进程无法回收
 
 这种情况下强制删除可以删除 apiserver 中的记录，但 Node 上的容器进程可能依然存在。
@@ -32,3 +32,7 @@ Pod 卡 Terminating 的可能原因：
 参考：
 + [[https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination][Pod Lifecycle - Termination of Pods | Kubernetes]]
 + [[https://containersolutions.github.io/runbooks/posts/kubernetes/pod-stuck-in-terminating-state/][Pod Stuck In Terminating State – Runbooks]]
+
+* Footnotes
+
+[fn:1] 这种情况可以尝试使用 kubectl exec 命令进入 pod，如果能进入估计容器进程是处于 D 状态，无法响应 SIGKILL 信号

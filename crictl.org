@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       0A0821FA-E053-4331-9B0B-065D0D6A8A72
+:END:
+#+TITLE: crictl
+
+* 删除未使用镜像
+  #+begin_example
+    crictl rmi --prune
+  #+end_example
+

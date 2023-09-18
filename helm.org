@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       9BC04C0C-8F31-4D7E-B8E2-622882C61E73
+:END:
+#+TITLE: helm
+
+获取 release 对应的 manifest：
+#+begin_src sh
+helm get manifest RELEASE_NAME
+#+end_src
+

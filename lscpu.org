@@ -35,3 +35,6 @@ lscpu 从 =/proc/cpuinfo= 收集 cpu 体系结构信息，再以易读的格式�
 
 参考：[[https://unix.stackexchange.com/questions/218074/how-to-know-number-of-cores-of-a-system-in-linux][cpu - How to know number of cores of a system in Linux? - Unix & Linux Stack Exchange]]
 
+* 操作系统怎么获取 CPU 详细信息
+  在 x86 平台上可以通过 cpuid 指令获取，在 ARM 上可以通过读取指定寄存器来获取。不同的 CPU 有对应的获取方式，操作系统会做相应的适配。
+

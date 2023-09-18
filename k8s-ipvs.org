@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       15490C43-CEA0-45D6-80DA-7D7DFB63C8F9
+:END:
+#+TITLE: k8s ipvs
+
+k8s iptables 模式下 service ip 通过 iptables 规则转发，这时 service ip 是没有对应的实体的，也就 ping 不同。
+
+在 ipvs 模式下，会创建 dummy 类型的虚拟接口 kube-ipvs0，service ip 会绑定在 kube-ipvs0 上。
+
+对应匹配 service-ip:port 的访问，走 ipvs 转发。不匹配的就打到了 kube-ipvs0 上，而 kube-ipvs0 和 lo 类似，能够 ping 通，访问 kube-ipvs0 ip + port 也约等于 127.0.0.1 + port。
+
