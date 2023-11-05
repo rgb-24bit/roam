@@ -3,11 +3,20 @@
 :END:
 #+TITLE: file stat
 
-在使用 stat 系统调用时，返回的 stat 结构中会包含 =st_blksize= 和 =st_blocks= 两个字段，分别表示：
-+ st_blksize - 操作系统建议的 I/O 操作的块大小，比如 buffered io 时可以使用这个大小作为缓冲区的大小
-+ st_block - 文件实际占用的 512[fn:1] 字节块块数
+* st_blksize & st_blocks
+  在使用 stat 系统调用时，返回的 stat 结构中会包含 =st_blksize= 和 =st_blocks= 两个字段，分别表示：
+  + st_blksize - 操作系统建议的 I/O 操作的块大小，比如 buffered io 时可以使用这个大小作为缓冲区的大小
+  + st_block - 文件实际占用的 512[fn:1] 字节块块数
+
+* set-user-id & set-group-id
+  在 st_mode 结构中有两个字段 =S_ISUID= 和 =S_ISGID= 分别对于设置组 ID 和设置用户 ID。当对应位被设置时，当文件作为进程运行时，进程权限等于文件所有者的权限，而非当前执行者的权限。
+
+  比如 =passwd= 命令便是通过这种方式让执行者用于 =/etc/passwd= 文件的编辑权限。
+
+  当设置了设置组 ID 时，文件的执行组执行位设置也就没意义了，因为会按照文件拥有者的权限来。[[id:8b756d99-d097-4ab6-869d-1b20777bb5d4][fcntl]] 使用这种方式来表示文件锁为强制性锁。
+
+  参考：[[https://man7.org/linux/man-pages/man7/inode.7.html][inode(7) - Linux manual page]]
 
 * Footnotes
 
-[fn:1] 实际大小要看具体系统 
-
+[fn:1] 实际大小要看具体系统

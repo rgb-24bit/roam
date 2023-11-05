@@ -5,6 +5,8 @@
 
 VXLAN 是 [[id:59A9EF64-9AD8-49A3-905B-BA65929BF810][Tunneling protocol]] 的一种，通过 UDP 负载传输 MAC 帧，用来解决 [[id:D771D05F-107D-4AE3-BDB1-39A52370F28F][VLAN]] 中网络数量不足和二层范围有限的问题，只要三层可达，那么就可以通过 VXLAN 组网。
 
+PS: VXLAN 本身只要求三层可达，也就是 IP 这一级就行，但实现上一般使用 UDP 作为传输协议。
+
 VXLAN 中的几个重要概念：
 + VTEP - 是 VXLAN 隧道网络的端点，负责 VXLAN 报文的封装和解析
 + VNI - 是 VXLAN 网络的标识，是个 24 位整数，能够支持千万级网络的划分

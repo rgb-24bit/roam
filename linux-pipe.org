@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       778bd149-4539-4500-ac3c-7f819579a7d7
+:END:
+#+TITLE: linux pipe
+
+linux pipe 系统调用创建两个文件描述符，其中一个文件描述符的输出是另一个文件描述符的输入。常用于终端管道连接不同命令的输入输出。
+
+参考：[[https://man7.org/linux/man-pages/man2/pipe.2.html][pipe(2) - Linux manual page]]
+
