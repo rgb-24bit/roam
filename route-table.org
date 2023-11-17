@@ -22,3 +22,8 @@ IP 数据报转发时，会先用目标 IP 地址和 Genmask 进行与运算，�
 
 除了 route 命令外，还可以使用 =ip route list= 和 =netstat -rn= 获取路由表信息。
 
+删除路由：
+#+begin_example
+  ip route del 10.120.100.0/24 dev iface
+#+end_example
+

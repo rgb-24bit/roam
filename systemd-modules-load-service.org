@@ -1,0 +1,21 @@
+:PROPERTIES:
+:ID:       4E7D9E67-9820-4476-A3AF-15233703568D
+:END:
+#+TITLE: systemd-modules-load.service
+
+Systemd 下可以使用 systemd-modules-load.service 来静态加载内核模块，可以将要加载的内核模块配置文件放在以下目录：
+#+begin_example
+  /etc/modules-load.d/*.conf
+  /run/modules-load.d/*.conf
+  /usr/lib/modules-load.d/*.conf
+#+end_example
+
+优先级从上到下，加载按配置文件的字典序加载。
+
+其中，加载某个模块错误后，会接着加载剩下的 mod，虽然会在最后返回失败，但能加载的 mod 都会加载。
+
+参考：
++ [[https://man.archlinux.org/man/modules-load.d.5.en][modules-load.d(5) — Arch manual pages]]
++ [[https://github.com/systemd/systemd/blob/main/src/modules-load/modules-load.c][systemd/src/modules-load/modules-load.c at main · systemd/systemd]]
++ [[https://github.com/systemd/systemd/blob/6cd1f6546c6c3709f31b23f16b7f33f3dcbd2cfe/src/shared/module-util.c#L41][systemd/src/shared/module-util.c at 6cd1f6546c6c3709f31b23f16b7f33f3dcbd2cfe · systemd/systemd]]
+

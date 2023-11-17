@@ -27,3 +27,12 @@
      #+end_example
   2. 选择 P 后 ESC 返回到展示页面即可
 
+* 排序
+  排序快捷键，按下对应按键排序：
+  #+begin_example
+    P: sort according to CPU utilization
+    M: sort by memory usage
+    T: sort by Time column
+    N: sort by PID number
+  #+end_example
+

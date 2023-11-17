@@ -10,6 +10,7 @@
 - [[#playbook][Playbook]]
 - [[#handlers][Handlers]]
 - [[#tags][Tags]]
+- [[#roles][Roles]]
 - [[#本地执行][本地执行]]
 
 * Ad-Hoc
@@ -89,6 +90,8 @@
 
   参考：[[https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html][How to build your inventory — Ansible Documentation]]
 
+  也可以在 =group_vars= 或 =host_vars= 目录中管理 Inventory 配置，参考 [[https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html#organizing-host-and-group-variables][Organizing host and group variables]]。
+  
 * Playbook
   在 Playbook 中，hosts 可以按照 Pattern 匹配目标 host，通常，我们可以将目标 hosts 作为变量传入：
   #+begin_example
@@ -174,7 +177,6 @@
 
   参考：[[https://docs.ansible.com/ansible/latest/user_guide/playbooks_handlers.html][Handlers: running operations on change — Ansible Documentation]]
 
-
 * Tags
   可以为 playbook 中的任务设置 tag，然后执行时通过类似 =--tags [tag1, tag2]= 选择要执行的任务：
   #+begin_src yaml
@@ -198,6 +200,11 @@
   #+end_src
 
   参考：[[https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_tags.html][Tags — Ansible Documentation]]
+
+* Roles
+  根据一定的目录结构来组织管理大量的 playbook，ansible 按照一定的规则自动加载配置，渲染模板。
+
+  参考：[[https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html][Roles — Ansible Documentation]]
 
 * 本地执行
   #+begin_src sh

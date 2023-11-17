@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       A5BDD5C4-50FB-435A-82E7-F0F0B896137E
+:END:
+#+TITLE: ip_local_port_range
+
+Linux 可以通过修改 =ip_local_port_range= 参数的值控制新建连接时本机使用的端口号范围：
+#+begin_example
+cat /proc/sys/net/ipv4/ip_local_port_range
+
+sysctl -w net.ipv4.ip_local_port_range='45000 65535'
+#+end_example
+

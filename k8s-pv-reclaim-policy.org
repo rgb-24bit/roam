@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       42B4DAAF-7A65-4FBA-9035-3D594302C5A8
+:END:
+#+TITLE: k8s pv reclaim policy
+
+当 PVC 删除后，PV 会根据配置的 Reclaim Policy 来决定回收方式，Reclaim Policy 的值有：
++ Delete - PVC 删除后同步删除 PV，默认策略
++ Retain - PVC 删除后保留 PV，PV 状态变为 Released，后续可以由管理员手动删除
++ Recycle - 已废弃
+
+对于通过 StorageClass 创建的 PV，会继承 StorageClass reclaimPolicy 字段的值。
+
+参考：
++ [[https://kubernetes.io/zh-cn/docs/concepts/storage/persistent-volumes/][持久卷 | Kubernetes]]
++ [[https://kubernetes.io/zh-cn/docs/concepts/storage/storage-classes/][存储类 | Kubernetes]]
+

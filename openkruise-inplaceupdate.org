@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       53522BBD-2756-4033-9C0F-F6CB8EDB9FCA
+:END:
+#+TITLE: OpenKruise InPlaceUpdate
+
+OpenKruise InPlaceUpdate 实现的核心原理就是 Pod 的 =metadata= 和 =containers[x].image= 是允许更新的。平时使用 deployment 这类 controller 的时候，修改 yaml 后会删除 pod 重建，但 pod 修改这两个字段的时候是可以原地修改的。
+
+这样，OpenKruise 通过动态修改原 Pod 的镜像、元信息达到 InPlaceUpdate 的效果。
+
+参考：
++ [[https://openkruise.io/zh/docs/next/core-concepts/inplace-update/][原地升级 | OpenKruise]]
++ https://github.com/openkruise/kruise/blob/master/pkg/util/inplaceupdate/inplace_update.go
+

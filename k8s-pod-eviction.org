@@ -3,6 +3,29 @@
 :END:
 #+TITLE: k8s pod eviction
 
+* 驱逐类型
+  K8S 中，驱逐类型有：
+  + 节点故障处于 NotReady 状态时有 KCM 发起的驱逐
+  + 节点资源压力过大时有 Kubelet 发起的驱逐
+  + 抢占调度时由 Scheduler 发起的驱逐
+
+* Taint based Eviction
+  节点故障处于 NotReady 发起的驱逐可以看着是[[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/taint-and-toleration/#taint-based-evictions][基于污点的驱逐]]，当节点故障长时间未上报心跳后，KCM 会标记节点为 NotReady，并根据节点上 Pod 配置的污点容忍情况开始进行驱逐。
+
+  节点被标记为 NotReady 的时间受 kubelet 和 kcm 参数影响，主要有：
+  |------------------------------+---------+--------------------------|
+  | 参数                         | 组件    | 作用                     |
+  |------------------------------+---------+--------------------------|
+  | node-status-update-frequency | kubelet | kubelet 上报心跳的间隔   |
+  | node-monitor-grace-period    | kcm     | 多久没有心跳认为节点故障 |
+  |------------------------------+---------+--------------------------|
+
+  节点被 kcm 认为故障后，会打上 =node.kubernetes.io/not-ready= 和 =node.kubernetes.io/unreachable= 的污点，并基于 Pod 污点容忍配置进行驱逐。
+
+  注：Kubernetes 会自动给 Pod 添加针对 node.kubernetes.io/not-ready 和 node.kubernetes.io/unreachable 的容忍度，且配置 tolerationSeconds=300。
+
+  参考：[[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/taint-and-toleration/][污点和容忍度 | Kubernetes]]
+
 * NodePressure Eviction
   kubelet 根据驱逐信号、驱逐条件和监控间隔来进行节点压力驱逐，其中，驱逐信号是特定资源在特定时间点的当前状态：
   |--------------------+----------------------------------|
@@ -74,8 +97,7 @@
   + [[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/node-pressure-eviction/][节点压力驱逐 | Kubernetes]]
   + [[https://kubernetes.io/zh-cn/docs/concepts/storage/ephemeral-volumes/][临时卷 | Kubernetes]]
 
-
-* COMMENT Clean Evicted Pods
+* Clean Evicted Pods
   #+begin_src sh
     kubectl get po -A|grep Evicted|awk '{system("kubectl delete po -n" $1 " " $2)}'
   #+end_src

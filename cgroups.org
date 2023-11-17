@@ -5,3 +5,25 @@
 
 cgroups 是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 内核提供的一种可以限制单个进程或者多个进程所使用资源的机制，可以对 cpu，内存等资源实现精细化的控制。
 
+* 目录结构
+  cgroup 各子系统目录通常在 =/sys/fs/cgroup/<subsystem>= 目录下，是一个分层的结构，子层级会继承父层级的值。通过查看进程 =/proc/$PID/cgroup= 文件可以看到该进程的 cgroup 的具体目录。
+
+  比如某个 k8s pod 进程的 cgroup 文件为：
+  #+begin_example
+    10:perf_event:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    9:freezer:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    8:pids:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    7:blkio:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    6:devices:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    5:memory:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    4:cpuset:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    3:cpu,cpuacct:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    2:net_cls,net_prio:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+    1:name=systemd:/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab
+  #+end_example
+
+  那么，该进程 =cpu,cpuacct= 子系统的目录就在 =/sys/fs/cgroup/kubepods/burstable/pod2b348574-f91d-4029-b823-63ac18212ce8/9dae82ac8de061b45b77810ff84aff2bb73fe2b0bab87f69c21c01f29eefc8ab= 下，
+  该目录下的各个文件就用于配置 =cpu= 子系统的参数。
+
+  查看：[[https://www.cnblogs.com/zhrx/p/16388175.html][Cgroup 原理及使用 - zhrx - 博客园]]
+

@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       104819E4-24DF-4E31-9242-40236738DC50
+:END:
+#+TITLE: kill process
+
+#+begin_example
+  kill -9 $PID
+  
+  pkill $NAME
+#+end_example
+

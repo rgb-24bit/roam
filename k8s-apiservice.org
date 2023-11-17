@@ -1,5 +1,6 @@
 :PROPERTIES:
 :ID:       C5EEAFF6-7B1C-4EF4-813B-0AB6885E381B
+:ROAM_ALIASES: "k8s namespace terminating"
 :END:
 #+TITLE: k8s apiservice
 
@@ -23,6 +24,7 @@
 #+end_src
 
 但需要注意的时，在删除 namespace 的时候，apiserver 会调注册上去的扩展 api 去清理资源，如果扩展 api 对应的服务也被删了，那么就无法清理完成，会一直卡在 Terminating。
+如果确定 apiservice 已删除，可以执行 =kubectl delete apiservices.apiregistration.k8s.io xxx= 删除 apiservice 避免卡 namespace 删除。
 
 参考：
 + [[https://www.cnblogs.com/qiuhom-1874/p/14279850.html][容器编排系统K8s之APIService资源 - Linux-1874 - 博客园]]

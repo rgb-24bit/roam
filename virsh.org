@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       A0A0B5A9-9B1D-48A8-BB06-F68A9412186A
+:END:
+#+TITLE: virsh
+
+virsh 是 kvm 的命令行工具，可以全生命周期的管理 kvm。常用命令：
+#+begin_src sh
+  virsh list        # 列出 Running 的虚拟机
+  virsh list --all  # 列出所有虚拟机
+  virsh reboot      # 重启虚拟机
+  virsh destroy     # 强制关闭虚拟机，不是删除
+  virsh start       # 启动虚拟机
+  virsh reset       # 强制重启虚拟机
+  virsh console     # 从宿主机连接指定虚拟的串行控制台
+#+end_src
+

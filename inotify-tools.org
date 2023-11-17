@@ -1,9 +1,24 @@
 :PROPERTIES:
 :ID:       499C7CD7-389A-4EFC-92A7-56DBCDDD0768
+:ROAM_ALIASES: inotify
 :END:
 #+TITLE: inotify-tools
 
 Linux 内核从 2.6.13 开始引入了 inotify 机制，inotify 是一种强大的、细粒度的、异步文件系统监控机制，可以监控文件系统的访问属性、读写属性、权限属性、删除创建、移动等操作。
 
 inotify-tools 包括一个 C 库和一组命令行工具，可在命令行下提供对文件系统事件的监控。
+
+* 使用情况统计
+  ☞ https://github.com/fatso83/dotfiles/blob/master/utils/scripts/inotify-consumers
+
+  注：这个脚本的统计不是很准确，好像统计不了没有 watch 文件的 inotify instance，C++ 版本的似乎做了这个统计 [[https://github.com/mikesart/inotify-info][mikesart/inotify-info]]，就是编译比较麻烦。
+
+  可以参考 [[https://unix.stackexchange.com/questions/15509/whos-consuming-my-inotify-resources][fedora - Who's consuming my inotify resources? - Unix & Linux Stack Exchange]] 查找 inotify instance，单个进程的在 =/proc/PID/fd/= 下面，名称为 =anon_inode:inotify= 的就是：
+  #+begin_example
+    # 统计数量
+    for foo in /proc/*/fd/*; do readlink -f $foo; done | grep inotify | sort | uniq -c | sort -nr
+
+    # 显示对应进程
+    find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -exec sh -c 'cat $(dirname {})/../cmdline; echo ""' \; 2>/dev/null
+  #+end_example
 

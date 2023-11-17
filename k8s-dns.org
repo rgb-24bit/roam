@@ -23,6 +23,52 @@
 
   参考：[[https://kubernetes.io/zh-cn/docs/concepts/services-networking/dns-pod-service/][Service 与 Pod 的 DNS | Kubernetes]]
 
+* Troubleshooting
+  Kubelet 创建 pod 时会读取宿主机上的 DNS 配置，比如 =/etc/resolv.conf= 文件，如果文件不存在可能导致 DNS 创建失败。
+
+  #+begin_src go
+    func (m *kubeGenericRuntimeManager) generatePodSandboxConfig(pod *v1.Pod, attempt uint32) (*runtimeapi.PodSandboxConfig, error) {
+      // ...
+    
+      dnsConfig, err := m.runtimeHelper.GetPodDNS(pod)
+      if err != nil {
+        return nil, err
+      }
+    
+      // ...
+    }
+    
+    // GetPodDNS returns DNS settings for the pod.
+    func (c *Configurer) GetPodDNS(pod *v1.Pod) (*runtimeapi.DNSConfig, error) {
+      dnsConfig, err := c.getHostDNSConfig()
+      if err != nil {
+        return nil, err
+      }
+    }
+    
+    func (c *Configurer) getHostDNSConfig() (*runtimeapi.DNSConfig, error) {
+      var hostDNS, hostSearch, hostOptions []string
+      // Get host DNS settings
+      if c.ResolverConfig != "" {
+        f, err := os.Open(c.ResolverConfig)
+        if err != nil {
+          return nil, err
+        }
+        defer f.Close()
+    
+        hostDNS, hostSearch, hostOptions, err = parseResolvConf(f)
+        if err != nil {
+          return nil, err
+        }
+      }
+      return &runtimeapi.DNSConfig{
+        Servers:  hostDNS,
+        Searches: hostSearch,
+        Options:  hostOptions,
+      }, nil
+    }
+  #+end_src
+
 * Footnotes
 
 [fn:1] 看代码可以发现 apiserver 对应 svc 走的不是 dns 解析，而是直接获取的 svc 的 ClusterIP 字段 [[https://github.com/kubernetes/kubernetes/blob/v1.24.0/staging/src/k8s.io/apiserver/pkg/util/proxy/proxy.go#L92][ResloveCluster]]

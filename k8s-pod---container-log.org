@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       78D01CEA-5625-4F56-A2CE-177A9CD5D31A
+:END:
+#+TITLE: k8s pod & container log
+
+在 K8S 中，容器标准输出的日志会放在节点的 =/var/log/pods= 和 =/var/log/containers= 目录下，可以在这下面来寻找历史日志。
+

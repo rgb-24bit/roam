@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       4F5B2A23-C35D-4E24-B174-BB2C53E1C71D
+:END:
+#+TITLE: cpu usage
+
+[[id:06F2318B-5493-4873-89CB-23D302B2F5CC][load average]] 表示同一时间有多少任务等待 CPU 资源，而 cpu usage 表示 cpu 处理非空闲任务所花费的时间的百分比。
+
+获取每个 CPU 使用情况：
+#+begin_example
+  cat /proc/stat |grep cpu |awk '{printf ("%5s usage %f\n", $1, 100-($5*100)/($2+$3+$4+$5+$6+$7+$8+$9+$10))}'
+#+end_example
+
+参考：[[https://www.baeldung.com/linux/get-cpu-usage][Get Overall CPU Usage on Linux | Baeldung on Linux]]
+

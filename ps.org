@@ -45,3 +45,10 @@ ps aux 使用 BSD 的格式来显示，各列的内容意思如下：
   +      //位于后台的进程组；
 #+end_example
 
+D 状态进程无法响应 kill 信号，杀不调，可以选择重启。
+
+常用：
+#+begin_example
+  ps -eo s,user,cmd | grep ^[Z]  # 列出僵尸进程
+#+end_example
+

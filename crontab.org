@@ -47,3 +47,8 @@ cron 表达式共六列，前五列用于指定执行时间，第六列为要执
     @reboot  /home/user/startup.sh
   #+end_src
 
+* mailto
+  crontab 任务执行后可以根据 MAILTO 变量配置的地址发送邮件，比如发向本机，有时会导致 =/var/mail/= 目录下文件占用过多磁盘空间。
+
+  可以 =crontab -e= 在最上面增加 ~MAILTO=""~ 配置来避免发送邮件。
+
