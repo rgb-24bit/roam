@@ -5,9 +5,14 @@
 
 + Tag :: [[id:7E39F12B-5295-4B80-8FE1-F90282CCEE3C][Consensus algorithm]]
 
-Raft 是一个非拜占庭的一致性算法，即所有通信是正确的而非伪造的。N 个结点的情况下（N 为奇数）可以最多容忍 (N − 1) / 2 个结点故障。
+Raft（Replication and Fault Tolerant）是一个允许网络分区（Partition Tolerant）的一致性协议，它保证了在一个由 N 个节点构成的系统中有 (N+1)/2（向上取整）个节点正常工作的情况下的系统的一致性，比如在一个 5 个节点的系统中允许 2 个节点出现非[[id:e3efd867-1ba1-430e-8478-6ed522bd241c][拜占庭]]错误，如节点宕机、网络分区、消息延时。
 
-因此通常至少会有 3 个节点。
+参考：
++ https://web.stanford.edu/~ouster/cgi-bin/papers/raft-atc14
++ [[https://fisco-bcos-documentation.readthedocs.io/zh-cn/stable/docs/design/consensus/raft.html][Raft — FISCO BCOS v2.9.0 文档]]
++ [[https://zhuanlan.zhihu.com/p/32052223][Raft 算法详解 - 知乎]]
 
-参考：[[https://zinglix.xyz/2020/06/25/raft/][「图解Raft」让一致性算法变得更简单 - ZingLix Blog]]
+* 脑裂问题
+  Raft 安全性由 [[id:7ac2aceb-35e8-48ef-aef8-8f78e6833db1][State machine replication]] 保证，在 State machine replication 中，容错需要 2F+1 个节点。同时，在 Raft 的 Log replication 中 Leader 会确保超过一半节点 ACK 后才会应用日志到状态机。这样，
+  虽然 Leader 选举没要求过半机制（好像是这样），但 Log replication 要求过半避免了[[id:ad1d646e-4290-4cfc-b12f-6760fe6595d5][脑裂]]问题。
 

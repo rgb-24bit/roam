@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       4dec80ed-382e-4d28-97d8-0e35ecf149b8
+:END:
+#+TITLE: Floyd-Warshall algorithm
+
+Floyd-Warshall 算法（Floyd-Warshall algorithm）是解决任意两点间的最短路径的一种算法，可以正确处理有向图或负权的最短路径问题，同时也被用于计算有向图的传递闭包。
+
+参考：[[https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm][Floyd–Warshall algorithm - Wikipedia]]
+

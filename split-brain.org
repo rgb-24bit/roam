@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       ad1d646e-4290-4cfc-b12f-6760fe6595d5
+:ROAM_ALIASES: 脑裂
+:END:
+#+TITLE: Split-Brain
+
+脑裂，英文 Split-Brain，指在类似 Elasticsearch、ZooKeeper 的分布式系统中，当两个机房之间的网络通信出现故障时，选举机制就有可能在不同的网络分区中选出两个 Leader。当网络恢复时，这两个 Leader 该如何处理数据同步？又该听谁的？这也就出现了“脑裂”现象。
+
+在 ZooKeeper 中，通过过半机制来解决脑裂问题，也就是节点需要获得超过一半的投票才能成为 Leader，分区时节点数量少的分区无法选出 Leader。同时也要求节点数为奇数，不然会出现对半分的情况（不然会出现无主）。
+
+参考：[[https://cloud.tencent.com/developer/article/1913575][分布式系统的“脑裂”到底是个什么玩意？-腾讯云开发者社区-腾讯云]]
+
