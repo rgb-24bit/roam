@@ -12,6 +12,7 @@
   |-----------------+----------------------+-----------------|
 
 * 根据 PID 获取 Pod 名称
+  传入 PPID：
   #+begin_src sh
     podinfo() {
         CID=$(cat /proc/$1/cgroup | grep kubepods | awk -F '/' '{print $NF}')

@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       D2641D06-4687-4658-B100-C1FC30C444D8
+:ROAM_ALIASES: fsm
+:END:
+#+TITLE: Finite-state machine
+
+有限状态机。
+

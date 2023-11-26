@@ -5,14 +5,327 @@
 
 + Tag :: [[id:7E39F12B-5295-4B80-8FE1-F90282CCEE3C][Consensus algorithm]]
 
-Raft（Replication and Fault Tolerant）是一个允许网络分区（Partition Tolerant）的一致性协议，它保证了在一个由 N 个节点构成的系统中有 (N+1)/2（向上取整）个节点正常工作的情况下的系统的一致性，比如在一个 5 个节点的系统中允许 2 个节点出现非[[id:e3efd867-1ba1-430e-8478-6ed522bd241c][拜占庭]]错误，如节点宕机、网络分区、消息延时。
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#raft][Raft]]
+- [[#脑裂问题][脑裂问题]]
+- [[#结合-etcd-实现理解][结合 ETCD 实现理解]]
+  - [[#election][election]]
+  - [[#log][log]]
+  - [[#node][node]]
+  - [[#ref][ref]]
 
-参考：
-+ https://web.stanford.edu/~ouster/cgi-bin/papers/raft-atc14
-+ [[https://fisco-bcos-documentation.readthedocs.io/zh-cn/stable/docs/design/consensus/raft.html][Raft — FISCO BCOS v2.9.0 文档]]
-+ [[https://zhuanlan.zhihu.com/p/32052223][Raft 算法详解 - 知乎]]
+* Raft
+  Raft（Replication and Fault Tolerant）是一个允许网络分区（Partition Tolerant）的一致性协议，它保证了在一个由 N 个节点构成的系统中有 (N+1)/2（向上取整）个节点正常工作的情况下的系统的一致性，比如在一个 5 个节点的系统中允许 2 个节点出现非[[id:e3efd867-1ba1-430e-8478-6ed522bd241c][拜占庭]]错误，如节点宕机、网络分区、消息延时。
+
+  参考：
+  + https://web.stanford.edu/~ouster/cgi-bin/papers/raft-atc14
+  + [[https://fisco-bcos-documentation.readthedocs.io/zh-cn/stable/docs/design/consensus/raft.html][Raft — FISCO BCOS v2.9.0 文档]]
+  + [[https://zhuanlan.zhihu.com/p/32052223][Raft 算法详解 - 知乎]]
 
 * 脑裂问题
   Raft 安全性由 [[id:7ac2aceb-35e8-48ef-aef8-8f78e6833db1][State machine replication]] 保证，在 State machine replication 中，容错需要 2F+1 个节点。同时，在 Raft 的 Log replication 中 Leader 会确保超过一半节点 ACK 后才会应用日志到状态机。这样，
   虽然 Leader 选举没要求过半机制（好像是这样），但 Log replication 要求过半避免了[[id:ad1d646e-4290-4cfc-b12f-6760fe6595d5][脑裂]]问题。
+
+  *UPDATE:* 看了下 etcd 中的 raft 实现，leader 选举成功就需要过半，分区后少于一半节点的分区 leader 都没有。过半提交可以确保分区后如果原 leader 在少数分区，不会提交新数据。
+
+* 结合 ETCD 实现理解
+  ☞ [[https://github.com/etcd-io/raft][etcd-io/raft: Raft library for maintaining a replicated state machine]]
+
+  ETCD 是分布式系统中广泛使用的一致性 KV 数据库，其 raft 实现相对来说也是比较好理解的，和论文中讲的也很像。在其实现内部，状态机的事件入口是 =Step= 函数：
+  #+begin_src go
+    func (r *raft) Step(m pb.Message) error {
+      switch {
+      case m.Term == 0:
+        // ...
+      case m.Term > r.Term:
+        // ...
+      case m.Term < r.Term:
+        // ...
+      }
+
+      switch m.Type {
+      case pb.XXX:
+        // ...
+      default:
+        err := r.step(r, m)
+        if err != nil {
+          return err
+        }
+      }
+      return nil
+    }
+  #+end_src
+
+  Step 函数有部分公共逻辑，同时，根据 raft 节点的身份，也配置有不同的 =r.step= 函数来处理事件：
+  #+begin_src go
+    func stepLeader(r *raft, m pb.Message) error
+    func stepCandidate(r *raft, m pb.Message) error
+    func stepFollower(r *raft, m pb.Message) error
+  #+end_src
+
+** election
+   raft 中一个节点 startup 后首先作为 follower 节点，如果 =tickElection= 多次后没有收到 leader 的消息，那么就会发送 =pb.MsgHub= 事件，节点收到后变成 candidate 开始选主，变成 candidate 是 term+1：
+   #+begin_src go
+     func (r *raft) becomeFollower(term uint64, lead uint64) {
+       r.step = stepFollower
+       r.reset(term)
+       r.tick = r.tickElection
+       r.lead = lead
+       r.state = StateFollower
+       r.logger.Infof("%x became follower at term %d", r.id, r.Term)
+     }
+
+     func (r *raft) becomeCandidate() {
+       // TODO(xiangli) remove the panic when the raft implementation is stable
+       if r.state == StateLeader {
+         panic("invalid transition [leader -> candidate]")
+       }
+       r.step = stepCandidate
+       r.reset(r.Term + 1)  // Term+1
+       r.tick = r.tickElection
+       r.Vote = r.id
+       r.state = StateCandidate
+       r.logger.Infof("%x became candidate at term %d", r.id, r.Term)
+     }
+
+     // tickElection is run by followers and candidates after r.electionTimeout.
+     func (r *raft) tickElection() {
+       r.electionElapsed++
+
+       if r.promotable() && r.pastElectionTimeout() {
+         r.electionElapsed = 0
+         if err := r.Step(pb.Message{From: r.id, Type: pb.MsgHup}); err != nil {
+           r.logger.Debugf("error occurred during election: %v", err)
+         }
+       }
+     }
+   #+end_src
+
+   选举成功获得过半选票后成为 leader：
+   #+begin_src go
+     func stepCandidate(r *raft, m pb.Message) error {
+       switch m.Type {
+       // ...
+       case myVoteRespType:
+         gr, rj, res := r.poll(m.From, m.Type, !m.Reject)
+         r.logger.Infof("%x has received %d %s votes and %d vote rejections", r.id, gr, m.Type, rj)
+         switch res {
+         case quorum.VoteWon:
+           if r.state == StatePreCandidate {
+             r.campaign(campaignElection)
+           } else {
+             r.becomeLeader()  // 选举成功
+             r.bcastAppend()
+           }
+         case quorum.VoteLost:
+           r.becomeFollower(r.Term, None)  // 选举失败，别人当选
+         }
+       }
+       return nil
+     }
+
+     func (r *raft) becomeLeader() {
+       if r.state == StateFollower {
+         panic("invalid transition [follower -> leader]")
+       }
+       r.step = stepLeader
+       r.reset(r.Term)
+       r.tick = r.tickHeartbeat
+       r.lead = r.id
+       r.state = StateLeader
+
+       // ...
+     }
+   #+end_src
+
+   leader 在任期内会发送心跳到各 follower 节点，在经过一定次数 =tickHeartbeat= 后会检查当前是否还有过半 follower active，不满足会变成 follower 重新开始选主：
+   #+begin_src go
+     // tickHeartbeat is run by leaders to send a MsgBeat after r.heartbeatTimeout.
+     func (r *raft) tickHeartbeat() {
+       r.heartbeatElapsed++
+       r.electionElapsed++
+
+       if r.electionElapsed >= r.electionTimeout {
+         r.electionElapsed = 0
+         if r.checkQuorum {
+           if err := r.Step(pb.Message{From: r.id, Type: pb.MsgCheckQuorum}); err != nil {  // 次数到了，开始检查
+             r.logger.Debugf("error occurred during checking sending heartbeat: %v", err)
+           }
+         }
+       }
+
+       if r.heartbeatElapsed >= r.heartbeatTimeout {
+         r.heartbeatElapsed = 0
+         if err := r.Step(pb.Message{From: r.id, Type: pb.MsgBeat}); err != nil {  // 定时发送心跳
+           r.logger.Debugf("error occurred during checking sending heartbeat: %v", err)
+         }
+       }
+     }
+
+
+     func stepLeader(r *raft, m pb.Message) error {
+       switch m.Type {
+       case pb.MsgCheckQuorum:
+         if !r.prs.QuorumActive() {
+           r.becomeFollower(r.Term, None)
+         }
+         // Mark everyone (but ourselves) as inactive in preparation for the next
+         // CheckQuorum.
+         r.prs.Visit(func(id uint64, pr *tracker.Progress) {
+           if id != r.id {
+             pr.RecentActive = false // 重置
+           }
+         })
+         return nil
+       }
+
+       pr := r.prs.Progress[m.From]
+       switch m.Type {
+       case pb.MsgHeartbeatResp:
+         pr.RecentActive = true  // 心跳回包，对应 follower 还活着
+       }
+     }
+   #+end_src
+
+   特别的，在 etcd 的实现中节点成为 candidate 前有一个 PreCandidate 的状态，因为成为 candidate 后 term 需要 +1，而如果出现网络分区，那么无法选举成功的分区会一直选举导致 term 值变的很大。
+   因此通过 PreCandidate 状态来预判断是否有可能选举成功，此时 term 不变。有可能选举成功才成为 candidate。
+
+** log
+   candidate 收到请求时会丢弃请求：
+   #+begin_src go
+     func stepCandidate(r *raft, m pb.Message) error {
+       switch m.Type {
+       case pb.MsgProp:
+         r.logger.Infof("%x no leader at term %d; dropping proposal", r.id, r.Term)
+         return ErrProposalDropped
+       }
+     }
+   #+end_src
+
+   follower 收到请求后可以转发给 leader 处理：
+   #+begin_src go
+     func stepFollower(r *raft, m pb.Message) error {
+       switch m.Type {
+       case pb.MsgProp:
+         m.To = r.lead  // 转发给 leader
+         r.send(m)
+       }
+     }
+   #+end_src
+
+   leader 收到请求后会：
+   1. 先 append 到本地，然后广播转发到所有 follower 节点
+      #+begin_src go
+        func stepLeader(r *raft, m pb.Message) error {
+          switch m.Type {
+          case pb.MsgProp:
+            // 省略了很多，比如检查是否是已 append 过的
+            // ...
+            if !r.appendEntry(m.Entries...) {  // append 到本地
+              return ErrProposalDropped
+            }
+            r.bcastAppend()  // 广播到 follower
+            return nil
+          }
+        }
+      #+end_src
+   2. follower 收到 append 事件后也 append 到自己节点，回包给 leader
+      #+begin_src go
+        func stepFollower(r *raft, m pb.Message) error {
+          switch m.Type {
+          case pb.MsgApp:
+            r.electionElapsed = 0
+            r.lead = m.From
+            r.handleAppendEntries(m)
+          }
+        }
+
+        func (r *raft) handleAppendEntries(m pb.Message) {
+          if m.Index < r.raftLog.committed {
+            r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: r.raftLog.committed})
+            return
+          }
+          if mlastIndex, ok := r.raftLog.maybeAppend(m.Index, m.LogTerm, m.Commit, m.Entries...); ok {
+            r.send(pb.Message{To: m.From, Type: pb.MsgAppResp, Index: mlastIndex})  // append 后回包
+            return
+          }
+        }
+      #+end_src
+   3. leader 收到回包后，如果过半就会 commit 自己，然后让 follower 也 commit
+      #+begin_src go
+        func stepLeader(r *raft, m pb.Message) error {
+          switch m.Type {
+          case pb.MsgAppResp:
+            pr.MaybeUpdate(m.Index)
+            if r.maybeCommit() {  // append 过半判断
+              r.bcastAppend()     // 这里复用了 Append 事件，消息中包含了最新 committed index，follower 收到后会更新到该值
+            }
+          }
+        }
+      #+end_src
+
+** node
+   前面部分是 raft 内部的状态，用户和 raft 交互通过 =Node= 这一抽象：
+   #+begin_src go
+     // Node represents a node in a raft cluster.
+     type Node interface {
+       // Tick increments the internal logical clock for the Node by a single tick. Election
+       // timeouts and heartbeat timeouts are in units of ticks.
+       Tick()
+
+       // Propose proposes that data be appended to the log. Note that proposals can be lost without
+       // notice, therefore it is user's job to ensure proposal retries.
+       Propose(ctx context.Context, data []byte) error
+
+       // Ready returns a channel that returns the current point-in-time state.
+       // Users of the Node must call Advance after retrieving the state returned by Ready (unless
+       // async storage writes is enabled, in which case it should never be called).
+       //
+       // NOTE: No committed entries from the next Ready may be applied until all committed entries
+       // and snapshots from the previous one have finished.
+       Ready() <-chan Ready
+
+       // Advance notifies the Node that the application has saved progress up to the last Ready.
+       // It prepares the node to return the next available Ready.
+       //
+       // The application should generally call Advance after it applies the entries in last Ready.
+       //
+       // However, as an optimization, the application may call Advance while it is applying the
+       // commands. For example. when the last Ready contains a snapshot, the application might take
+       // a long time to apply the snapshot data. To continue receiving Ready without blocking raft
+       // progress, it can call Advance before finishing applying the last ready.
+       //
+       // NOTE: Advance must not be called when using AsyncStorageWrites. Response messages from the
+       // local append and apply threads take its place.
+       Advance()
+     }
+   #+end_src
+
+   用户通过调用 =Tick= 来告诉 raft 过了一个单位时间，通过 =Propose= 来提交数据到 raft，通过 =Ready= 来获取最新 *已提交* 的数据，通过 =Advance= 来告诉 raft 之前已提交的数据应用层也处理好了，即 =applied=.
+
+   一般使用姿势为：
+   #+begin_src go
+     for {
+       select {
+       case <-s.Ticker:
+         n.Tick()
+       case rd := <-s.Node.Ready():
+         saveToStorage(rd.HardState, rd.Entries, rd.Snapshot)
+         send(rd.Messages)
+         for _, entry := range rd.CommittedEntries {
+           process(entry)
+         }
+         s.Node.Advance()
+       case <-s.done:
+         return
+       }
+     }
+   #+end_src
+
+   所以 raft 中日志有 =committed=, =applying= 和 =applied= 三个索引。
+
+   在给的使用例子中，应用也会先将日志往 [[id:C8AEB0C6-B9FA-42BF-91D4-147907999D59][wal]] 写入一份，再具体执行。
+
+** ref
+   + [[https://www.codedump.info/post/20180922-etcd-raft/#msgappmsgsnap%E6%B6%88%E6%81%AF][etcd Raft 库解析 - codedump的网络日志]]
 

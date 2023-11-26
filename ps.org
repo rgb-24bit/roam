@@ -49,6 +49,6 @@ D 状态进程无法响应 kill 信号，杀不调，可以选择重启。
 
 常用：
 #+begin_example
-  ps -eo s,user,cmd | grep ^[Z]  # 列出僵尸进程
+  ps -eo s,pid,ppid,user,cmd | grep ^[Z]  # 列出僵尸进程
 #+end_example
 
