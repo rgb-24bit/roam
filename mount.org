@@ -5,16 +5,16 @@
 
 在 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 中，通过 mount 可以将设备和文件系统挂载到指定目录，常用命令格式为：
 #+begin_example
-  mount -t type [-o options] device dir
+  mount [-t type] [-o options] device mountpoint
 #+end_example
 
-整个操作涉及了三个对象：设备（device）、文件系统（type）和挂载目录（dir）。
+整个操作涉及了三个对象：设备（device）、文件系统（type，可选）和挂载目录（mountpoint）。
 
 其中，Linux 将 device 都放在 /dev 目录下，其中一部分设备是系统生成的软件设备，比如 /dev/null 这些，有些则是物理设备，比如磁盘、内存。
 
 PS：Linux 系统的根目录 / 默认会挂载磁盘的主[[id:02D51ACA-1959-4D7A-B3DF-161CB79742A5][分区]]。
 
-可以直接在 dir 下挂载知道文件系统，设备设置为 none：
+可以直接在 dir 下挂载文件系统，设备设置为 none：
 #+begin_example
   mount -t type none dir
 #+end_example

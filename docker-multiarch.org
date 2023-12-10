@@ -3,7 +3,15 @@
 :END:
 #+TITLE: docker multiarch
 
-docker 单个镜像可以有一个 manifest 列表，列表中的每个 manifest 对应某个架构的镜像文件，docker pull 是可以根据架构寻找对应的 manifest 下载镜像。
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#manifest][manifest]]
+- [[#编译镜像][编译镜像]]
+- [[#拉取镜像][拉取镜像]]
+- [[#创建-manifest][创建 manifest]]
+- [[#oci-manifest][OCI Manifest]]
+
+* manifest
+  docker 单个镜像可以有一个 manifest 列表，列表中的每个 manifest 对应某个架构的镜像文件，docker pull 是可以根据架构寻找对应的 manifest 下载镜像。
 
 * 编译镜像
   可以使用 buildx 工具编译多架构镜像，参考 [[https://www.docker.com/blog/multi-arch-build-and-images-the-simple-way/][Multi-arch build and images, the simple way | Docker]]。
@@ -39,4 +47,21 @@ docker 单个镜像可以有一个 manifest 列表，列表中的每个 manifest
   #+end_example
 
   参考：[[https://docs.docker.com/engine/reference/commandline/manifest/][docker manifest | Docker Docs]]
+
+* OCI Manifest
+  遇到个问题和 OCI Manifest 有关，之前在 registry 间复制镜像使用 [[https://github.com/containers/skopeo][skopeo]] 命令，请求使用 =Accept: application/vnd.docker.distribution.manifest.v2+json= 来判断镜像是否存在。
+
+  然后突然有了个 OCI 的镜像，导致 skopeo 和请求都报错了：
+  + 请求报错：
+    #+begin_example
+      OCI index found, but accept header does not support OCI indexes
+    #+end_example
+  + skopeo 报错：
+    #+begin_example
+      unsupported MIME type for compression: application/vnd.in-toto+json
+    #+end_example
+
+  解决方式：
+  1. 请求 header 修改为 =Accept: application/vnd.docker.distribution.manifest.v2+json,application/vnd.oci.image.index.v1+json=
+  2. skopeo 命令替换为 [[https://github.com/regclient/regclient][regctl]]
 
