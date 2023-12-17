@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       3F1B0B7F-C525-48E6-BA50-7292ADFF5B4A
+:END:
+#+TITLE: k8s three way merge patch
+
+[[id:9BC04C0C-8F31-4D7E-B8E2-622882C61E73][helm]] 执行升级操作时使用 [[https://github.com/kubernetes/apimachinery/blob/kubernetes-1.29.0/pkg/util/strategicpatch/patch.go#L2101][CreateThreeWayMergePatch]] 来创建实际要应用的 patch，其逻辑为：
+1. helm 将之前版本通过模板渲染出来的 yaml、集群中正在使用的 yaml 和当前版本通过模板渲染出来的 yaml 定义为 original、modified 和 current
+2. deltaMap = diff(current, modified, IgnoreDeletions)，也就是得到 modified 中相对于 current 多的部分，比如手动添加的环境变量
+3. deletionsMap = diff(original, modified, IgnoreChangesAndAdditions)，得到 modified 中相对于 original 少的部分，比如手动删除的环境变量
+4. 合并 deltaMap 和 deletionsMap 得到 patch
+
+不同类型的资源 patch strategy 也有区别，可以看 [[https://kubernetes.io/docs/reference/kubernetes-api/][api 文档]]找到。环境变量的策略是 merge on key name，所以手动添加的环境变量可以在升级时保留下来。
+

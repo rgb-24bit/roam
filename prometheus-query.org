@@ -1,0 +1,32 @@
+:PROPERTIES:
+:ID:       60D89E50-06E7-4CD4-9223-F57FE1EAFFA9
+:END:
+#+TITLE: prometheus query
+
+* 查询逻辑
+  Prometheus 查询时有一个 =step= 参数，对 PromQL 表达式求值时：
+  1. 对于 [start, end] 时间区间，从 start 开始，以 step 为长度，把时间区间分成若干段
+  2. 对每个段进行求值
+
+  比如：start=10,end=20,step=2，那么就会有 ts=10,ts=12,ts=14,ts=16,ts=18,ts=206 段，然后为这 6 个段进行求值。求值方式视乎表达式中 Time series selector 的类型而定。
+
+  不同类型的逻辑：
+  + Instant vector selector：从该段的 timestamp（含）往前找，取第一个找到的值。如果该段 timestamp 往前的 5 分钟范围内没有找到任何值，则该段无值。
+  + Range vector selector：返回的是当前 timestamp 之前的 range duration 内的所有值。
+
+  grafana 中 step 的值是动态计算得到的。
+
+  参考：[[https://www.cnblogs.com/frankyou/p/16264399.html][详解Prometheus range query中的step参数 - FrankYou - 博客园]]
+
+* Grafana templating
+  |-----------------------------+-----------------------------------------------------------------------|
+  | label_names()               | Returns a list of label names.                                        |
+  | label_values(label)         | Returns a list of label values for the label in every metric.         |
+  | label_values(metric, label) | Returns a list of label values for the label in the specified metric. |
+  | metrics(metric)             | Returns a list of metrics matching the specified metric regex.        |
+  | query_result(query)         | Returns a list of Prometheus query result for the query.              |
+  | up{job="<job_name>"}        | Returns a job up time.                                                |
+  |-----------------------------+-----------------------------------------------------------------------|
+
+  参考：[[https://hackernoon.com/observability-tips-and-tricks-for-using-grafana-and-prometheus][Observability Tips and Tricks For Using Grafana and Prometheus | HackerNoon]]
+

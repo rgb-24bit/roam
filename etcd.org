@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       8AE90F00-ED84-409A-BAA3-7310FA1A928D
+:END:
+#+TITLE: etcd
+
+* Troubleshooting
+** Leader's raft index is smaller than member's raft index
+   ☞ [[https://github.com/etcd-io/etcd/issues/7696][Leader's raft index is smaller than member's raft index · Issue #7696 · etcd-io/etcd]]
+
+   可能原因就是 etcdctl 连接各个 endpoint 的时间不一样，先连接 leader 后连接 member，间隔期间 member 更新了 index。
+

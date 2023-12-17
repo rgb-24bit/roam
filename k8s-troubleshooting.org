@@ -11,6 +11,8 @@
   | CRI(containerd) | /var/log/syslog      | key: containerd |
   |-----------------+----------------------+-----------------|
 
+  ☞ [[id:78D01CEA-5625-4F56-A2CE-177A9CD5D31A][k8s pod & container log]]
+
 * 根据 PID 获取 Pod 名称
   传入 PPID：
   #+begin_src sh
