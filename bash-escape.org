@@ -1,0 +1,48 @@
+:PROPERTIES:
+:ID:       8CD13A33-1122-42F5-8793-3F7E53C90B38
+:END:
+#+TITLE: bash escape
+
+bash 中可以使用 =\= 和 ='= 和 ="= 来引用原始字符串，各自力度不一样：
++ \ 用于删除单个字符的特殊含义，比如 $ 字符：
+  #+begin_src bash
+    franky ~> date=20021226
+
+    franky ~> echo $date
+    20021226
+
+    franky ~> echo \$date
+    $date
+  #+end_src
++ ' 用于保留引号内每个字符的字面值。单引号之间不能出现单引号，即使前面有反斜杠也是如此：
+  #+begin_src bash
+    franky ~> echo '$date'
+    $date
+  #+end_src
++ " 保留所有包含的字符的字面值，$ 和 ` 和 \ 除外：
+  #+begin_src bash
+    franky ~> echo "$date"
+    20021226
+
+    franky ~> echo "`date`"
+    Sun Apr 20 11:22:06 CEST 2003
+
+    franky ~> echo "I'd say: \"Go for it!\""
+    I'd say: "Go for it!"
+
+    franky ~> echo "\"
+    More input>"
+
+    franky ~> echo "\\"
+    \
+
+  #+end_src
+
+可以在 ssh 执行 subshell 时使用：
+#+begin_example
+  ssh user@remote "kill -9 \$(ps -ef | awk '/service_name/{print $2}')"
+#+end_example
+
+参考：
++ [[https://unix.stackexchange.com/questions/277199/how-to-run-subshell-commands-over-ssh][bash - How to run subshell commands over SSH? - Unix & Linux Stack Exchange]]
++ [[https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_03_03.html][Quoting characters]]

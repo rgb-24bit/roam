@@ -3,131 +3,160 @@
 :END:
 #+TITLE: Prometheus metric types
 
-Prometheus 中提供了四种基本的指标类型：Counter、Gauge、Histogram 和 Summary。各自特点如下：
-+ Counter: 单调递增计数器，值只能增加或重启时重置为 0。常见指标如 http_requests_total 就是 Counter 类型的指标。通常可以使用 rate 来查询指标增长速率，也就是 QPS。
-  #+begin_src go
-    
-    type Counter interface {
-      Metric
-      Collector
-    
-      // Inc increments the counter by 1. Use Add to increment it by arbitrary
-      // non-negative values.
-      Inc()
-      // Add adds the given value to the counter. It panics if the value is <
-      // 0.
-      Add(float64)
-    }
-  #+end_src
-+ Gauge: 表示可以任意上升和下降的单个数值，也可以直接设置为某个值。常见如 node_memory_MemFree 就是 Gauge 类型的指标，可以使用 delta 来计算一段时间的变化情况，也可以用 predict_linear 对指标值进行预测。
-  #+begin_src go
-    type Gauge interface {
-      Metric
-      Collector
-    
-      // Set sets the Gauge to an arbitrary value.
-      Set(float64)
-      // Inc increments the Gauge by 1. Use Add to increment it by arbitrary
-      // values.
-      Inc()
-      // Dec decrements the Gauge by 1. Use Sub to decrement it by arbitrary
-      // values.
-      Dec()
-      // Add adds the given value to the Gauge. (The value can be negative,
-      // resulting in a decrease of the Gauge.)
-      Add(float64)
-      // Sub subtracts the given value from the Gauge. (The value can be
-      // negative, resulting in an increase of the Gauge.)
-      Sub(float64)
-    
-      // SetToCurrentTime sets the Gauge to the current Unix time in seconds.
-      SetToCurrentTime()
-    }
-  #+end_src
-+ Histogram: 对观测值进行采样，根据值大小增加对应计数桶的值，同时提供所有观测值的总和。
-  #+begin_src go
-    type Histogram interface {
-      Metric
-      Collector
-    
-      // Observe adds a single observation to the histogram. Observations are
-      // usually positive or zero. Negative observations are accepted but
-      // prevent current versions of Prometheus from properly detecting
-      // counter resets in the sum of observations. (The experimental Native
-      // Histograms handle negative observations properly.) See
-      // https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
-      // for details.
-      Observe(float64)
-    }
-    
-    temps := prometheus.NewHistogram(prometheus.HistogramOpts{
-      Name:    "pond_temperature_celsius",
-      Help:    "The temperature of the frog pond.", // Sorry, we can't measure how badly it smells.
-      Buckets: prometheus.LinearBuckets(20, 5, 5),  // 5 buckets, each 5 centigrade wide.
-    })
-  #+end_src
-
-  比如对于指标 =<basename>= 会得到如下具体指标：
-  + ~<basename>_bucket{le="<upper inclusive bound>"}~ 值小于 =<upper inclusive bound>= 的计数桶，比如 =etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket= 的不同计数桶如下：
-    #+begin_example
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="0.5"} 0
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1"} 0
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="2"} 0
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="4"} 571
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="8"} 14869
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="16"} 15699
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="32"} 15732
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="64"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="128"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="256"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="512"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1024"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="2048"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="4096"} 15733
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="+Inf"} 15733
-    #+end_example
-  + ~<basename>_sum~ 所有观测值的总和，值对应的是 =le= 部分的值，bucket 指标的值是计数，比如前面计数桶中小于 8 的有 14869 个，14869 * 8 就是 118952，14869 * 4 是 59476，96857 在两者之间：
-    #+begin_example
-      etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_sum 96857
-    #+end_example
-  + ~<basename>_count~ 所有观测值的数量，和 ~<basename>_bucket{le="+Inf"}~ 值相等
-+ Summary: Summary 和 Histogram 类似，对观测值进行采样，计算滑动时间窗口上的可配置分位数，也就是长说的 p50、p90、p99 值：
-  #+begin_src go
-    type Summary interface {
-      Metric
-      Collector
-    
-      // Observe adds a single observation to the summary. Observations are
-      // usually positive or zero. Negative observations are accepted but
-      // prevent current versions of Prometheus from properly detecting
-      // counter resets in the sum of observations. See
-      // https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
-      // for details.
-      Observe(float64)
-    }
-    temps := prometheus.NewSummary(prometheus.SummaryOpts{
-      Name:       "pond_temperature_celsius",
-      Help:       "The temperature of the frog pond.",
-      Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-    })
-    
-  #+end_src
-
-  比如对于指标 =<basename>= 会得到如下具体指标：
-  + ~<basename>{quantile="<φ>"}~, 其中 ~φ-quantiles (0 ≤ φ ≤ 1)~. 比如 =go_gc_duration_seconds= 在不同分位数下的值：
+* 指标类型
+  Prometheus 中提供了四种基本的指标类型：Counter、Gauge、Histogram 和 Summary。各自特点如下：
+  + Counter: 单调递增计数器，值只能增加或重启时重置为 0。常见指标如 http_requests_total 就是 Counter 类型的指标。通常可以使用 rate 来查询指标增长速率，也就是 QPS。
     #+begin_src go
-      go_gc_duration_seconds{quantile="0"} 3.5118e-05
-      go_gc_duration_seconds{quantile="0.25"} 5.2447e-05
-      go_gc_duration_seconds{quantile="0.5"} 6.0855e-05
-      go_gc_duration_seconds{quantile="0.75"} 7.5155e-05
-      go_gc_duration_seconds{quantile="1"} 0.002199447
+
+      type Counter interface {
+        Metric
+        Collector
+
+        // Inc increments the counter by 1. Use Add to increment it by arbitrary
+        // non-negative values.
+        Inc()
+        // Add adds the given value to the counter. It panics if the value is <
+        // 0.
+        Add(float64)
+      }
     #+end_src
-  + ~<basename>_sum~ 所有观测值的总和
-  + ~<basename>_count~ 所有观测值的数量
+  + Gauge: 表示可以任意上升和下降的单个数值，也可以直接设置为某个值。常见如 node_memory_MemFree 就是 Gauge 类型的指标，可以使用 delta 来计算一段时间的变化情况，也可以用 predict_linear 对指标值进行预测。
+    #+begin_src go
+      type Gauge interface {
+        Metric
+        Collector
 
-对于 Histogram 和 Summary 来说，Histogram 可以用来观测指标值具体的分布情况，而 Summary 可以用来观测在不同分位下值的情况，比如 p50 是多少，p95 是多少，会不会出现长尾（p50 值小，p90+ 值很大，存在少数慢请求）。
+        // Set sets the Gauge to an arbitrary value.
+        Set(float64)
+        // Inc increments the Gauge by 1. Use Add to increment it by arbitrary
+        // values.
+        Inc()
+        // Dec decrements the Gauge by 1. Use Sub to decrement it by arbitrary
+        // values.
+        Dec()
+        // Add adds the given value to the Gauge. (The value can be negative,
+        // resulting in a decrease of the Gauge.)
+        Add(float64)
+        // Sub subtracts the given value from the Gauge. (The value can be
+        // negative, resulting in an increase of the Gauge.)
+        Sub(float64)
 
-也可以使用 =histogram_quantile= 函数来计算 Histogram 类型指标的分位数，只不过 Summary 是客户端上报时计算好，查询压力小。而 histogram_quantile 是查询时计算。
+        // SetToCurrentTime sets the Gauge to the current Unix time in seconds.
+        SetToCurrentTime()
+      }
+    #+end_src
+  + Histogram: 对观测值进行采样，根据值大小增加对应计数桶的值（递增），同时提供所有观测值的总和。
+    #+begin_src go
+      type Histogram interface {
+        Metric
+        Collector
 
-参考：
-+ [[https://prometheus.io/docs/concepts/metric_types/#metric-types][Metric types | Prometheus]]
+        // Observe adds a single observation to the histogram. Observations are
+        // usually positive or zero. Negative observations are accepted but
+        // prevent current versions of Prometheus from properly detecting
+        // counter resets in the sum of observations. (The experimental Native
+        // Histograms handle negative observations properly.) See
+        // https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
+        // for details.
+        Observe(float64)
+      }
+
+      temps := prometheus.NewHistogram(prometheus.HistogramOpts{
+        Name:    "pond_temperature_celsius",
+        Help:    "The temperature of the frog pond.", // Sorry, we can't measure how badly it smells.
+        Buckets: prometheus.LinearBuckets(20, 5, 5),  // 5 buckets, each 5 centigrade wide.
+      })
+    #+end_src
+
+    比如对于指标 =<basename>= 会得到如下具体指标：
+    + ~<basename>_bucket{le="<upper inclusive bound>"}~ 值小于 =<upper inclusive bound>= 的计数桶，比如 =etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket= 的不同计数桶如下：
+      #+begin_example
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="0.5"} 0
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1"} 0
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="2"} 0
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="4"} 571
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="8"} 14869
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="16"} 15699
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="32"} 15732
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="64"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="128"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="256"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="512"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="1024"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="2048"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="4096"} 15733
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_bucket{le="+Inf"} 15733
+      #+end_example
+    + ~<basename>_sum~ 所有观测值的总和，值对应的是 =le= 部分的值，bucket 指标的值是计数，比如前面计数桶中小于 8 的有 14869 个，14869 * 8 就是 118952，14869 * 4 是 59476，96857 在两者之间：
+      #+begin_example
+        etcd_debugging_mvcc_index_compaction_pause_duration_milliseconds_sum 96857
+      #+end_example
+    + ~<basename>_count~ 所有观测值的数量，和 ~<basename>_bucket{le="+Inf"}~ 值相等
+  + Summary: Summary 和 Histogram 类似，对观测值进行采样，计算滑动时间窗口上的可配置分位数，也就是长说的 p50、p90、p99 值：
+    #+begin_src go
+      type Summary interface {
+        Metric
+        Collector
+
+        // Observe adds a single observation to the summary. Observations are
+        // usually positive or zero. Negative observations are accepted but
+        // prevent current versions of Prometheus from properly detecting
+        // counter resets in the sum of observations. See
+        // https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
+        // for details.
+        Observe(float64)
+      }
+      temps := prometheus.NewSummary(prometheus.SummaryOpts{
+        Name:       "pond_temperature_celsius",
+        Help:       "The temperature of the frog pond.",
+        Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+      })
+
+    #+end_src
+
+    比如对于指标 =<basename>= 会得到如下具体指标：
+    + ~<basename>{quantile="<φ>"}~, 其中 ~φ-quantiles (0 ≤ φ ≤ 1)~. 比如 =go_gc_duration_seconds= 在不同分位数下的值：
+      #+begin_src go
+        go_gc_duration_seconds{quantile="0"} 3.5118e-05
+        go_gc_duration_seconds{quantile="0.25"} 5.2447e-05
+        go_gc_duration_seconds{quantile="0.5"} 6.0855e-05
+        go_gc_duration_seconds{quantile="0.75"} 7.5155e-05
+        go_gc_duration_seconds{quantile="1"} 0.002199447
+      #+end_src
+    + ~<basename>_sum~ 所有观测值的总和
+    + ~<basename>_count~ 所有观测值的数量
+
+  对于 Histogram 和 Summary 来说，Histogram 可以用来观测指标值具体的分布情况，而 Summary 可以用来观测在不同分位下值的情况，比如 p50 是多少，p95 是多少，会不会出现长尾（p50 值小，p90+ 值很大，存在少数慢请求）。
+
+  也可以使用 =histogram_quantile= 函数来计算 Histogram 类型指标的分位数，只不过 Summary 是客户端上报时计算好，查询压力小。而 histogram_quantile 是查询时计算。
+
+  参考：
+  + [[https://prometheus.io/docs/concepts/metric_types/#metric-types][Metric types | Prometheus]]
+
+* histogram_quantile
+  对于 Histogram 类型的指标来说，其原始指标 =<basename>= 是 Counter 类型，不同的 Bucket 就是在不同 =le= 值下的 Counter 桶。使用 histogram_quantile 计算分位数时，通常使用如下查询：
+  #+begin_example
+    histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) // GOOD.
+  #+end_example
+
+  解释：
+  1. =sum(rate(http_request_duration_seconds_bucket[5m])) by (le)= 计算各 =le= 下增加的 request 次数。比如 5 分钟内有 10000 次请求，那么计算得到不同延迟的请求次数：
+     |------------+-------+---------+----------+-----------+-----------+-----------+----------+------+-------+------+------|
+     | bucket(le) | 10ms  | 50ms    | 100ms    | 200ms     | 300ms     | 500ms     | 1s       | 2s   | 3s    | 5s   | +Inf |
+     |------------+-------+---------+----------+-----------+-----------+-----------+----------+------+-------+------+------|
+     | range      | ~10ms | 10~50ms | 50~100ms | 100~200ms | 200~300ms | 300~500ms | 500ms~1s | 1~2s | 2s~3s | 3~5s |  5s~ |
+     | rate(t)    | 3000  | 3000    | 1500     | 1000      | 800       | 400       | 200      | 40   | 30    | 5    | 5    |
+     |------------+-------+---------+----------+-----------+-----------+-----------+----------+------+-------+------+------|
+
+  2. 然后我们计算 =histogram_quantile(0.95)= 也就是 =pct95= 的值，10000 的 pct95 是 9500，那么就在 ~bucket{le="500ms"}~ 中，而 prometheus 假设桶中请求延迟均匀分布，也就是 500ms 桶中有 400 个请求，
+     那么 prometheus 就假设这 400 个请求均匀分布在 =500 - 300 = 200= 这个区间上，第一个请求 300ms，第二个 300.5ms，以此类推。
+
+     计算得到的结果就是：400ms = 300+(9500-9300)*(200/400)。9300 是 10ms 到 300ms 桶总和。
+
+  参考：
+  + [[https://stackoverflow.com/questions/55162093/understanding-histogram-quantile-based-on-rate-in-prometheus][histogram - Understanding histogram_quantile based on rate in Prometheus - Stack Overflow]]
+  + [[https://prometheus.io/docs/practices/histograms/][Histograms and summaries | Prometheus]]
+
+  这种情况其实也就有个问题，Prometheus 是假设桶中值均匀分布来计算的，如果桶值范围很大，那么计算得到的结果可能就并不准确。比如 k8s apiserver_client_certificate_expiration_seconds_bucket 指标，
+  可能整个集群刚部署好，所有值都在 1year 这个桶中，但是 1year 前面的桶是 6month，1year 中的值在计算时会按照 6 个月的时间跨度均分。可能得到刚部署的集群点 ptc1 的时候就得到 6 个月多一点的值。
+

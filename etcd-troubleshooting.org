@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       26530DA9-91C5-439B-AC6F-DE53ED098941
+:END:
+#+TITLE: etcd troubleshooting
+
+参考：[[https://etcd.io/docs/v3.1/faq/][Frequently Asked Questions (FAQ) | etcd]]
+
+* What does the etcd warning “apply entries took too long” mean? 
+  有可能是磁盘慢，这个日志出现在平均延迟超过 100ms 时，可以使用下面语句查看 =backend_commit_duration_seconds= p99 延迟（一般不超过 50ms，不要看均值，均值容易被快的请求拉小）：
+  #+begin_example
+    histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket[1m]))
+  #+end_example
+

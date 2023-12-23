@@ -17,3 +17,9 @@ free 显示的内容中：
 - buff/cache 是内核为了提升磁盘操作的性能，消耗的一部分内存用于缓存磁盘数据。这部分内存可以很快地被释放，所以一般也算做可用内存
 - available 大约是 free + buff/cache
 
+计算正在 used 和 free 百分比：
+#+begin_example
+  $ free | grep Mem | awk '{print $3/$2 * 100.0}'  # used
+  $ free | grep Mem | awk '{print $4/$2 * 100.0}'  # feee
+#+end_example
+

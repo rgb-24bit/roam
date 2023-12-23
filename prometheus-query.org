@@ -19,14 +19,26 @@
   参考：[[https://www.cnblogs.com/frankyou/p/16264399.html][详解Prometheus range query中的step参数 - FrankYou - 博客园]]
 
 * Grafana templating
+  在 grafana variables 功能中使用，形似 prometheus function 但实际是 grafana 提供的模板，会转换为 prometheus 接口调用：
   |-----------------------------+-----------------------------------------------------------------------|
   | label_names()               | Returns a list of label names.                                        |
   | label_values(label)         | Returns a list of label values for the label in every metric.         |
   | label_values(metric, label) | Returns a list of label values for the label in the specified metric. |
   | metrics(metric)             | Returns a list of metrics matching the specified metric regex.        |
   | query_result(query)         | Returns a list of Prometheus query result for the query.              |
-  | up{job="<job_name>"}        | Returns a job up time.                                                |
   |-----------------------------+-----------------------------------------------------------------------|
 
   参考：[[https://hackernoon.com/observability-tips-and-tricks-for-using-grafana-and-prometheus][Observability Tips and Tricks For Using Grafana and Prometheus | HackerNoon]]
+
+* 内置指标
+  |----------------------+---------------------------------------------------------------------------------------------------------|
+  | 指标                 | 作用                                                                                                    |
+  |----------------------+---------------------------------------------------------------------------------------------------------|
+  | up{job="<job_name>"} | 对应的 scrape target 是否是健康的，0 表示不在线（采集失败了），1 表示正常，可以用来判断 server 是否故障 |
+  |----------------------+---------------------------------------------------------------------------------------------------------|
+
+* 特定查询
+  #+begin_example
+    count by (label) (metric)  # count(*) group by label
+  #+end_example
 
