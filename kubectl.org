@@ -6,6 +6,7 @@
 * 目录                                                    :TOC_4_gh:noexport:
 - [[#tls-secret][tls secret]]
 - [[#rollout][rollout]]
+- [[#set-env][set env]]
 
 * tls secret
   create or update tls secret:
@@ -29,5 +30,11 @@
     
     # Rollback to the previous deployment with dry-run
     kubectl rollout undo --dry-run=server deployment/abc
+  #+end_example
+
+* set env
+  kubectl 支持直接设置 env：
+  #+begin_example
+    kubectl set env deployment/registry STORAGE_DIR=/local
   #+end_example
 
