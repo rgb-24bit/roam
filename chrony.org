@@ -18,3 +18,25 @@ Ref [[https://chrony.tuxfamily.org/doc/3.2/chrony.conf.html][chrony.conf(5)]]
     chronyd -q 'server 192.168.11.145 iburst'
   #+end_example
 
+* 查看 ntp 源状态
+  #+begin_example
+    chronyc sources -v
+  #+end_example
+
+  结果例：
+  #+begin_example
+      .-- Source mode  '^' = server, '=' = peer, '#' = local clock.
+     / .- Source state '*' = current synced, '+' = combined , '-' = not combined,
+    | /   '?' = unreachable, 'x' = time may be in error, '~' = time too variable.
+    ||                                                 .- xxxx [ yyyy ] +/- zzzz
+    ||      Reachability register (octal) -.           |  xxxx = adjusted offset,
+    ||      Log2(Polling interval) --.      |          |  yyyy = measured offset,
+    ||                                \     |          |  zzzz = estimated error.
+    ||                                 |    |           \
+    MS Name/IP address         Stratum Poll Reach LastRx Last sample
+    ===============================================================================
+    ^* .....................        11  10   377   530   -654ns[ -905ns] +/-  477ms
+  #+end_example
+
+  通常 MS 值为 =^*= 对应 server, current synced。如果 source state 是 =?= 说明源不可用。
+

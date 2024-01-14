@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       B9EFC554-916F-47A5-A97E-58C047ACF0B2
+:END:
+#+TITLE: k8s pod port
+
+在定义 pod 时可以通过 =container.ports= 字段标记 pod 使用的 port，但实际这里只是标记的作用，实际上 pod 通过 =0.0.0.0= 监听的端口就算没通过 port 标记，也是可以通过 pod-ip:port 访问的。
+#+begin_quote
+List of ports to expose from the container. Not specifying a port here DOES NOT prevent that port from being exposed. Any port which is listening on the default "0.0.0.0" address inside a container will be accessible from the network. Modifying this array with strategic merge patch may corrupt the data. For more information See https://github.com/kubernetes/kubernetes/issues/108255. 
+
+https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#ports
+#+end_quote
+

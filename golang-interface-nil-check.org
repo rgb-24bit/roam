@@ -22,3 +22,15 @@
   }
 #+end_src
 
+或者 unsafe 的方式：
+#+begin_src go
+  type xface struct {
+    x    uintptr
+    data unsafe.Pointer
+  }
+  
+  func IsNil(v any) bool {
+    return (*xface)(unsafe.Pointer(&v)).data == nil
+  }
+#+end_src
+

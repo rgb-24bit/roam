@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       15CCEF1A-54BF-49D5-9F7E-917682A83879
+:END:
+#+TITLE: k8s StatefulSet & Deployment
+
+StatefulSet 相较于 Deployment 来说，其 Pod 名称是有序固定的，因此带来的特性是：
++ 稳定的、唯一的网络标识符。因为 Pod 名称是不变的，那么 Pod 的域名也就是固定的
++ 稳定的、持久的存储。通过  VolumeClaimTemplate 创建出来的 PVC 和 Pod 名称是想对应的且固定的
++ 有序的、优雅的部署和扩缩。
++ 有序的、自动的滚动更新。
+
+参考：
++ [[https://www.cnblogs.com/weifeng1463/p/10284122.html][StatefulSet 和 Deployment 的区别 - Oops!# - 博客园]]
++ [[https://kubernetes.io/zh-cn/docs/concepts/workloads/controllers/statefulset/#using-statefulsets][StatefulSet | Kubernetes]]
+
