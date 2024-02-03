@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       5F7BD9DC-52CB-4469-9F10-8034B2F990C8
+:END:
+#+TITLE: admission webhook cert
+
+怎么给 webhook 配置证书是一个问题，生成证书不难，难的是如果让 webhook server 读取到证书，同时配置到 Webhook 的 CaBundle 字段上。
+
+[[id:EDDA2C2D-BCE0-4604-8397-106FDD95C025][OpenKruise]] 的做法是在 controller 里面去生成证书，然后再通过 k8s client 去更新 secret 和 WebhookConfiguration：
+☞ https://github.com/openkruise/kruise/blob/master/pkg/webhook/util/controller/webhook_controller.go
+
+或者在 chart 包中定义类似 cert 的变量，然后执行 helm 命令时传入。
+
+另外，也可以考虑使用 [[id:18720373-813B-4DA4-8E33-F25E56A50F23][cert-manager]] 注入。
+

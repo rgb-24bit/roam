@@ -3,5 +3,14 @@
 :END:
 #+TITLE: cri
 
+* 创建 Pod
+  CRI 规范中，创建 Pod 的主流程大概是：
+  1. kubelet 调用 CRI RunPodSandbox 接口，通常来说就是创建 pause 容器，准备 network ns 之类的操作
+  2. 根据 Pod 定义的容器，调用 CreateContainer 和 StartContainer 接口运行容器
 
+  这里其实可以看到创建容器和启动容器是两个操作，对应到 [[id:AD8C376C-22AD-4FF6-BE8C-30AA14BE29D0][containerd]] 中的实现，创建容器是创建了容器元数据，而启动容器才实际启动了容器进程。对应 containerd 中 container 和 task 的概念。
+
+* 参考
+  + [[https://github.com/kubernetes/cri-api/blob/master/pkg/apis/runtime/v1/api.proto][cri-api/pkg/apis/runtime/v1/api.proto at master · kubernetes/cri-api]]
+  + [[https://www.infoq.cn/article/eah8zm3vh8mgwot5hokc][从零开始入门 K8s：理解容器运行时接口 CRI_服务革新_知谨_InfoQ精选文章]]
 

@@ -1,0 +1,31 @@
+:PROPERTIES:
+:ID:       4F048424-02BB-4DD4-A74F-1B1E39CAC75C
+:END:
+#+TITLE: RuntimeClass
+
+Pod 可以通过 spc.runtimeClass 字段来指定容器运行时，这个容器运行时和 [[id:27DBED3A-A4B2-4C1C-BFCD-C958D5A4BB17][cri]] 不同，RuntimeClass 指的具体的符合 OCI 规范的容器运行时实现。比如 [[https://github.com/opencontainers/runc][runc]] 这样基于 linux namespace 隔离来实现的容器运行时，
+也有像 [[https://katacontainers.io/][kata]] 这样轻量的基于虚拟机实现的容器运行时。
+
+在 [[id:AD8C376C-22AD-4FF6-BE8C-30AA14BE29D0][containerd]] 中也可以配置多种容器运行时，比如：
+#+begin_src toml
+  version = 2
+  [plugins."io.containerd.grpc.v1.cri".containerd]
+    default_runtime_name = "crun"
+    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+      # crun: https://github.com/containers/crun
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
+        runtime_type = "io.containerd.runc.v2"
+        [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun.options]
+          BinaryName = "/usr/local/bin/crun"
+      # gVisor: https://gvisor.dev/
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.gvisor]
+        runtime_type = "io.containerd.runsc.v1"
+      # Kata Containers: https://katacontainers.io/
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.kata]
+        runtime_type = "io.containerd.kata.v2"
+#+end_src
+
+参考：
++ [[https://github.com/containerd/containerd/blob/main/docs/cri/config.md][CRI Plugin Config Guide - Containerd]]
++ [[https://github.com/kubernetes/enhancements/tree/master/keps/sig-node/585-runtime-class#runtime-handler][KEP-585: Runtime Class]]
+

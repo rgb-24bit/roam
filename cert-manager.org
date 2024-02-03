@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       18720373-813B-4DA4-8E33-F25E56A50F23
+:END:
+#+TITLE: cert-manager
+
+
+

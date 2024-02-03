@@ -3,8 +3,14 @@
 :END:
 #+TITLE: k8s service
 
-
 * 实现原理
   + [[https://cloud.tencent.com/developer/article/1607796][k8s集群网络(7)-service之ipvs cluster ip实现原理-腾讯云开发者社区-腾讯云]]
   + [[https://cloud.tencent.com/developer/article/1607777][k8s集群网络(8)-service之ipvs node port实现原理-腾讯云开发者社区-腾讯云]]
+
+* service.kubernetes.io/service-proxy-name
+  当 serive 上存在 =service.kubernetes.io/service-proxy-name= 注解时 kube-proxy 会忽略该 serivice 的处理，交给自定义的 proxy 实现。
+
+  这时，就算使用 [[id:15490C43-CEA0-45D6-80DA-7D7DFB63C8F9][k8s ipvs]] 模式的 kube-proxy，service 的 ip 也可能 ping 不通，因为这个 ip 没挂在 kube-ipvs0 上。
+  
+  参考：[[https://github.com/kubernetes-sigs/kpng/blob/master/doc/service-proxy.md#ignored-servicesendpoints][Ignored Services/Endpoints]]
 
