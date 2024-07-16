@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       85425DCA-FEB4-46D9-AA59-D476A2273857
+:END:
+#+TITLE: container metrics
+
+Ref:
++ [[id:AD8C376C-22AD-4FF6-BE8C-30AA14BE29D0][containerd]]
+
+参考 [[https://github.com/containerd/cgroups/tree/main][containerd/cgroups]]，通过统计目标容器 cgroup 文件来得到指标数值。
+
+Ref https://github.com/containerd/cgroups/blob/main/cgroup2/manager.go#L556
+

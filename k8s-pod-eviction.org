@@ -24,7 +24,44 @@
 
   注：Kubernetes 会自动给 Pod 添加针对 node.kubernetes.io/not-ready 和 node.kubernetes.io/unreachable 的容忍度，且配置 tolerationSeconds=300。
 
+  污点类型常用的有 NoSchedule 和 NoExecute 两种，NoSchedule 是禁止调度而 NoExecute 才会触发驱逐。
+  
   参考：[[https://kubernetes.io/zh-cn/docs/concepts/scheduling-eviction/taint-and-toleration/][污点和容忍度 | Kubernetes]]
+
+* Zone
+  K8S 会根据每个 node 对象的 region 和 zone 的 label 值，将 node 划分到不同的 zone 中，不同状态下的驱逐策略不一样，共有以下几种状态：
+  1. Initial：初始状态
+  2. FullDisruption：ready 的 node 数量为 0，not ready 的 node 数量大于 0
+  3. PartialDisruption：not ready 的 node 数量大于 2 且其占比大于等于 unhealthyZoneThreshold
+  4. Normal：上述三种状态以外的情形，都属于该状态
+  
+  需要注意二级驱逐速率对驱逐的影响，即 kcm 启动参数--secondary-node-eviction-rate，代表如果某个 zone 下的 unhealthy 节点的百分比超过 --unhealthy-zone-threshold（默认为 0.55）时，驱逐速率将会减小，
+  如果不是 LargeCluster（zone 节点数量小于等于--large-cluster-size-threshold，默认为 50），驱逐操作将会停止，如果是 LargeCluster，驱逐速率将降为每秒--secondary-node-eviction-rate 个，默认为 0.01。
+
+  特别需要注意的一点就是：如果集群规模小于 50，NotReady 节点大于 2，Zone 状态为 PartialDisruption 时，驱逐操作可能停止。表现上节点会打上 NoSchedule 的污点但不会有 NoExecute 的污点。
+
+  #+begin_src go
+    // pkg/controller/nodelifecycle/node_lifecycle_controller.go
+    func (nc *Controller) ComputeZoneState(nodeReadyConditions []*v1.NodeCondition) (int, ZoneState) {
+      readyNodes := 0
+      notReadyNodes := 0
+      for i := range nodeReadyConditions {
+        if nodeReadyConditions[i] != nil && nodeReadyConditions[i].Status == v1.ConditionTrue {
+          readyNodes++
+        } else {
+          notReadyNodes++
+        }
+      }
+      switch {
+      case readyNodes == 0 && notReadyNodes > 0:
+        return notReadyNodes, stateFullDisruption
+      case notReadyNodes > 2 && float32(notReadyNodes)/float32(notReadyNodes+readyNodes) >= nc.unhealthyZoneThreshold:
+        return notReadyNodes, statePartialDisruption
+      default:
+        return notReadyNodes, stateNormal
+      }
+    }
+  #+end_src
 
 * NodePressure Eviction
   kubelet 根据驱逐信号、驱逐条件和监控间隔来进行节点压力驱逐，其中，驱逐信号是特定资源在特定时间点的当前状态：

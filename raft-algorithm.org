@@ -13,6 +13,8 @@
   - [[#log][log]]
   - [[#node][node]]
   - [[#ref][ref]]
+- [[#故障场景][故障场景]]
+  - [[#网络分区][网络分区]]
 
 * Raft
   Raft（Replication and Fault Tolerant）是一个允许网络分区（Partition Tolerant）的一致性协议，它保证了在一个由 N 个节点构成的系统中有 (N+1)/2（向上取整）个节点正常工作的情况下的系统的一致性，比如在一个 5 个节点的系统中允许 2 个节点出现非[[id:e3efd867-1ba1-430e-8478-6ed522bd241c][拜占庭]]错误，如节点宕机、网络分区、消息延时。
@@ -328,4 +330,29 @@
 
 ** ref
    + [[https://www.codedump.info/post/20180922-etcd-raft/#msgappmsgsnap%E6%B6%88%E6%81%AF][etcd Raft 库解析 - codedump的网络日志]]
+
+* 故障场景
+** 网络分区
+   假如 Raft 节点分布在 A、B、C 三个区域，同时分布为 2:2:1，当网络分区(A 和 B 区域不互通）时，如果 Leader 节点在：
+   1. 在 A 区域，此时 C 区域是 follower 节点，由于 A、B 不互通，所以 B 区域节点无法连上 Leader 节点，同时选主时 C 区域节点不会投票，所以 B 区域节点会处于 No Leader 的状态，无法工作
+      |------+-------+-----------+-----------------------|
+      | Zone | Node  | State     | Visible nodes         |
+      |------+-------+-----------+-----------------------|
+      | A    | node1 | leader    | node1-2,node5         |
+      | A    | node2 | follower  | node1-2,node5         |
+      | B    | node3 | no leader | node3-4,node5         |
+      | B    | node4 | no leader | node3-4,node5         |
+      | C    | node5 | follower  | node1-2,node3-4,ndoe5 |
+      |------+-------+-----------+-----------------------|
+   2. 在 B 区域，和在 A 区域效果类似
+   3. 在 C 区域，此时 C 为 Leader，A、B 区域节点均为 follower，集群所有 raft 节点都可以正常工作
+      |------+-------+----------+-----------------------|
+      | Zone | Node  | State    | Visible nodes         |
+      |------+-------+----------+-----------------------|
+      | A    | node1 | follower | node1-2,node5         |
+      | A    | node2 | follower | node1-2,node5         |
+      | B    | node3 | follower | node3-4,node5         |
+      | B    | node4 | follower | node3-4,node5         |
+      | C    | node5 | leader   | node1-2,node3-4,ndoe5 |
+      |------+-------+----------+-----------------------|
 

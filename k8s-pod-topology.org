@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       00C7D760-6D05-4751-9E85-32D63EE9BCAB
+:END:
+#+TITLE: k8s pod topology
+
+可以使用拓扑分布约束（Topology Spread Constraints）来控制 Pod 在集群内故障域之间的分布， 例如区域（Region）、可用区（Zone）、节点和其他用户自定义拓扑域。 
+
+#+begin_src yaml
+  ---
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: example-pod
+  spec:
+    # 配置一个拓扑分布约束
+    topologySpreadConstraints:
+      - maxSkew: <integer>
+        minDomains: <integer> # 可选；自从 v1.25 开始成为 Beta
+        topologyKey: <string>
+        whenUnsatisfiable: <string>
+        labelSelector: <object>
+        matchLabelKeys: <list> # 可选；自从 v1.27 开始成为 Beta
+        nodeAffinityPolicy: [Honor|Ignore] # 可选；自从 v1.26 开始成为 Beta
+        nodeTaintsPolicy: [Honor|Ignore] # 可选；自从 v1.26 开始成为 Beta
+    ### 其他 Pod 字段置于此处
+#+end_src
+
+各字段含义：
++ maxSkew - 描述 Pod 可以被不均匀分布的程度，必选字段且值应该大于零。其语义将随着 whenUnsatisfiable 的值发生变化：
+  - whenUnsatisfiable: DoNotSchedule - 定义目标拓扑中匹配 Pod 的数量与全局最小值（符合条件的域中匹配的最小 Pod 数量，如果符合条件的域数量小于 MinDomains 则为零） 之间的最大允许差值。
+    无法满足时 Pod 会 Pending。
+  - whenUnsatisfiable: ScheduleAnyway - 调度器会更为偏向能够降低偏差值的拓扑域
++ topologyKey - 划分拓扑域的节点标签，比如 =topology.kubernetes.io/zone=. 同时符合条件的域定义为其节点满足 nodeAffinityPolicy 和 nodeTaintsPolicy 要求的域
++ whenUnsatisfiable - 指示如果 Pod 不满足分布约束时如何处理：
+  - DoNotSchedule（默认）告诉调度器不要调度。
+  - ScheduleAnyway 告诉调度器仍然继续调度，只是根据如何能将偏差最小化来对节点进行排序。
++ labelSelector 用于查找匹配的 Pod。匹配此标签的 Pod 将被统计，以确定相应拓扑域中 Pod 的数量
+

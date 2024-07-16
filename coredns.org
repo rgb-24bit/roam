@@ -6,3 +6,59 @@
 * Plugins
   CoreDNS Plugins 执行顺序由 [[https://github.com/coredns/coredns/blob/master/plugin.cfg][plugin.cfg]] 决定，一般 [template > file > etcd > forward]。
 
+** rewrite
+   Name Field Rewrites:
+   #+begin_example
+     rewrite [continue|stop] name [exact|prefix|suffix|substring|regex] STRING STRING [OPTIONS]
+   #+end_example
+
+   这里 rewrite 是根据匹配类型重写相应的部分。比如 suffix 就只重写 suffix，如果要使用 rewrite 来实现泛域名解析，应该使用 regex：
+   #+begin_example
+     rewrite name regex .*\.a\.b\.com a.b.com
+   #+end_example
+
+** etcd
+   ETCD 中可以根据 host 值来判断记录类型，比如 CNAME、A、AAAA：
+   #+begin_src go
+     func (s *Service) HostType() (what uint16, normalized net.IP) {
+       ip := net.ParseIP(s.Host)
+     
+       switch {
+       case ip == nil:
+         if len(s.Text) == 0 {
+           return dns.TypeCNAME, nil
+         }
+         return dns.TypeTXT, nil
+     
+       case ip.To4() != nil:
+         return dns.TypeA, ip.To4()
+     
+       case ip.To4() == nil:
+         return dns.TypeAAAA, ip.To16()
+       }
+       // This should never be reached.
+       return dns.TypeNone, nil
+     }
+   #+end_src
+
+   CNAME 记录查询时，会判断 CNAME 记录的值是不是和当前的域相同，相同就直接接着在 ETCD 里面查询，否则走 lookup：
+   #+begin_src go
+     switch what {
+         case dns.TypeCNAME:
+           newRecord := serv.NewCNAME(state.QName(), serv.Host)
+           if dns.IsSubDomain(zone, dns.Fqdn(serv.Host)) {
+             state1 := state.NewWithQuestion(serv.Host, state.QType())
+             state1.Zone = zone
+             nextRecords, tc, err := A(ctx, b, zone, state1, append(previousRecords, newRecord), opt)
+     
+             continue
+           }
+           // This means we can not complete the CNAME, try to look else where.
+           target := newRecord.Target
+           // Lookup
+           m1, e1 := b.Lookup(ctx, state, target, state.QType())
+     }
+   #+end_src
+
+   这里特殊的点：只有 lookup 才可以走到其他的配置里面去，如果 CNAME 记录需要通过其他配置 forward 到其他 dns 服务，那么就需要确保 cname 记录的域和查询的域不一样。
+

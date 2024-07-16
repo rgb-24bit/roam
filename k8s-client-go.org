@@ -187,6 +187,12 @@
 
   参考：[[https://jimmysong.io/kubernetes-handbook/develop/client-go-informer-sourcecode-analyse.html][client-go 中的 informer 源码分析 · Kubernetes 中文指南——云原生应用架构实战手册]]
 
+* Resync
+  Informer 中有 Resync 机制来确保对象事件被处理，其设计为：
+  + Reflector 持有 DeltaFIFO，从 apiserver 获取到的对象会放入 DeltaFIFO
+  + 从 DeltaFIFO 中取出的对象，先根据事件类型更新 Indexer 也就是客户端缓存，然后再执行 handler 函数
+  + 会通过 Resync 函数定时将 Indexer 中的对象重新放入 DeltaFIFO，触发事件，Indexer 中是缓存的所有对象，Resync 大概率是触发 Update 事件
+
 * EventRecorder
   在 k8s 中，资源对象常通过 meta 表示元信息，spec 表示自身的定义，而 status 表示自身的状态。而 Event，常用来记录和资源对象相关的事件，如果说 meta、spec 和 status 描述了资源现在的样子，
   那么，Event 则记录了资源从过去到现在之间发生了什么。

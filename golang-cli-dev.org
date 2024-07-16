@@ -1,0 +1,30 @@
+:PROPERTIES:
+:ID:       33F185D6-4F78-4E84-A765-FD6DCBBDB2D5
+:END:
+#+TITLE: golang cli dev
+
+* 目录结构
+  ☞ https://github.com/kubernetes/kubectl ([[https://github.com/spf13/cobra][cobra]])
+  
+  #+begin_example
+    .
+    ├── cmd
+    │   └── main.go
+    ├── pkg
+    │   └── cmd
+    │       ├── cmd.go
+    │       ├── subcommand1
+    │       │   └── subcommand1.go
+    │       └── subcommand2
+    │           └── subcommand2.go
+    └── go.mod
+  #+end_example
+
+  cmd 和 subcommand 包都提供 NewCommand 函数，cmd 负责组装子命令，命令具体逻辑在 subcommand 包中实现，其他基本功能（不关注上层命令）在 pkg 其他包中。
+
+  NOTE:
+  + cobra 传入 Run 函数的 Args 参数是去掉 flag 参数后剩下的位置参数。
+
+* 命令行参数
+  + Complete => Validate => ApplyTo/Apply
+

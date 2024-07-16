@@ -23,3 +23,17 @@
     }
   #+end_src
 
+* 节点故障
+  在一次测试中发现 k8s master 节点 reboot 和直接掉电表现行为不一致，主要差别：reboot 时 master 节点被标记为 NotReady 的速度比掉电更快。
+
+  观察 apiserver 和 controller-manager 日志发现：
+  + 掉电时，apiserver 访问 etcd 会出现慢请求，导致 controller-manager 丢失 lease 锁，新 controller-manager 获取到 lease 锁后启动 informer 刷新缓存需要一段时间，才开始 NodeNotReady 计时。而 reboot 不会导致这个问题。
+  + 对应到 etcd 日志上也存在不同的报错
+  + 怀疑 reboot 是操作系统发送 SIGTERM 信号到 etcd 进程，使得 etcd graceful shutdown 优雅退出，避免了慢请求出现（reboot 时节点还可以 ping 通约 10s 左右，掉电会立即失联）
+
+  修改了 controller-manager 持有 lease 锁的时长到默认值的两倍，似乎规避了这一问题：
+  #+begin_example
+    - --leader-elect-lease-duration=30s
+    - --leader-elect-renew-deadline=20s
+  #+end_example
+

@@ -3,7 +3,7 @@
 :END:
 #+TITLE: RuntimeClass
 
-Pod 可以通过 spc.runtimeClass 字段来指定容器运行时，这个容器运行时和 [[id:27DBED3A-A4B2-4C1C-BFCD-C958D5A4BB17][cri]] 不同，RuntimeClass 指的具体的符合 OCI 规范的容器运行时实现。比如 [[https://github.com/opencontainers/runc][runc]] 这样基于 linux namespace 隔离来实现的容器运行时，
+Pod 可以通过 spc.runtimeClass 字段来指定容器运行时，这个容器运行时和 [[id:27DBED3A-A4B2-4C1C-BFCD-C958D5A4BB17][cri]] 不同，RuntimeClass 指的具体的符合 [[id:27A00C33-B44F-4AFB-A57C-E09260F0256C][OCI]] 规范的容器运行时实现。比如 [[https://github.com/opencontainers/runc][runc]] 这样基于 linux namespace 隔离来实现的容器运行时，
 也有像 [[https://katacontainers.io/][kata]] 这样轻量的基于虚拟机实现的容器运行时。
 
 在 [[id:AD8C376C-22AD-4FF6-BE8C-30AA14BE29D0][containerd]] 中也可以配置多种容器运行时，比如：

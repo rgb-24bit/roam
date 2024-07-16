@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       9AF826C5-B728-400F-A346-CCD842A2F12E
+:END:
+#+TITLE: container memory metrics
+
+kubectl top 时使用的指标为 container_memory_working_set_bytes，值为 rss + active_files，active_files 会由系统操作管理，内存不足时会自动回收。使用指标 container_memory_rss 更好。
+
+Ref:
++ [[https://blog.csdn.net/qq_34468174/article/details/130643948][【k8s pod container内存指标说明】_memory rss-CSDN博客]]
+

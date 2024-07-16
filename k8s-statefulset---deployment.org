@@ -13,3 +13,12 @@ StatefulSet 相较于 Deployment 来说，其 Pod 名称是有序固定的，因
 + [[https://www.cnblogs.com/weifeng1463/p/10284122.html][StatefulSet 和 Deployment 的区别 - Oops!# - 博客园]]
 + [[https://kubernetes.io/zh-cn/docs/concepts/workloads/controllers/statefulset/#using-statefulsets][StatefulSet | Kubernetes]]
 
+* StatefulSet OrderedReady
+  StatefulSet 默认策略：
+  + 对于包含 N 个 副本的 StatefulSet，当部署 Pod 时，它们是依次创建的，顺序为 0..N-1
+  + 当删除 Pod 时，它们是逆序终止的，顺序为 N-1..0
+  + 在将扩缩操作应用到 Pod 之前，它前面的所有 Pod 必须是 Running 和 Ready 状态
+  + 在一个 Pod 终止之前，所有的继任者必须完全关闭
+
+  参考：[[https://kubernetes.io/zh-cn/docs/concepts/workloads/controllers/statefulset/#pod-management-policies][StatefulSet | Kubernetes]]
+

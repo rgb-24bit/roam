@@ -12,5 +12,6 @@ virsh 是 kvm 的命令行工具，可以全生命周期的管理 kvm。常用�
   virsh start       # 启动虚拟机
   virsh reset       # 强制重启虚拟机
   virsh console     # 从宿主机连接指定虚拟的串行控制台
+  virsh shutdown    # 关闭虚拟机
 #+end_src
 

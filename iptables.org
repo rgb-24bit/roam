@@ -16,9 +16,24 @@ iptables 中存在很多的 rule，每个 rule 匹配一定的目标，执行相
 命令使用：
 #+begin_src sh
   # show filter table rules
-  iptables -L 
+  iptables -L
   
   # show special table rules
   iptables -t <table> -L
+  
+  # show chain
+  iptables -L INPUT -n --line-number
+  
+  # DELETE
+  iptables -D INPUT <match>
+  iptables -D INPUT <number>
+  
+  # INSERT
+  iptables -I INPUT <match>
+#+end_src
+
+禁止非本机端口访问：
+#+begin_src sh
+  iptables -I INPUT ! -i lo -p tcp --dport 80 -j DROP
 #+end_src
 

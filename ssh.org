@@ -13,6 +13,7 @@
   - [[#远程转发][远程转发]]
 - [[#配置优先级][配置优先级]]
 - [[#controlmaster--controlpersist][ControlMaster & ControlPersist]]
+- [[#环境变量][环境变量]]
 
 * Configure SSH Key-Based Authentication
   #+begin_example
@@ -94,7 +95,6 @@
      remote -> local -> target
    #+end_example
 
-
 * 配置优先级
   ssh 客户端配置加载的顺序为：命令行参数 -> ~/.ssh/config -> etc/ssh/ssh_config，除了命令行参数，后面两个配置文件中的配置格式通常为：
   #+begin_src conf
@@ -149,4 +149,9 @@
         ControlMaster auto
         ControlPath /tmp/ssh-session-%r@%h:%p
   #+end_src
+
+
+* 环境变量
+  通过 ssh 登录目标服务器后，shell 进程并不会直接集成 sshd 进程的环境变量，sshd 会走 login 流程从配置文件中去加载配置文件，参考：
+  https://github.com/openbsd/src/blob/master/usr.bin/ssh/session.c#L833
 

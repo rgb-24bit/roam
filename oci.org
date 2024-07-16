@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       27A00C33-B44F-4AFB-A57C-E09260F0256C
+:END:
+#+TITLE: OCI
+
+[[https://opencontainers.org/][Open Container Initiative - Open Container Initiative]]
+

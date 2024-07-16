@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       CDC670A9-AC1A-4105-BED9-AB2840503431
+:END:
+#+TITLE: k8s rbac
+
+* RoleBinding & ClusterRoleBinding
+  RoleBinding 在 Namespace 级别，而 ClusterRoleBinding 在集群级别，两者使用方式上都差不多，根据权限收敛范围来使用就行。
+

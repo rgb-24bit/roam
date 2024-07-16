@@ -1,0 +1,18 @@
+:PROPERTIES:
+:ID:       D08C8AAE-1EDF-4836-9853-73E648578CFF
+:END:
+#+TITLE: k8s ingress ssl
+
+使用 ingress nginx controller 时，如果 ingress 中配置了 TLS，那么默认会为 ingress 中配置的所有 host 开启 SSL Redirect，不会匹配 TLS Domain。
+
+#+begin_quote
+By default the controller redirects HTTP clients to the HTTPS port 443 using a 308 Permanent Redirect response if TLS is enabled for that Ingress.
+
+Ref https://kubernetes.github.io/ingress-nginx/user-guide/tls/
+#+end_quote
+
+可以通过注解关闭 Redirect：
+#+begin_example
+kubectl annotate ingress xxx nginx.ingress.kubernetes.io/ssl-redirect=false
+#+end_example
+

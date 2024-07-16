@@ -1,0 +1,26 @@
+:PROPERTIES:
+:ID:       2095D8AE-7C34-4435-8304-738BAB43215B
+:END:
+#+TITLE: dns recursion
+
+DNS 递归查询由 DNS 服务器完成，服务器递归访问配置的上游服务器，直到找到需要的记录或失败。
+
+发起递归查询时，客户端请求设置 RD 标志，通常服务器实现也会同步设置 RD 标志，表示是递归查询，另外 RA 标志标识服务器是否支持递归：
+#+begin_example
+  ;; global options: +cmd
+  ;; Got answer:
+  ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 23517
+  ;; flags: qr aa rd; QUERY: 1, ANSWER: 4, AUTHORITY: 0, ADDITIONAL: 1
+#+end_example
+
+对于 [[id:711FC40B-9614-4D2F-B328-2B32EB87E415][coredns]] 来说，大部分 plugin 不会设置 RA 标志，因此会得到类似如下的报错：
+#+begin_example
+  dig
+  WARNING: recursion requested but not available
+  
+  nslookup
+  Got recursion not available from x.x.x.x, trying next server
+#+end_example
+
+参考：[[https://datatracker.ietf.org/doc/html/rfc2929#section-2][rfc2929]]
+

@@ -12,3 +12,6 @@ IPVS 是 [[id:B3AFABEA-45B9-4F06-84AE-A46857C3F65E][linux kernal]] 实现的四�
 + [[https://github.com/liexusong/linux-source-code-analyze/blob/master/lvs-principle-and-source-analysis-part1.md][LVS原理与实现 - 原理篇]]
 + [[https://github.com/liexusong/linux-source-code-analyze/blob/master/lvs-principle-and-source-analysis-part2.md][LVS原理与实现 - 实现篇]]
 
+* RS Health check
+  看 [[http://www.linuxvirtualserver.org/HighAvailability.html][High Availability]] 中的内容，LVS 自身是没有 RS IP 的健康检查能力的，也就是会出现 RS IP 故障后流量依然发往故障 IP 的情况。在 K8S 中就需要等待 controller 摘除故障 Pod IP。
+

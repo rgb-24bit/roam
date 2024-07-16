@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       095899D9-651B-41CB-BDE3-325697C69041
+:END:
+#+TITLE: SSL/TLS handshake
+
++ [[https://www.ibm.com/docs/en/ibm-mq/9.3?topic=tls-overview-ssltls-handshake][An overview of the SSL/TLS handshake - IBM Documentation]]
+
+在浏览器访问 HTTPS 网站的时候，通常只需要效验服务器证书。但 SSL/TLS 是支持验证客户端证书的，比如在 etcd 中，访问 etcd 时使用客户端证书来访问 etcd。
+
+这种情况下，服务器会发送 *client certificate request* 请求，客户端这时需要将自己的证书发送给服务端。 
+
+在 golang 中通过如下字段配置，值为 =RequestClientCert= 时要求在握手阶段获取客户端证书：
+#+begin_src go
+  http.Server.TLSConfig.ClientAuth
+#+end_src
+

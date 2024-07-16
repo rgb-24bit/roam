@@ -12,7 +12,7 @@
 
   不同类型的逻辑：
   + Instant vector selector：从该段的 timestamp（含）往前找，取第一个找到的值。如果该段 timestamp 往前的 5 分钟范围内没有找到任何值，则该段无值。
-  + Range vector selector：返回的是当前 timestamp 之前的 range duration 内的所有值。
+  + Range vector selector：返回的是当前 timestamp 之前的 range duration 内的所有值。（注意区分 range query 和 range vector，range query 是整个查询时间范围，range vector 是某个时间范围内的求值方式）
 
   grafana 中 step 的值是动态计算得到的。
 

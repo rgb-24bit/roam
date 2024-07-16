@@ -47,7 +47,7 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
   #+begin_src sh
     salt -C 'G@os:Ubuntu and webser* or E@database.*' test.version
   #+end_src
-
+  
 * Grains
   可以通过 grains 获取底层系统的信息：
   #+begin_src sh
@@ -57,7 +57,28 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
     # 获取指定项信息
     $ salt '*' grains.item xxx
   #+end_src
-
+  
 * Debug
   执行时通过 =-l trace= 可以显示 trace 日志，方便排查执行失败的原因。
+
+  
+* master & minion
+  minion 启动时会自动生成自己的密钥对（如果不存在）：
+  #+begin_example
+    /etc/salt/pki/minion/minion.pem
+    /etc/salt/pki/minion/minion.pub
+  #+end_example
+
+  minion 启动后会将 minion.pub 发给 master，master 收到后会放到如下位置：
+  #+begin_example
+    /etc/salt/pki/master/minions/[minion_id]
+  #+end_example
+
+  然后 minion 会在 =/etc/salt/pki/minion/minion_master.pub= 中存放 master 的公钥，之后两边就可以开始通信了。
+
+  也可以事先将证书复制到 master =/etc/salt/pki/master/minions/[minion_id]= 位置和 minion =/etc/salt/pki/minion= 下，这样就不用单独生成证书了，minion 启动会直接使用已有证书去通信即可。
+
+  参考：[[https://docs.saltproject.io/en/latest/topics/tutorials/preseed_key.html][Preseed Minion with Accepted Key]]。
+
+  如果 minion 替换了证书，那么需要在每个 master 节点上删除已有的 =/etc/salt/pki/master/minions/[minion_id]= 文件，然后重启 =salt-master= 和 =salt-minion= 让他们重新互信。
 
