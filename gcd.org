@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       8d67219b-8925-4d08-ada5-81ec2ddecc89
+:END:
+#+TITLE: gcd
+
+#+begin_src go
+  func gcd(a, b int) int {
+      for b != 0 {
+          a, b = b, a % b
+      }
+      return a
+  }
+#+end_src
+

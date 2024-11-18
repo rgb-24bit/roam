@@ -1,0 +1,24 @@
+:PROPERTIES:
+:ID:       32ad7edc-9f26-4b15-92b6-b1c17d3265f5
+:END:
+#+TITLE: git ssh proxy clash
+
+~/.ssh/config:
+#+begin_example
+  ProxyCommand nc -X 5 -x 127.0.0.1:7890 %h %p
+  
+  Host github.com
+    User git
+    Port 22
+    Hostname github.com
+    TCPKeepAlive yes
+    IdentitiesOnly yes
+  
+  Host ssh.github.com
+    User git
+    Port 443
+    Hostname ssh.github.com
+    TCPKeepAlive yes
+    IdentitiesOnly yes
+#+end_example
+

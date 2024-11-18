@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       d4c4ea6d-a232-439b-9ae9-f0bdd137785b
+:END:
+#+TITLE: k8s kustomize
+
+[[https://github.com/kubernetes-sigs/kustomize][kubernetes-sigs/kustomize: Customization of kubernetes YAML configurations]]
+
