@@ -16,3 +16,76 @@ Ref https://kubernetes.github.io/ingress-nginx/user-guide/tls/
 kubectl annotate ingress xxx nginx.ingress.kubernetes.io/ssl-redirect=false
 #+end_example
 
+#+begin_src yaml
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: tls-example-ingress
+  spec:
+    tls:
+    - hosts:
+        - https-example.foo.com
+      secretName: testsecret-tls
+    rules:
+    - host: https-example.foo.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service1
+              port:
+                number: 80  
+#+end_src
+
+ingress nginx 会先使用 rules.host 和 tls.hosts 匹配，如果匹配的上就直接返回对应证书。如果都不能匹配，就会解析遍历所有 tls.secretName 证书，如果能匹配域名，就使用该证书。也就是会出现 tls 中没配置 hosts，但对应域名的证书依然可以正常使用的情况：
+#+begin_src go
+  // https://github.com/kubernetes/ingress-nginx/blob/main/internal/ingress/controller/controller.go#L1688
+  func extractTLSSecretName(host string, ing *ingress.Ingress,
+    getLocalSSLCert func(string) (*ingress.SSLCert, error),
+  ) string {
+    if ing == nil {
+      return ""
+    }
+  
+    // naively return Secret name from TLS spec if host name matches
+    lowercaseHost := toLowerCaseASCII(host)
+    for _, tls := range ing.Spec.TLS {
+      for _, tlsHost := range tls.Hosts {
+        if toLowerCaseASCII(tlsHost) == lowercaseHost {
+          return tls.SecretName
+        }
+      }
+    }
+  
+    // no TLS host matching host name, try each TLS host for matching SAN or CN
+    for _, tls := range ing.Spec.TLS {
+      if tls.SecretName == "" {
+        // There's no secretName specified, so it will never be available
+        continue
+      }
+  
+      secrKey := fmt.Sprintf("%v/%v", ing.Namespace, tls.SecretName)
+  
+      cert, err := getLocalSSLCert(secrKey)
+      if err != nil {
+        klog.Warningf("Error getting SSL certificate %q: %v", secrKey, err)
+        continue
+      }
+  
+      if cert == nil || cert.Certificate == nil {
+        continue
+      }
+  
+      err = cert.Certificate.VerifyHostname(host)
+      if err != nil {
+        continue
+      }
+      klog.V(3).Infof("Found SSL certificate matching host %q: %q", host, secrKey)
+      return tls.SecretName
+    }
+  
+    return ""
+  }
+#+end_src

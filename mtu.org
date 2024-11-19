@@ -24,3 +24,6 @@ Maximum Transmission Unit，缩写 MTU，中文名是：最大传输单元。MTU
   + -M do 设置 DF 标志，不分片
   + -s $(($MTU - 28)) 包大小，ping 数据包会加上大小为 28 的 header，所以减去 28
 
+* TCP MSS
+  TCP 在 *建立连接* 阶段，可以通过 MSS 协商出一个不超过最小 MTU 的值。
+

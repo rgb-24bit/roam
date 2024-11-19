@@ -1,0 +1,89 @@
+:PROPERTIES:
+:ID:       66BB9E0C-5C7D-47D7-A7C9-728505A1BC47
+:END:
+#+TITLE: grpc
+
+* golang client 源码阅读技巧
+  grpc go client 源码各种 wrapper 看着很头痛，其设计思路是：
+  1. ClientConn 作为中间对象，负责处理、传递各种状态变化事件，比如 resolver、balancer、subconn 的状态变化
+  2. resolver、balancer、subconn 等都定义了自己的接口，这些接口存在同名的方法，比如 UpdateXXXState
+  3. ClientConn 通过 Wrapper 来实现 resolver 或其他模块定义的接口，warpper 内部调用 ClientConn 本身的方法
+  4. 也就是在 module 和 ClientConn 增加了一个中间层 Wrapper 来互动
+
+  比如 resolver 定义的接口：
+  #+begin_src go
+    // ClientConn contains the callbacks for resolver to notify any updates
+    // to the gRPC ClientConn.
+    //
+    // This interface is to be implemented by gRPC. Users should not need a
+    // brand new implementation of this interface. For the situations like
+    // testing, the new implementation should embed this interface. This allows
+    // gRPC to add new methods to this interface.
+    type ClientConn interface {
+      // UpdateState updates the state of the ClientConn appropriately.
+      //
+      // If an error is returned, the resolver should try to resolve the
+      // target again. The resolver should use a backoff timer to prevent
+      // overloading the server with requests. If a resolver is certain that
+      // reresolving will not change the result, e.g. because it is
+      // a watch-based resolver, returned errors can be ignored.
+      //
+      // If the resolved State is the same as the last reported one, calling
+      // UpdateState can be omitted.
+      UpdateState(State) error
+      // ReportError notifies the ClientConn that the Resolver encountered an
+      // error.  The ClientConn will notify the load balancer and begin calling
+      // ResolveNow on the Resolver with exponential backoff.
+      ReportError(error)
+      // NewAddress is called by resolver to notify ClientConn a new list
+      // of resolved addresses.
+      // The address list should be the complete list of resolved addresses.
+      //
+      // Deprecated: Use UpdateState instead.
+      NewAddress(addresses []Address)
+      // NewServiceConfig is called by resolver to notify ClientConn a new
+      // service config. The service config should be provided as a json string.
+      //
+      // Deprecated: Use UpdateState instead.
+      NewServiceConfig(serviceConfig string)
+      // ParseServiceConfig parses the provided service config and returns an
+      // object that provides the parsed config.
+      ParseServiceConfig(serviceConfigJSON string) *serviceconfig.ParseResult
+    }
+  #+end_src
+ 
+  wrapper 实现：
+  #+begin_src go
+    // UpdateState is called by resolver implementations to report new state to gRPC
+    // which includes addresses and service config.
+    func (ccr *ccResolverWrapper) UpdateState(s resolver.State) error {
+      errCh := make(chan error, 1)
+      ok := ccr.serializer.Schedule(func(context.Context) {
+        ccr.addChannelzTraceEvent(s)
+        ccr.curState = s
+        if err := ccr.cc.updateResolverState(ccr.curState, nil); err == balancer.ErrBadResolverState {
+          errCh <- balancer.ErrBadResolverState
+          return
+        }
+        errCh <- nil
+      })
+      if !ok {
+        // The only time when Schedule() fail to add the callback to the
+        // serializer is when the serializer is closed, and this happens only
+        // when the resolver wrapper is closed.
+        return nil
+      }
+      return <-errCh
+    }
+  #+end_src
+
+  clientConn 实现：
+  #+begin_src go
+    func (cc *ClientConn) updateResolverState(s resolver.State, err error) error {
+      // ...
+    }    
+  #+end_src
+
+  参考：
+  + [[https://pandaychen.github.io/2019/11/11/GRPC-RESOLVER-DEEP-ANALYSIS/][gRPC 源码分析之 Resolver 篇 - 熊喵君的博客 | PANDAYCHEN]]
+

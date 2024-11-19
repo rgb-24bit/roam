@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       61A86186-ADA7-494B-A1D2-89B8E88030B6
+:END:
+#+TITLE: du
+
+某些情况下，比如 =/run= 目录下会挂载不同的目录、文件系统，可以使用 =--one-file-system= 查看同一个文件系统的文件大小，特别查看 =/run= 目录自身占用的时候可用：
+#+begin_example
+  du -sh --one-file-system /run/*
+#+end_example
+

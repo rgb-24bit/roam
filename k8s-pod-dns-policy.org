@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       68C8D18C-F9B9-40EB-B04F-3923F23B9480
+:END:
+#+TITLE: k8s pod dns policy
+
++ [[https://kubernetes.io/zh-cn/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy][Service 与 Pod 的 DNS | Kubernetes]]
+
+可以使用 dnsConfig 字段配置 Pod DNS 配置，可以配置 nameservers、searches 和 options。
+

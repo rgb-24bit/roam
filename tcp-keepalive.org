@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       32FEBF5E-7C9E-4D01-A8E0-E9BFE0076BBE
+:END:
+#+TITLE: TCP KeepAlive
+
+内核参数：
+#+begin_example
+  sysctl net.ipv4.tcp_keepalive_time  # 默认 7200s
+  sysctl net.ipv4.tcp_keepalive_probes
+  sysctl net.ipv4.tcp_keepalive_intvl
+#+end_example
+
+参考：[[https://www.cnblogs.com/hueyxu/p/15759819.html][TCP KeepAlive 机制理解与实践小结 - huey_x - 博客园]]

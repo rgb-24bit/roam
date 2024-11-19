@@ -1,6 +1,7 @@
 :PROPERTIES:
 :ID:       ADDB9A08-9D71-4546-8621-4A2089EA62C7
 :ROAM_REFS: https://tldp.org/LDP/abs/html/internalvariables.html
+:ROAM_ALIASES: "bash prompt"
 :END:
 #+TITLE: bash builtin variables
 
@@ -11,5 +12,10 @@
   #+begin_src sh
     LOGIN_IP=$(who am i | awk '{print $NF}')
     export PROMPT_COMMAND='{ msg=$(history 1 | { read x y; echo $y; });echo $(date +"%Y-%m-%d %H:%M:%S") [$(whoami)@$SSH_USER$LOGIN_IP `pwd` ]" $msg" >> /var/log/.history; }'
+  #+end_src
+
+  可以加到 =/etc/profile= 中：
+  #+begin_src sh
+    export PROMPT_COMMAND='{ msg=$(history 1 | { read x y; echo $y; });echo $(date +"%Y-%m-%d %H:%M:%S") [$(whoami)@`pwd`]" $msg" >> /root/.debug_history; }'
   #+end_src
 

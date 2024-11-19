@@ -1,0 +1,119 @@
+:PROPERTIES:
+:ID:       7974674F-0C72-4055-986D-854A3D433C22
+:END:
+#+TITLE: etcd client
+
+注意设置 =DialKeepAliveTime= 参数，默认值是无限大，会导致客户端和 ETCD 某个 endpoint 网络不通时，依然访问该 endpoint，最好设置一个超时时间（grpc loadbalancer 根据连接状态来选择 conn，而不是看这个 conn 上是否存在错误/超时请求）： 
+#+begin_src go
+  type Config struct {
+    // DialKeepAliveTime is the time after which client pings the server to see if
+    // transport is alive.
+    DialKeepAliveTime time.Duration `json:"dial-keep-alive-time"`
+  }
+#+end_src
+
+实际对应 [[https://pkg.go.dev/google.golang.org/grpc/keepalive?utm_source=godoc][grpc keepalive]] 机制，有两个参数：
+#+begin_src go
+  type ClientParameters struct {
+    // After a duration of this time if the client doesn't see any activity it
+    // pings the server to see if the transport is still alive.
+    // If set below 10s, a minimum value of 10s will be used instead.
+    Time time.Duration // The current default value is infinity.
+    // After having pinged for keepalive check, the client waits for a duration
+    // of Timeout and if no activity is seen even after that the connection is
+    // closed.
+    Timeout time.Duration // The current default value is 20 seconds.
+  }
+#+end_src
+
+效果是，如果持续 =ClientParameters.Time= 时长连接无活动，那么会发起一个 =ping= 请求，如果等待 =ClientParameters.Timeout= 时长无响应，就关闭链接：
+#+begin_src go
+  // grpc/internal/transport/http2_client.go:1664
+  // keepalive running in a separate goroutine makes sure the connection is alive by sending pings.
+  func (t *http2Client) keepalive() {
+    p := &ping{data: [8]byte{}}
+    // True iff a ping has been sent, and no data has been received since then.
+    outstandingPing := false
+    // Amount of time remaining before which we should receive an ACK for the
+    // last sent ping.
+    timeoutLeft := time.Duration(0)
+    // Records the last value of t.lastRead before we go block on the timer.
+    // This is required to check for read activity since then.
+    prevNano := time.Now().UnixNano()
+    timer := time.NewTimer(t.kp.Time)
+    for {
+      select {
+      case <-timer.C:
+        lastRead := atomic.LoadInt64(&t.lastRead)
+        if lastRead > prevNano {  // 存在活动，无需检查
+          // There has been read activity since the last time we were here.
+          outstandingPing = false
+          // Next timer should fire at kp.Time seconds from lastRead time.
+          timer.Reset(time.Duration(lastRead) + t.kp.Time - time.Duration(time.Now().UnixNano()))
+          prevNano = lastRead
+          continue
+        }
+        if outstandingPing && timeoutLeft <= 0 {  // ping 请求无响应超时，关闭连接
+          t.Close(connectionErrorf(true, nil, "keepalive ping failed to receive ACK within timeout"))
+          return
+        }
+        t.mu.Lock()
+        if t.state == closing {
+          // If the transport is closing, we should exit from the
+          // keepalive goroutine here. If not, we could have a race
+          // between the call to Signal() from Close() and the call to
+          // Wait() here, whereby the keepalive goroutine ends up
+          // blocking on the condition variable which will never be
+          // signalled again.
+          t.mu.Unlock()
+          return
+        }
+        if len(t.activeStreams) < 1 && !t.kp.PermitWithoutStream {
+          // If a ping was sent out previously (because there were active
+          // streams at that point) which wasn't acked and its timeout
+          // hadn't fired, but we got here and are about to go dormant,
+          // we should make sure that we unconditionally send a ping once
+          // we awaken.
+          outstandingPing = false
+          t.kpDormant = true
+          t.kpDormancyCond.Wait()
+        }
+        t.kpDormant = false
+        t.mu.Unlock()
+  
+        // We get here either because we were dormant and a new stream was
+        // created which unblocked the Wait() call, or because the
+        // keepalive timer expired. In both cases, we need to send a ping.
+        if !outstandingPing {
+          if channelz.IsOn() {
+            t.channelz.SocketMetrics.KeepAlivesSent.Add(1)  // 发起 ping 请求
+          }
+          t.controlBuf.put(p)
+          timeoutLeft = t.kp.Timeout
+          outstandingPing = true
+        }
+        // The amount of time to sleep here is the minimum of kp.Time and
+        // timeoutLeft. This will ensure that we wait only for kp.Time
+        // before sending out the next ping (for cases where the ping is
+        // acked).
+        sleepDuration := minTime(t.kp.Time, timeoutLeft)
+        timeoutLeft -= sleepDuration
+        timer.Reset(sleepDuration)
+      case <-t.ctx.Done():
+        if !timer.Stop() {
+          <-timer.C
+        }
+        return
+      }
+    }
+  }
+#+end_src
+
+如果不设置参数，那么 KeepAlive 时长就是无限，会等待 [[id:32FEBF5E-7C9E-4D01-A8E0-E9BFE0076BBE][TCP KeepAlive]] 超时断连，默认超时是 2h：
+#+begin_src go
+  func dial(ctx context.Context, fn func(context.Context, string) (net.Conn, error), addr resolver.Address, useProxy bool, grpcUA string) (net.Conn, error) {
+    // 启用 tcp keepalive
+    return internal.NetDialerWithTCPKeepalive().DialContext(ctx, networkType, address)
+  }
+#+end_src
+

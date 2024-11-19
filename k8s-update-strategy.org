@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       1A4DB137-40D3-4D21-95C0-076697F59A53
+:END:
+#+TITLE: k8s update strategy
+
+K8S 中，DaemonSet 和 StatefulSet 支持 OnDelete 更新策略，更新了 Spec 后，需要手动删除 Pod 触发更新，不会自动重启。
+
+

@@ -22,3 +22,9 @@ inotify-tools 包括一个 C 库和一组命令行工具，可在命令行下提
     find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -exec sh -c 'cat $(dirname {})/../cmdline; echo ""' \; 2>/dev/null
   #+end_example
 
+  相关参数：
+  #+begin_example
+    fs.inotify.max_user_instances
+    fs.inotify.max_user_watches
+  #+end_example
+

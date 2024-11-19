@@ -8,3 +8,9 @@
   nc -z -v 10.8.8.8 20-80
 #+end_example
 
+nc 有两个版本，不同版本返回的成功信息不一样：
+#+begin_example
+  # nc.traditional xxxx open (?)
+  # nc.openbsd xxxx succeeded!
+#+end_example
+

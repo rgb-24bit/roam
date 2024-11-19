@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       ACFA3332-8206-4CEC-9A62-68354173116F
+:END:
+#+TITLE: time series
+
+[[id:7E3881DE-E84A-4047-B145-FB5B234C92F9][TSDB]] 中，指标名称 + 不同 Label KV 组合是不同的 time series。也就是说，当指标 Label 的值增长时，time series 数量也随之增加，会带来额外的存储压力。
+

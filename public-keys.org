@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       EAA4290A-985D-4C0D-97FC-603804417A73
+:END:
+#+TITLE: public keys
+
+在 github 或 gitlab 中，可以使用 domain/username.keys 获取到用户公钥。
+
+

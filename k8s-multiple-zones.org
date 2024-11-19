@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       C7E65989-AB9C-40BE-BBCE-5A91754AE1BD
+:END:
+#+TITLE: k8s multiple zones
+
+Kubernetes 是对底层资源的抽象和编排，跨 AZ 在 Kubernetes 这里本质上是一个调度的问题。Kubernetes 可以提供拓扑感知和对应的调度能力，但是它本身不会提供跨 AZ 之后的高可用性能力的。
+
+比如 3 AZ 场景两个 AZ 网络隔离，可能 ETCD 层面还是可以正常工作，导致跨 AZ Service 有所有 AZ endpoint，但是 AZ1 访问 AZ2 会失败（[[id:FADB6939-0299-4DD5-A512-639F74189DAA][Raft algorithm]]）。
+
+Ref:
++ [[https://kubernetes.io/docs/setup/best-practices/multiple-zones/#networking][Running in multiple zones | Kubernetes]]
++ [[https://www.scaleway.com/en/docs/containers/kubernetes/reference-content/multi-az-clusters/#service-with-scw-loadbalancer-zone-annotation][Ensuring resiliency with multi-AZ Kubernetes clusters | Scaleway Documentation]]
+

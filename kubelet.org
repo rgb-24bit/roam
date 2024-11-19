@@ -3,5 +3,29 @@
 :END:
 #+TITLE: kubelet
 
+* kernel/flag
+  kubelet 启动时会对 kernel/flag 进行效验：
+  #+begin_src go
+    // pkg/kubelet/cm/container_manager_linux.go
+    func setupKernelTunables(option KernelTunableBehavior) error {
+      desiredState := map[string]int{
+        utilsysctl.VMOvercommitMemory: utilsysctl.VMOvercommitMemoryAlways,
+        utilsysctl.VMPanicOnOOM:       utilsysctl.VMPanicOnOOMInvokeOOMKiller,
+        utilsysctl.KernelPanic:        utilsysctl.KernelPanicRebootTimeout,
+        utilsysctl.KernelPanicOnOops:  utilsysctl.KernelPanicOnOopsAlways,
+        utilsysctl.RootMaxKeys:        utilsysctl.RootMaxKeysSetting,
+        utilsysctl.RootMaxBytes:       utilsysctl.RootMaxBytesSetting,
+      }
+    
+      // ...
+    }
+  #+end_src
 
+  比如 kernel.panic，期望值是 10，不满足时会导致 kubelet 启动失败。
+
+* podPidsLimit
+  kubelet 可以通过 podPidsLimit 限制 Pod 内 Pids 数量，也就限制了线程的数量。可以临时编辑对应的 cgroup 文件来调大限制。
+  #+begin_example
+    cat /sys/fs/cgroup/pids/kubepods/besteffort/pod8b61d4de-a7ad-11e9-b5b9-246e96ad0900/pids.max 
+  #+end_example
 

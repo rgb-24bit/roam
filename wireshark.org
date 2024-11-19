@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       6FEDBCC4-EFB2-4F86-AA62-9DA0E986CD11
+:END:
+#+TITLE: wireshark
+
+* DNS
+  + [[https://imroc.cc/kubernetes-troubleshooting/skill/wireshark][使用 wireshark 分析数据包 | Kubernetes 排障指南]]
+

@@ -1,0 +1,11 @@
+:PROPERTIES:
+:ID:       11CD211E-3626-4CD4-8A7C-D8C951577C04
+:END:
+#+TITLE: terminal encoding
+
+#+begin_example
+  export LESSCHARSET=utf-8
+  export LANG=zh_CN.UTF-8
+  export PAGER=less
+#+end_example
+

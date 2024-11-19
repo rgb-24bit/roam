@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       5F2EFF34-0F8B-499A-A170-0EE95C7F8428
+:END:
+#+TITLE: kube-proxy
+
+* IPVS
+  IPVS 模式下，当 endpoints 移除后，如果对应 rs.ActiveConn+rs.InactiveConn != 0，为实现摘流，Kube-Proxy 会先将其 rs 的 weight 设置为 0。所有连接断开后，才会删除 rs。
+

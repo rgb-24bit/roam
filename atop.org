@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       B6EB9E5A-4C6E-46E4-A6A1-B5983D34466E
+:END:
+#+TITLE: atop
+
+* 问题
+  atopacct down 后可能造成 =/run/pacct_source= 文件过大占满 =/run= 目录空间。重新启动 atopacct 可以解决。
+

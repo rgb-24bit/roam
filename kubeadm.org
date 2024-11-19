@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       C1061997-A72B-429C-B5AE-7105E40FAFAB
+:END:
+#+TITLE: kubeadm
+
+☞ [[https://kubernetes.io/zh-cn/docs/reference/setup-tools/kubeadm/][Kubeadm | Kubernetes]]
+
+* certs
+  #+begin_example
+    kubeadm certs check-expiration  # 检查证书过期时间
+    kubeadm certs renew             # 续订证书
+  #+end_example
+
+  [[https://kubernetes.io/zh-cn/docs/setup/best-practices/certificates/][PKI 证书和要求 | Kubernetes]]
+

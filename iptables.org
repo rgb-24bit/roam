@@ -30,6 +30,9 @@ iptables 中存在很多的 rule，每个 rule 匹配一定的目标，执行相
   
   # INSERT
   iptables -I INPUT <match>
+  
+  # APPEND
+  iptables -A INPUT <match>
 #+end_src
 
 禁止非本机端口访问：
@@ -37,3 +40,5 @@ iptables 中存在很多的 rule，每个 rule 匹配一定的目标，执行相
   iptables -I INPUT ! -i lo -p tcp --dport 80 -j DROP
 #+end_src
 
+注意事项：
++ iptables 按照链上的顺序执行规则，放行规则要放在 DROP 规则前面才能生效。-I 是在链头插入，-A 是在链尾，需要注意两者顺序上的差异

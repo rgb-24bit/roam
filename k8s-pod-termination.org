@@ -32,6 +32,7 @@ Pod 卡 Terminating 的可能原因：
 参考：
 + [[https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination][Pod Lifecycle - Termination of Pods | Kubernetes]]
 + [[https://containersolutions.github.io/runbooks/posts/kubernetes/pod-stuck-in-terminating-state/][Pod Stuck In Terminating State – Runbooks]]
++ [[https://kubernetes.io/zh-cn/docs/concepts/workloads/pods/pod-lifecycle/][Pod 的生命周期]]
 
 * Footnotes
 

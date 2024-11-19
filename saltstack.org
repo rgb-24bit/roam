@@ -60,7 +60,6 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
   
 * Debug
   执行时通过 =-l trace= 可以显示 trace 日志，方便排查执行失败的原因。
-
   
 * master & minion
   minion 启动时会自动生成自己的密钥对（如果不存在）：
@@ -81,4 +80,11 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
   参考：[[https://docs.saltproject.io/en/latest/topics/tutorials/preseed_key.html][Preseed Minion with Accepted Key]]。
 
   如果 minion 替换了证书，那么需要在每个 master 节点上删除已有的 =/etc/salt/pki/master/minions/[minion_id]= 文件，然后重启 =salt-master= 和 =salt-minion= 让他们重新互信。
+
+
+* Output
+  设置输出为 json 格式：
+  #+begin_example
+    salt --out=json --static
+  #+end_example
 
