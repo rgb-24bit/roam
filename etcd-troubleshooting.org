@@ -11,3 +11,26 @@
     histogram_quantile(0.99, rate(etcd_disk_backend_commit_duration_seconds_bucket[1m]))
   #+end_example
 
+* space/quota exceeded
+  + [[https://github.com/kubernetes/kops/issues/4005][ETCD database space / quota exceeded, goes into maintenance mode · Issue #4005 · kubernetes/kops]]
+    #+begin_src sh
+      export ETCDCTL_API=3
+      ETCD_ENDPOINT_MAIN="https://localhost:4001"
+      ETCD_ENDPOINT_EVENTS="https://localhost:4002"
+      CA_FILE="/srv/kubernetes/ca.crt"
+      ETCD_CMD="etcdctl --cacert ${CA_FILE}"
+      rev=`${ETCD_CMD} --endpoints ${ETCD_ENDPOINT_MAIN} endpoint status --write-out="json" | egrep -o '"revision":[0-9]*' | egrep -o '[0-9]*'`
+      ${ETCD_CMD} --endpoints ${ETCD_ENDPOINT_MAIN} compact $rev
+      ${ETCD_CMD} --endpoints ${ETCD_ENDPOINT_MAIN} defrag
+      ${ETCD_CMD} --endpoints ${ETCD_ENDPOINT_MAIN} alarm disarm
+    #+end_src
+
+    Ref https://etcd.io/blog/2023/how_to_debug_large_db_size_issue/
+
+  监控指标：
+  #+begin_example
+    etcd_debugging_mvcc_db_total_size_in_bytes
+    etcd_mvcc_db_total_size_in_use_in_bytes
+    etcd_server_quota_backend_bytes
+  #+end_example
+

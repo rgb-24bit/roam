@@ -42,3 +42,20 @@
     count by (label) (metric)  # count(*) group by label
   #+end_example
 
+
+* range vector & instant vector
+  在 prometheus 中，查询接口分为 range query 和 instant query。其中，由于 range vector 会返回多个 timestamp 的数据，所以 range query 接口限制了只能传 instant vector。
+  #+begin_quote
+  For instant queries, any of the above data types are allowed as the root of the expression. Range queries only support scalar-typed and instant-vector-typed expressions.
+  [[https://prometheus.io/docs/prometheus/latest/querying/basics/#expression-language-data-types][Expression language data types]]
+  #+end_quote
+
+  所以通常要用聚合函数将 range vector 转换为 instant vector。
+
+  但是在使用 Victoria Metrics 时，VM 存隐式查询转换，会自动给 range vector 加上 =default_rollup= 这个聚合函数，所以往 range query 接口传 range vector 没问题。
+
+  参考：
+  + [[https://satyanash.net/software/2021/01/04/understanding-prometheus-range-vectors.html][Understanding Prometheus Range Vectors - Satyajeet Kanetkar]]
+  + [[https://prometheus.io/docs/prometheus/latest/querying/basics/#expression-language-data-types][Querying basics | Prometheus]]
+  + [[https://docs.victoriametrics.com/victoriametrics/metricsql/#implicit-query-conversions][Implicit query conversions]]
+

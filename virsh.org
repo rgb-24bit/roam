@@ -15,3 +15,8 @@ virsh 是 kvm 的命令行工具，可以全生命周期的管理 kvm。常用�
   virsh shutdown    # 关闭虚拟机
 #+end_src
 
+恢复所有 paused 虚拟机：
+#+begin_example
+  for vm in $(virsh list --state-paused --name); do virsh resume "$vm"; done
+#+end_example
+

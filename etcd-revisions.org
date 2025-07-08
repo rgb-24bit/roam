@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       4C34DA3D-B624-48EA-9C1E-C30258CC483B
+:END:
+#+TITLE: etcd revisions
+
+etcd 集群中有一个全局递增的 64-bit id 为 revision，对集群中数据的每次更改都会增加 revision 的值。每个 key-value pair 都会保存改 key 的创建/修改 revision。同时 key-value pair 还有递增的 version 字段，从 0 开始，删除时归 0。
+#+begin_example
+  message KeyValue {
+    bytes key = 1;
+    int64 create_revision = 2;
+    int64 mod_revision = 3;
+    int64 version = 4;
+    bytes value = 5;
+    int64 lease = 6;
+  }
+#+end_example
+

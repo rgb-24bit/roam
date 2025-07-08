@@ -1,0 +1,25 @@
+:PROPERTIES:
+:ID:       245964E6-FD32-4E29-ABED-F58486D3A4A0
+:END:
+#+TITLE: get host ip
+
+#+begin_src go
+  var (
+    hostIP     net.IP
+    hostIPOnce sync.Once
+  )
+  
+  func HostIP() net.IP {
+    hostIPOnce.Do(func() {
+      conn, _ := net.Dial("udp", "1.2.3.4:5") // udp connection is no handshake, works offline
+      defer glang.Close(conn)
+      hostIP = conn.LocalAddr().(*net.UDPAddr).IP
+    })
+    return hostIP
+  }
+#+end_src
+
+UDP 没有握手环节，所以 Dial 会成功，然后就能拿到 local ip 了。换成其他语言也一样，还不用担心多网卡。
+
+☞ [[https://gist.github.com/jniltinho/9787946][Get My IP Golang]]
+

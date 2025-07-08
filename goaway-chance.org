@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       D771360E-34F8-471E-86B3-D6558BD83447
+:END:
+#+TITLE: goaway-chance
+
+[[https://kubernetes.io/docs/reference/command-line-tools-reference/kube-apiserver/][kube-apiserver]] 的一个参数是 goaway-chance，为了避免 HTTP2 长连导致单个 apiserver 负载过高，允许通过这个参数配置随机断开连接的比例。让客户端重新选择 apiserver 来达到负载的目的。
+
+对于 k8s 这种 server 无法动态横向扩容，同时连接为长连接，这样的参数确实出现的很有道理，一种好思路。
+

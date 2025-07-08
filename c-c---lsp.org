@@ -1,0 +1,12 @@
+:PROPERTIES:
+:ID:       48604FF9-8167-45D9-AF8F-2A58B95A2342
+:END:
+#+TITLE: C/C++ LSP
+
+主要就是要告诉 LSP Server Include 和 LD Path，依赖安装方式就各种方式都行了。对于使用 CMake 的项目，可以通过下面命令生成 compile_commands.json：
+#+begin_example
+  cmake -H. -BDebug -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES
+#+end_example
+
+参考：[[https://github.com/MaskRay/ccls/wiki/Project-Setup][Project Setup · MaskRay/ccls Wiki]]
+

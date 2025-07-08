@@ -1,0 +1,27 @@
+:PROPERTIES:
+:ID:       9AD87845-9924-4861-B561-78D8E9152846
+:END:
+#+TITLE: kubelet certificate
+
+* rotateCertificates
+  kubelet 可以通过 rotateCertificates 配置开启 kubelet 访问 apiserver 的客户端证书的自动轮转，会在证书过期前 10-30% 一段时间自动轮转：
+  #+begin_src go
+    // jitteryDuration uses some jitter to set the rotation threshold so each node
+    // will rotate at approximately 70-90% of the total lifetime of the
+    // certificate.  With jitter, if a number of nodes are added to a cluster at
+    // approximately the same time (such as cluster creation time), they won't all
+    // try to rotate certificates at the same time for the rest of the life of the
+    // cluster.
+    //
+    // This function is represented as a variable to allow replacement during testing.
+    var jitteryDuration = func(totalDuration float64) time.Duration {
+      return wait.Jitter(time.Duration(totalDuration), 0.2) - time.Duration(totalDuration*0.3)
+    }
+  #+end_src
+
+* kubelet server
+  kubelet 会作为 server 启动，启动时会自签证书 =/var/lib/kubelet/pki/kubelet.crt=, 有效期为一年。监听端口默认为 10250，不过不一定有用。
+
+* 证书目录
+  =/var/lib/kubelet/pki=
+

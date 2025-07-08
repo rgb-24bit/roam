@@ -32,3 +32,7 @@
 
   注意：nc 命令默认只是发送输入到 host:port，不会等待响应。所以可能得到空输出。可以加入 =-q= 参数等待返回。
 
+* 监控指标
+  + [[https://zookeeper.apache.org/doc/r3.8.4/zookeeperMonitor.html][ZooKeeper: Because Coordinating Distributed Systems is a Zoo]]
+  + [[https://zookeeper.apache.org/doc/r3.6.0/apidocs/zookeeper-server/org/apache/zookeeper/server/ServerMetrics.html][ServerMetrics (Apache ZooKeeper - Server 3.6.0 API)]]
+

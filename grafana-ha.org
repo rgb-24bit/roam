@@ -1,0 +1,14 @@
+:PROPERTIES:
+:ID:       DA63F268-0371-45BD-9312-55359CC251E3
+:END:
+#+TITLE: grafana ha
+
+* alert
+  grafana ha 模式下告警 ha 本质上是通过 [[https://github.com/prometheus/alertmanager][prometheus/alertmanager]] 实现，会单独监听端口 9094。
+
+  参考：
+  + [[https://github.com/grafana/grafana/blob/main/pkg/services/ngalert/notifier/multiorg_alertmanager.go#L202][grafana/pkg/services/ngalert/notifier/multiorg_alertmanager.go]]
+  + [[https://grafana.com/docs/grafana/latest/alerting/set-up/configure-high-availability/][Configure high availability | Grafana documentation]]
+  + [[https://cloud.tencent.com/developer/article/2065087][Grafana 高可用部署最佳实践-腾讯云开发者社区-腾讯云]]
+  + [[https://github.com/prometheus/alertmanager][prometheus/alertmanager: Prometheus Alertmanager]]
+

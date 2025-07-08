@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       33AB9EC5-E323-4DBE-8AAF-24E8149A805D
+:END:
+#+TITLE: oam
+
+[[https://github.com/oam-dev/spec][Open Application Model (OAM)]]
+

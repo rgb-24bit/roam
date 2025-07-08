@@ -40,3 +40,97 @@ Ref [[https://chrony.tuxfamily.org/doc/3.2/chrony.conf.html][chrony.conf(5)]]
 
   通常 MS 值为 =^*= 对应 server, current synced。如果 source state 是 =?= 说明源不可用。
 
+* 问题排查
+  =/run= 目录满可能导致 =chronyd= 服务一直卡在 =activing= 状态。
+
+* adjtimex
+  chronyd 通过 [[https://man7.org/linux/man-pages/man2/adjtimex.2.html][adjtimex]] 系统调用来微调系统时间，主要是设置 =timex= 的 =freq= 值来实现，Linux 在每次时钟中断时计算更新时间，计算方式类比如下：
+  #+begin_src c
+    // 计算每次时钟中断的时间增量（微秒）
+    long long calculate_time_increment(long long tick, int frequency) {
+        // 基本时间增量
+        long long increment = tick;
+    
+        // 频率修正
+        if (frequency != 0) {
+            // 计算修正因子
+            double correction_factor = 1.0 + (double)frequency / 1000000.0;
+            increment = (long long)(increment * correction_factor);
+        }
+    
+        return increment;
+    }
+  #+end_src
+
+  其中，tick 表示每次时钟中断的间隔，一般为 =10000us= 也就是 10 毫秒。frequency 是机器时钟频率和时钟服务器之间的偏移量，通过调整频率来加快减慢机器时间。
+  可以使用 [[https://github.com/rogers0/adjtimex/tree/master][adjtimex]] 命令查看节点 tick 和 frequency 值（输出的 frequency 有 16 位小数部分，实际值得除 65536）。
+
+  chronyd 相关配置项：
+  + maxupdateskew - chrony 评估得到的时钟频率差距，当前结果和之前结果之间的误差范围，如果大于 maxupdateskew，就不接受
+  + maxslewrate - 更新 frequency 值的速度
+  + maxdrift - 最大时钟频率差距，默认为 500000ppm。这里是偏移量，和 frequency 的值不是同一个值
+  + maxchange - 和时钟服务器之间最大的差距值，单位秒，如果超过这个值，在几次时钟调整后退出进入 makestep 流程
+  + makestep - 当和时钟服务器之间的时间差大于一定值时，单位秒，在配置的步骤数内快步调整时间同步
+
+  看着就是通过 adjtimex 调整 frequency 来慢调时间，makestep 来快调。不会调整 tick 的值。
+
+  参考：
+  + [[https://chrony-project.org/doc/4.6.1/chrony.conf.html][chrony – chrony.conf(5)]]
+  + [[https://www.cnblogs.com/edver/p/16016521.html][Linux时钟子系统分析 - Edver - 博客园]]
+  + [[https://www.cnblogs.com/muahao/p/6274930.html][adjtimex和时钟的几个概念tick,freq,ppm,jiffies - 苏小北1024 - 博客园]]
+  + [[https://info.support.huawei.com/info-finder/encyclopedia/zh/NTP.html][什么是NTP？NTP如何实现时钟同步？ - 华为]]
+  + [[https://man7.org/linux/man-pages/man2/adjtimex.2.html][adjtimex(2) - Linux manual page]]
+  + [[https://litux.nl/mirror/kerneldevelopment/0672327201/ch10lev1sec5.html#ch10lev1sec5][The Timer Interrupt Handler]]
+  + [[https://www.verifysoft.com/2001/timer.c.html][./kernel/timer.c]]
+
+
+* 时间更新和修正原理
+** 时间更新
+   Linux 通过硬件实时时钟 RTC 和系统时钟源来更新时间：
+   - 硬件实时时钟 RTC：由主板电池供电的硬件芯片，断电后仍能保持时间更新，系统启动时读取作为初始时间
+   - 系统时钟源：为内核提供高频计时信号，用于更新系统时间和定时器
+
+   Linux 系统启动后基于系统时间源的周期性时钟中断来更新时间，不再依赖 RTC。每次时钟中断时，基于两次时钟中断的间隔和硬件时钟频率偏差来计算得到需要更新的时间：
+   #+begin_src c
+     // 计算每次时钟中断的时间增量（微秒）
+     long long calculate_time_increment(long long tick, int frequency) {
+         // 基本时间增量
+         long long increment = tick;
+     
+         // 频率修正
+         if (frequency != 0) {
+             // 计算修正因子
+             double correction_factor = 1.0 + (double)frequency / 1000000.0;
+             increment = (long long)(increment * correction_factor);
+         }
+     
+         return increment;
+     }
+   #+end_src
+
+   系统时间保存在内核 timex结构体中，每次中断将计算得到的结果增加到 timex.time.tv_usec(微秒），超过一定值后就递增 timex.time.tv_sec（秒）。
+
+** 时间跳跃修正和时间平滑修正
+   chrony服务有时间跳跃修正和时间平滑修正两种时间修正策略：
+   - 时间跳跃修正：用于系统时间和 NTP 时钟源之间差距较大时，直接修改系统的时间值。类似于使用 date命令设置时间
+   - 时间平滑修正：用于系统时间和 NTP 时钟源之间差距较小时，通过 adjtimex系统调用修改时钟频率偏差（frequency）值来达到平滑修正系统时间的效果。修改 frequency后，每次时钟中断计算得到的时间增量大小就会发生变化，达到系统时间变化加快/减慢的效果。理论上系统上软件对这种修改方式无感知，因为软件获取到的系统时间是中断计算后的结果
+
+   相关配置项：
+   #+begin_src conf
+     # chronyd 启动时，当系统时间和 NTP 时钟源的差距大于 threshold（秒）时，通过 limit 次时钟跳跃修正使系统时间和 NTP 时钟源时间一致。可以通过 chronyc -a makestep 手动触发这一动作
+     makestep threshold limit
+     
+     # chronyd 在 start 次时间更新后，如果发现系统时间和 NTP 时钟源的差距大于 offset（秒）且超过 ignore 次时，退出 chronyd 进程。此时系统重新拉起 chronyd，进入 makestep 操作
+     maxchange offset start ignore
+     
+     # 最大时钟频率偏差，默认 500000
+     maxdrift drift-in-ppm
+     
+     # chronyd 会计算得到的时钟频率偏差的误差值，如果误差大于 maxupdateskew，则认为计算得到的结果不可靠，忽略
+     maxupdateskew skew-in-ppm
+     
+     # 现在 chronyd 更新 frequency 的速度不超过 rate-in-ppm
+     maxslewrate rate-in-ppm
+   #+end_src
+   
+   如果要让 chronyd 只进行时间平滑修正，可以选择不配置 makestep 和 maxchange。

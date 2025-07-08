@@ -1,0 +1,7 @@
+:PROPERTIES:
+:ID:       E5B85135-2838-4819-8D19-E6F517149A28
+:END:
+#+TITLE: monitor system
+
+监控系统，对于业务指标来说应该考虑通过每个节点上的 agent 来采集，如果使用 prometheus，prometheus 所在节点故障会导致监控丢失一段时间。
+

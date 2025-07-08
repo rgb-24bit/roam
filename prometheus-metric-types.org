@@ -50,7 +50,7 @@
       type Histogram interface {
         Metric
         Collector
-
+      
         // Observe adds a single observation to the histogram. Observations are
         // usually positive or zero. Negative observations are accepted but
         // prevent current versions of Prometheus from properly detecting
@@ -60,7 +60,7 @@
         // for details.
         Observe(float64)
       }
-
+      
       temps := prometheus.NewHistogram(prometheus.HistogramOpts{
         Name:    "pond_temperature_celsius",
         Help:    "The temperature of the frog pond.", // Sorry, we can't measure how badly it smells.

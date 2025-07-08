@@ -1,0 +1,29 @@
+:PROPERTIES:
+:ID:       F23E5437-4FFF-41D1-B766-3CC42A7FB048
+:END:
+#+TITLE: mdtest
+
+源码：
++ https://github.com/hpc/ior
++ https://www.open-mpi.org/software/ompi/v3.0/
+
+编译：
+1. 先编译 ompi
+   #+begin_example
+     ./configure --prefix=/usr/local/openmpi/
+     make
+     make install
+   #+end_example
+2. 后编译 mdtest
+   #+begin_example
+     export PATH=$PATH:/usr/local/openmpi/bin/
+     export LD_LIBRARY_PATH=/usr/local/openmpi/lib:$LD_LIBRARY_PATH
+     
+     ./bootstrap
+     ./configure
+     make
+     make install
+   #+end_example
+
+参考：[[https://wiki.lustre.org/MDTest][MDTest - Lustre Wiki]]
+

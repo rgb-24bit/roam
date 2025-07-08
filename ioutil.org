@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       A161B911-2805-4371-91A7-A053588616B8
+:END:
+#+TITLE: ioutil
+
+https://github.com/influxdata/telegraf/issues/1007
+#+begin_example
+  rate(diskio_io_time[1m])/1000*100
+#+end_example
+
++ diskio_io_time This value counts the number of milliseconds during which the device has had I/O requests queued.
++ rate 计算的 1s 之间的变化率，除 1000 到毫秒
+

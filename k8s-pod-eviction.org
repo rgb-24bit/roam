@@ -3,6 +3,15 @@
 :END:
 #+TITLE: k8s pod eviction
 
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#驱逐类型][驱逐类型]]
+- [[#taint-based-eviction][Taint based Eviction]]
+- [[#zone][Zone]]
+- [[#nodepressure-eviction][NodePressure Eviction]]
+- [[#diskpressure-eviction][DiskPressure Eviction]]
+- [[#clean-evicted-pods][Clean Evicted Pods]]
+- [[#workload][Workload]]
+
 * 驱逐类型
   K8S 中，驱逐类型有：
   + 节点故障处于 NotReady 状态时有 KCM 发起的驱逐
@@ -138,3 +147,14 @@
   #+begin_src sh
     kubectl get po -A|grep Evicted|awk '{system("kubectl delete po -n" $1 " " $2)}'
   #+end_src
+
+* Workload
+  节点 NotReady 污点驱逐时不同 Workload 表现不一样的原因：
+  + DaemonSet 的 Pod 不会被驱逐，是因为 DaemonSet 会默认为 Pod 添加节点 NotReady 的污点容忍，不会触发驱逐
+  + Deployment 使用的 ReplicaSet，ReplicaSet 检测到存在 Pod Terminating 后，就会去创建新的 Pod，所以表现上会是存在很多卡在 Terminating 状态的 Pod，然后又有新的 Pod 被创建出来
+  + StatefulSet 只会删除 Pod.Phase 为 Failed 的 Pod，否则会等待 Pod 删除掉后再创建新 Pod。而 K8S 1.27 之前，TaintManager 只会调用 Pod Delete 接口，不会更新 Pod.Phase，这使得 StatefulSet 不会创建新 Pod。
+
+  其中，删除 Pod 时，如果 DeleteOptions.GracePeriodSeconds 未设置，那 Pod 会进行 GracefulDelete，默认为 30s，而节点挂了后，不会执行实际删除动作，所以会卡在 Terminating 状态。
+
+  在 1.27 后 K8S 有了 PodGCController，会自动将长时间处于 Terminating 状态的 Pod 的 Phase 状态更新为 Failed。
+

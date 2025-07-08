@@ -7,3 +7,4 @@ bonding 是把多张物理网卡通过软件虚拟成一个虚拟的网卡技术
 
 通过 bonding 得到的虚拟网卡常命名为 bondx。
 
+获取 bond 网卡 [[id:9AB8A356-2F8D-4A01-A244-DE459977D851][linux net operation]].

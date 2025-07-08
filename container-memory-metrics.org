@@ -3,8 +3,12 @@
 :END:
 #+TITLE: container memory metrics
 
-kubectl top 时使用的指标为 container_memory_working_set_bytes，值为 rss + active_files，active_files 会由系统操作管理，内存不足时会自动回收。使用指标 container_memory_rss 更好。
+kubectl top 时使用的指标为 container_memory_working_set_bytes，值为 rss + active_files，active_files 会由系统操作管理，内存不足时会自动回收。其中：
++ working_set：反映容器 “正在使用” 的活跃内存，包含被访问的缓存，适合评估实时内存压力。
++ rss：反映容器 “硬占用” 的物理内存，不包含未访问的缓存，适合评估实际 RAM 消耗。
 
-Ref:
-+ [[https://blog.csdn.net/qq_34468174/article/details/130643948][【k8s pod container内存指标说明】_memory rss-CSDN博客]]
+在容器监控中，建议同时关注这两个指标：working_set 用于告警 OOM 风险，rss 用于集群资源规划。若发现两者差异较大（如 working_set 远大于 rss），通常意味着存在大量文件缓存，可通过业务逻辑优化或内核参数（如 vm.dirty_ratio）调整缓存策略。
 
+参考：
++ https://stackoverflow.com/questions/68289644/relationship-between-container-memory-working-set-bytes-and-process-resident-mem
++ https://xiaorui.cc/archives/7373

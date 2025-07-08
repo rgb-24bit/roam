@@ -117,3 +117,99 @@
   }
 #+end_src
 
+* election
+  ☞ [[https://github.com/etcd-io/etcd/blob/main/client/v3/concurrency/election.go][etcd/client/v3/concurrency/election.go]]
+
+  原理：
+  1. 每个 Session 绑定一个 Lease，Campaign 时按指定前缀创建一个 key，获取到创建的 revision
+  2. 如果这个 revision 就是最新的，说明拿到锁。如果不是，说明存在其他 session 创建了 key，等待其他 session 创建的 key 过期
+
+  其他函数：
+  + Resign 是删除自己创建的 Key，重新开始抢锁，但正常都不会是自己抢到，因为 revision 更大。
+  + Proclaim 修改 key 的值为对应的值
+
+* retry
+  ETCD 客户端默认有重试的能力，会根据错误和请求类型来判断是否可以重试，其中，如果是请求超时的话是不会重试的，在上面 DialKeepAliveTime 参数的场景导致的失败也就不会重试：
+  #+begin_src go
+    // isSafeRetry returns "true", if request is safe for retry with the given error.
+    func isSafeRetry(c *Client, err error, callOpts *options) bool {
+      if isContextError(err) {
+        return false
+      }
+    
+      // Situation when learner refuses RPC it is supposed to not serve is from the server
+      // perspective not retryable.
+      // But for backward-compatibility reasons we need  to support situation that
+      // customer provides mix of learners (not yet voters) and voters with an
+      // expectation to pick voter in the next attempt.
+      // TODO: Ideally client should be 'aware' which endpoint represents: leader/voter/learner with high probability.
+      if errors.Is(err, rpctypes.ErrGRPCNotSupportedForLearner) && len(c.Endpoints()) > 1 {
+        return true
+      }
+    
+      switch callOpts.retryPolicy {
+      case repeatable:
+        return isSafeRetryImmutableRPC(err)
+      case nonRepeatable:
+        return isSafeRetryMutableRPC(err)
+      default:
+        c.lg.Warn("unrecognized retry policy", zap.String("retryPolicy", callOpts.retryPolicy.String()))
+        return false
+      }
+    }
+    
+    func isContextError(err error) bool {
+      return status.Code(err) == codes.DeadlineExceeded || status.Code(err) == codes.Canceled
+    }
+    
+    // isSafeRetryImmutableRPC returns "true" when an immutable request is safe for retry.
+    //
+    // immutable requests (e.g. Get) should be retried unless it's
+    // an obvious server-side error (e.g. rpctypes.ErrRequestTooLarge).
+    //
+    // Returning "false" means retry should stop, since client cannot
+    // handle itself even with retries.
+    func isSafeRetryImmutableRPC(err error) bool {
+      eErr := rpctypes.Error(err)
+      if serverErr, ok := eErr.(rpctypes.EtcdError); ok && serverErr.Code() != codes.Unavailable {
+        // interrupted by non-transient server-side or gRPC-side error
+        // client cannot handle itself (e.g. rpctypes.ErrCompacted)
+        return false
+      }
+      // only retry if unavailable
+      ev, ok := status.FromError(err)
+      if !ok {
+        // all errors from RPC is typed "grpc/status.(*statusError)"
+        // (ref. https://github.com/grpc/grpc-go/pull/1782)
+        //
+        // if the error type is not "grpc/status.(*statusError)",
+        // it could be from "Dial"
+        // TODO: do not retry for now
+        // ref. https://github.com/grpc/grpc-go/issues/1581
+        return false
+      }
+      return ev.Code() == codes.Unavailable
+    }
+    
+    // isSafeRetryMutableRPC returns "true" when a mutable request is safe for retry.
+    //
+    // mutable requests (e.g. Put, Delete, Txn) should only be retried
+    // when the status code is codes.Unavailable when initial connection
+    // has not been established (no endpoint is up).
+    //
+    // Returning "false" means retry should stop, otherwise it violates
+    // write-at-most-once semantics.
+    func isSafeRetryMutableRPC(err error) bool {
+      if ev, ok := status.FromError(err); ok && ev.Code() != codes.Unavailable {
+        // not safe for mutable RPCs
+        // e.g. interrupted by non-transient error that client cannot handle itself,
+        // or transient error while the connection has already been established
+        return false
+      }
+      desc := rpctypes.ErrorDesc(err)
+      return desc == "there is no address available" || desc == "there is no connection available"
+    }
+  #+end_src
+
+  grpc 本身也支持重试，但是不适配 etcd 的场景，所以 etcd 客户端是通过 interceptor 来进行重试。
+

@@ -14,3 +14,9 @@
   
   参考：[[https://github.com/kubernetes-sigs/kpng/blob/master/doc/service-proxy.md#ignored-servicesendpoints][Ignored Services/Endpoints]]
 
+* publishNotReadyAddresses
+  可以通过设置 =publishNotReadyAddresses= 的值为 true 来发布未 ready pod 的 ip，默认为 false。
+
+* 定位
+  K8S Service 定位更倾向于服务发现，而不是 LB 的角色，没办法在 RS 故障的情况下摘除流量。
+

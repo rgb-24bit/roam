@@ -3,5 +3,5 @@
 :END:
 #+TITLE: linux kernal
 
-
+Ref https://litux.nl/mirror/kerneldevelopment/0672327201/toc.html
 

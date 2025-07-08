@@ -1,0 +1,66 @@
+:PROPERTIES:
+:ID:       EF7CCC64-F2B6-4477-8F12-0121A98B7662
+:END:
+#+TITLE: k8s code generator
+
+K8S 项目在自定义资源时，需要生成自定义对象的 DeepCopy 方法、ClientSet 客户端和 CRD 资源定义，相关的工具：
++ [[https://github.com/kubernetes/code-generator][code-generator]] - 用于生成 DeepCopy、ClientSet 等代码
++ [[https://github.com/kubernetes-sigs/controller-tools][controller-gen]] - 依赖 code-generator，用于生成 CRD 资源定义，也可以生成 DeepCopy 代码。受设计理念影响，不支持生成 ClientSet。
++ [[https://github.com/kubernetes-sigs/kubebuilder][kubebuilder]] - 基于 controller-runtime 和 controller-tools 开发的库/工具
+
+简单来说就是缺一个同时支持 DeepCopy、ClientSet 和 CRD 资源定义的生成工具，如果要支持这些，需要自己去组合上面三个工具，或用已有的整个工具（比如 Operator SDK，会比较重）。
+
+
+* code-generator tag
+  全局标签，通常放在 doc.go 中：
+  #+begin_src go
+    // +k8s:deepcopy-gen=package
+    //   为包内所有类型默认生成深拷贝（DeepCopy）方法，并注册到 Kubernetes 方案（Scheme）中
+    // +groupName=example.org
+    //   定义 API 组（API Group）的完整名称，用于生成正确的客户端代码
+    
+    // Package v1alpha1 is the v1alpha1 version of the API.
+    package v1alpha1
+  #+end_src
+
+  局部标签（Local Tags，位于类型定义上方）：
+  #+begin_src go
+    // DeepCopy tags
+    // +k8s:deepcopy-gen=false
+    //   对特定类型禁用深拷贝方法生成（默认全局启用时使用）
+    // +k8s:deepcopy-gen=true
+    //   对特定类型显式启用深拷贝方法生成（全局未启用时使用）
+    // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+    //   为类型生成 DeepCopyObject() 方法，以实现 runtime.Object 接口
+    // +k8s:deepcopy-gen:interfaces=example.com/pkg/apis/example.SomeInterface
+    //   为包含接口字段的类型生成特定接口的深拷贝方法，确保类型安全
+    //
+    // Client Tags
+    // +genclient
+    //   为类型生成 typed client（客户端），仅适用于资源类型（非 List 类型）
+    // +genclient:noStatus
+    //   禁用 /status 子资源的客户端方法（如 UpdateStatus），适用于未分离 spec 和 status 的资源
+    // +genclient:nonNamespaced
+    //   标记资源为集群范围（非命名空间化），生成的客户端将不包含命名空间参数
+    // +genclient:noVerbs
+    //   禁用所有 HTTP 动词对应的客户端方法
+    // +genclient:onlyVerbs=create,delete
+    //   仅生成指定 HTTP 动词的客户端方法（如 create、delete）
+    // +genclient:skipVerbs=get,list,create
+    //   跳过指定 HTTP 动词的客户端方法生成
+    // +genclient:method=Create,verb=create,result=k8s.io/apimachinery/pkg/apis/meta/v1.Status
+    //   自定义客户端方法的 HTTP 动词和返回类型（如创建操作返回 metav1.Status 而非资源本身）
+    
+    // ExampleResource example
+    type ExampleResource struct {
+      metav1.TypeMeta   `json:",inline"`
+      metav1.ObjectMeta `json:"metadata,omitempty"`
+    
+      Spec   ExampleResourceSpec   `json:"spec,omitempty"`
+      Status ExampleResourceStatus `json:"status,omitempty"`
+    }
+  #+end_src
+
+* controller-gen tags
+  参考：https://book.kubebuilder.io/reference/markers
+

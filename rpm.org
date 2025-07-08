@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       441D217E-4A49-4747-9467-3E959A1671C7
+:END:
+#+TITLE: rpm
+
+* 下载本机所有 rpm 包
+  #+begin_example
+    yum list installed|awk '{print $1}'|xargs -n1 yum download -y
+  #+end_example
+

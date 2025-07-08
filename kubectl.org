@@ -7,6 +7,7 @@
 - [[#tls-secret][tls secret]]
 - [[#rollout][rollout]]
 - [[#set-env][set env]]
+- [[#set-resources][set resources]]
 
 * tls secret
   create or update tls secret:
@@ -37,4 +38,11 @@
   #+begin_example
     kubectl set env deployment/registry STORAGE_DIR=/local
   #+end_example
+
+* set resources
+  #+begin_example
+    kubectl set resources deployment nginx --limits=cpu=0,memory=0 --requests=cpu=0,memory=0
+  #+end_example
+
+  [[https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-resources-em-][Kubectl Reference Docs]]
 
