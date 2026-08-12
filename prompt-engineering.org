@@ -1,0 +1,457 @@
+:PROPERTIES:
+:ID:       A2D59089-B30E-4B4E-9697-E97F946DDA80
+:END:
+#+TITLE: prompt engineering
+
+* 目录                                                    :TOC_4_gh:noexport:
+- [[#understand][Understand]]
+- [[#guide][Guide]]
+- [[#template][Template]]
+- [[#技巧和框架][技巧和框架]]
+  - [[#大模型输入][大模型输入]]
+  - [[#多模态模型提示词][多模态模型提示词]]
+  - [[#提示词组成][提示词组成]]
+  - [[#提示词原则][提示词原则]]
+  - [[#提示词技巧][提示词技巧]]
+    - [[#角色-role][角色 Role]]
+    - [[#结构化输出-structured-output][结构化输出 Structured Output]]
+    - [[#强调-emphasis-with-uppercase-directives][强调 Emphasis with Uppercase Directives]]
+    - [[#思维链-chain-of-thought][思维链 Chain of Thought]]
+    - [[#少样本学习-few-shot-learning][少样本学习 Few-Shot Learning]]
+  - [[#提示词高级策略][提示词高级策略]]
+
+* Understand
+  大模型的能力涌现业界虽然有很多理论上的解释，但核心原理依然一定程度上还是黑盒，但这并不妨碍大模型作为一个「可用」的工具。可以类比 IDE 这样的工具，会带来生产效率的提升。
+  #+begin_quote
+  这世界上不是所有东西都有明确的理论解释的，就像人脑一样，但这并不尴尬能用。大模型学习到的参数权重、智能还是黑盒，但确实能用，并且正在影响生产力。
+  #+end_quote
+  
+  现在，通过各种手段，现在大模型的可靠性已经有了相当的保障，同时 MCP、Skills 和各种 Agent 技术的成熟（特别 26 年初的 OpenClaw），大模型的应用进入了新的阶段。
+
+  大模型动则几十亿的参数，Prompt 是一种手段，激活大模型特定参数，引导大模型安装指定要求工作，是经过验证的一种基础有效且重要的手段。
+
+* Guide
+  + [[https://www.promptingguide.ai/zh][提示工程指南 | Prompt Engineering Guide]] - 优点在对高级技巧的介绍，比如 RAG、Meta Prompting 等
+  + [[https://prompts.chat/book][互动提示词工程之 | prompts.chat]] - 对提示词的基础要素和框架介绍的比较全面细节
+
+* Template
+  创建提示词：
+  #+begin_example
+    Create a GPT prompt based on the following task requirements:
+
+    ## Requirements
+
+    - Keep the prompt clear and easy for GPT's understanding.
+    - **Only** use plain English. If the original is not in English, translate it.
+    - Be concise as each token in the prompt incurs a cost.
+    - The prompt is suggested to be a well-structured Markdown.
+    - Include requirements, output format and steps if applicable.
+    - Include one or two input/output `## Examples` where appropriate.
+    - Maintain a professional tone.
+
+    ## Response Format
+
+    - Provide the prompt content directly, without titles, additional explanations or comments
+    - No need for warpping up with "```markdown".
+  #+end_example
+
+  优化提示词：
+  #+begin_example
+    Optimize the given prompt delimited by triple back ticks.
+
+    # Requirements
+    - Provide clear inputs and outputs, so it could be easy to understand for GPT.
+    - Use plain English.
+    - Check spelling and grammar.
+    - Keep the original format and typography if possible.
+    - Every token in the prompt costs money, so be concise.
+    - Be professional.
+  #+end_example
+
+  Meta Prompt:
+  #+begin_example
+    Given a task description or existing prompt, produce a detailed system prompt to guide a language model in completing the task effectively.
+    
+    # Guidelines
+    
+    - The prompt should be in English.
+    - Understand the Task: Grasp the main objective, goals, requirements, constraints, and expected output.
+    - Minimal Changes: If an existing prompt is provided, improve it only if it's simple. For complex prompts, enhance clarity and add missing elements without altering the original structure.
+    - Reasoning Before Conclusions**: Encourage reasoning steps before any conclusions are reached. ATTENTION! If the user provides examples where the reasoning happens afterward, REVERSE the order! NEVER START EXAMPLES WITH CONCLUSIONS!
+        - Reasoning Order: Call out reasoning portions of the prompt and conclusion parts (specific fields by name). For each, determine the ORDER in which this is done, and whether it needs to be reversed.
+        - Conclusion, classifications, or results should ALWAYS appear last.
+    - Examples: Include high-quality examples if helpful, using placeholders [in brackets] for complex elements.
+       - What kinds of examples may need to be included, how many, and whether they are complex enough to benefit from placeholders.
+    - Clarity and Conciseness: Use clear, specific language. Avoid unnecessary instructions or bland statements.
+    - Formatting: Use markdown features for readability. DO NOT USE ``` CODE BLOCKS UNLESS SPECIFICALLY REQUESTED.
+    - Preserve User Content: If the input task or prompt includes extensive guidelines or examples, preserve them entirely, or as closely as possible. If they are vague, consider breaking down into sub-steps. Keep any details, guidelines, examples, variables, or placeholders provided by the user.
+    - Constants: DO include constants in the prompt, as they are not susceptible to prompt injection. Such as guides, rubrics, and examples.
+    - Output Format: Explicitly the most appropriate output format, in detail. This should include length and syntax (e.g. short sentence, paragraph, JSON, etc.)
+        - For tasks outputting well-defined or structured data (classification, JSON, etc.) bias toward outputting a JSON.
+        - JSON should never be wrapped in code blocks (```) unless explicitly requested.
+    
+    The final prompt you output should adhere to the following structure below. Do not include any additional commentary, only output the completed system prompt. SPECIFICALLY, do not include any additional messages at the start or end of the prompt. (e.g. no "---")
+    
+    [Concise instruction describing the task - this should be the first line in the prompt, no section header]
+    
+    [Additional details as needed.]
+    
+    [Optional sections with headings or bullet points for detailed steps.]
+    
+    # Steps [optional]
+    
+    [optional: a detailed breakdown of the steps necessary to accomplish the task]
+    
+    # Output Format
+    
+    [Specifically call out how the output should be formatted, be it response length, structure e.g. JSON, markdown, etc]
+    
+    # Examples [optional]
+    
+    [Optional: 1-3 well-defined examples with placeholders if necessary. Clearly mark where examples start and end, and what the input and output are. User placeholders as necessary.]
+    [If the examples are shorter than what a realistic example is expected to be, make a reference with () explaining how real examples should be longer / shorter / different. AND USE PLACEHOLDERS! ]
+    
+    # Notes [optional]
+    
+    [optional: edge cases, details, and an area to call or repeat out specific important considerations]
+    
+    # IMPORTANT
+    - The prompt should ONLY written in English.
+  #+end_example
+
+  Meta Prompt ReAct:
+  #+begin_example
+    Given a task description or existing prompt, produce a detailed system prompt with available tools(if applicable) to guide OpenAI GPT-4o in completing the task effectively.
+    
+    # Guidelines
+    
+    - The prompt should be in English.
+    - Understand the Task: Grasp the main objective, goals, requirements, constraints, and expected output.
+    - Minimal Changes: If an existing prompt and tools are provided, improve it only if it's simple. For complex prompts, enhance clarity and add missing elements without altering the original structure.
+    - Tools: Analyze the task requirements to determine whether specific tools or resources are necessary for effective completion. If tools are required, generate them first, ensuring they align with the task's goals. Then, the system prompt should incorporate the tools and guides the language model in completing the task effectively.
+        - The name should adhere to Python function naming conventions, which typically use lowercase letters, underscores to separate words, and avoid special characters or spaces.
+        - The name should be descriptive and concise, reflecting the tool's purpose or functionality.
+        - Avoid ending the name with "_tool" unless explicitly requested.
+    - If you think the task should be in a ReAct manner, you **should** mention "follow the ReAct (Reasoning + Acting) framework to complete the task effectively. "
+    - Reasoning Before Conclusions: Encourage reasoning steps before any conclusions are reached. ATTENTION! If the user provides examples where the reasoning happens afterward, REVERSE the order! NEVER START EXAMPLES WITH CONCLUSIONS!
+        - Reasoning Order: Call out reasoning portions of the prompt and conclusion parts (specific fields by name). For each, determine the ORDER in which this is done, and whether it needs to be reversed.
+        - Conclusion, classifications, or results should ALWAYS appear last.
+    - Examples: Include high-quality examples if helpful, using placeholders [in brackets] for complex elements.
+       - What kinds of examples may need to be included, how many, and whether they are complex enough to benefit from placeholders.
+    - Clarity and Conciseness: Use clear, specific language. Avoid unnecessary instructions or bland statements.
+    - Formatting: Use markdown features for readability. DO NOT USE ``` CODE BLOCKS UNLESS SPECIFICALLY REQUESTED.
+      - Use the following format to represent function calls in the `Examples` section.
+        <|FunctionCallBegin|>
+        [{"name": "func1", "parameters": {...}},
+        {"name": "func2", "parameters": {...}]
+        <|FunctionCallEnd|>
+    
+    - Preserve User Content: If the input task or prompt includes extensive guidelines or examples, preserve them entirely, or as closely as possible. If they are vague, consider breaking down into sub-steps. Keep any details, guidelines, examples, variables, or placeholders provided by the user.
+    - Constants: DO include constants in the prompt, as they are not susceptible to prompt injection. Such as guides, rubrics, and examples.
+    - Output Format: Explicitly the most appropriate output format, in detail. This should include length and syntax (e.g. short sentence, paragraph, JSON, etc.)
+        - For tasks outputting well-defined or structured data (classification, JSON, etc.) bias toward outputting a JSON.
+        - JSON should never be wrapped in code blocks (```) unless explicitly requested.
+    
+    The final prompt you output should adhere to the following structure below. Do not include any additional commentary, only output the completed system prompt. SPECIFICALLY, do not include any additional messages at the start or end of the prompt. (e.g. no "---")
+    
+    
+    # Tools [optional]
+    
+    [{
+      "name": "function_name",
+      "description": "Function description.",
+      "strict": true,
+      "parameters": {
+        "type": "object",
+        "required": ["parameter1", "parameter2"],
+        "properties": {
+          "parameter1": {
+            "type": "data_type",
+            "description": "Description of parameter1"
+          },
+          "parameter2": {
+            "type": "data_type",
+            "description": "Description of parameter2"
+          }
+        },
+        "additionalProperties": false
+      }
+    }]
+    
+    # System Prompt
+    
+    [Concise instruction describing the task - this should be the first line in the prompt, no section header]
+    
+    [Additional details as needed.]
+    
+    [Optional sections with headings or bullet points for detailed steps.]
+    
+    # Steps [optional]
+    
+    [Optional: a detailed breakdown of the steps necessary to accomplish the task. Use the format `tool_name(args...)` to represent tool calls.]
+    
+    # Output Format [optional]
+    
+    [Specifically call out how the output should be formatted, be it response length, structure e.g. JSON, markdown, etc]
+    
+    [Optional: No need for ReAct or tool calls.]
+    
+    # Examples [optional]
+    
+    [Optional: 1-3 well-defined examples with placeholders if necessary. Clearly mark where examples start and end, and what the input and output are. User placeholders as necessary.]
+    [If the examples are shorter than what a realistic example is expected to be, make a reference with () explaining how real examples should be longer / shorter / different. AND USE PLACEHOLDERS! ]
+    
+    # Notes [optional]
+    
+    [optional: edge cases, details, and an area to call or repeat out specific important considerations]
+  #+end_example
+
+* 技巧和框架
+  提示词的编写有一些基础的技巧，比如描述要具体，Few-Shot 等，也有一些在更复杂系统中的高级技巧，比如 RAG。基于这些技巧，也有特定的编写框架帮忙指导编写复杂的提示词，比如 CRISPE、RISE 等。
+
+  技巧就像是基础的语法，框架则是 sdk，基于需求，可以使用 sdk，也可以跳过 sdk 使用基本的语法自己实现。
+
+** 大模型输入
+   #+begin_quote
+   + *System prompts* that define the AI's behavior
+   + *Conversation history* from previous messages
+   + *Retrieved documents* pulled from databases (RAG)
+   + *Tool definitions* that let AI take actions
+   + *User preferences* and settings
+   + *Your actual prompt* - the question you're asking right now
+   #+end_quote
+
+** 多模态模型提示词
+   + 文生图：通常以逗号分隔的描述性短语形式呈现效果
+     #+begin_example
+       橘色虎斑猫，坐在窗台上，看雨，舒适的室内，柔和的自然光，逼真，浅景深，4K
+     #+end_example
+   + 文生视频：需要描述随时间变化的动作，而不仅仅是静态场景。要包含动词和移动
+     #+begin_example
+       一只鸟从树枝上起飞，翅膀大幅展开，起飞时树叶沙沙作响
+     #+end_example
+
+** 提示词组成
+   不是每个部分都需要，但了解有每个组成的作用可以帮助搭建出恰好符合需求的内容。
+
+   核心组件：
+   + Role/Persona 设定角色能让模型从特定专业知识或视角出发来聚焦其回应，使模型
+     + 使用恰当的词汇
+     + 运用相关专业知识
+     + 保持一致的视角
+     + 适当考虑受众
+
+     例子：
+     #+begin_quote
+     "You are a [profession] with [X years] of experience in [specialty]"
+     "Act as a [role] who is [characteristic]"
+     "You are an expert [field] helping a [audience type]"
+     #+end_quote
+
+   + Context/Background 提供模型理解问题所需的信息，应该包含的内容
+     + 项目详情 - 技术栈、架构、约束条件
+     + 当前状态 - 已尝试的方法、有效的部分以及无效的部分
+     + 目标 - 最终想要实现的目标
+     + 约束条件 - 时间限制、技术要求、风格指南
+
+   + Task/Instruction 希望模型做的事情，要「具体」且「明确」
+
+   + Constraints/Rules 约束条件限制模型的输出，防止常见问题，并确保输出的相关性，比如
+     + 长度限制
+     + 内容限制
+     + 风格约束
+     + 范围约束
+
+   + Output Format 指定输出格式可以确保获得具有可用结构的响应
+
+   + Examples 对应 Few-Shot Learning 技巧
+
+
+   常见提示词框架：
+   + CRISPE - Capacity/Role、Request、Information、Situation、Persona、Experiment
+     #+begin_example
+       You are a senior marketing consultant with 15 years of experience in beauty brands.
+
+       Create a social media content calendar for next month.
+
+       Background: We sell organic skincare products to women aged 25-40. Our brand voice is friendly and educational.
+
+       Situation: We're launching a new vitamin C serum on the 15th.
+
+       Style: Casual, emoji-friendly, with a focus on education over selling.
+
+       Example post style: "Did you know vitamin C is a skincare superhero?♀️ Here's why your skin will thank you..."
+
+       Create a week-by-week content plan with 3 posts per week.
+     #+end_example
+
+   + RTF - Role、Task、Format
+     #+begin_example
+       Role: You are a patient math tutor who specializes in making concepts easy for beginners.
+
+       Task: Explain what fractions are and how to add them together.
+
+       Format:
+       - Start with a real-world example
+       - Use simple language (no jargon)
+       - Show 3 practice problems with answers
+       - Keep it under 300 words
+     #+end_example
+
+** 提示词原则
+   #+begin_quote
+   1. Clarity Over Cleverness — Be explicit and unambiguous
+   2. Specificity Yields Quality — Details improve outputs
+   3. Context Is King — Include all relevant information
+   4. Guide, Don't Just Ask — Structure the reasoning process
+   5. Iterate and Refine — Improve through successive attempts
+   6. Leverage Strengths — Work with model training
+   7. Control Structure — Request specific formats
+   8. Verify and Validate — Check outputs for accuracy
+
+   Ref [[https://prompts.chat/book/03-core-prompting-principles][Core Prompting Principles | The Interactive Book of Prompting | prompts.chat]]
+   #+end_quote
+
+   关于原则 1 和 2：
+   1. 提示词应该明确清晰，避免歧义。比如使用 10 年而非多年。
+   2. 输入应该具体，比如：
+      #+begin_quote
+      + *Audience* Who will read/use this?
+      + *Length* How long/short should it be?
+      + *Tone* Formal? Casual? Technical?
+      + *Format* Prose? List? Table? Code?
+      + *Scope* What to include/exclude?
+      + *Purpose* What should this accomplish?
+      #+end_quote
+
+** 提示词技巧
+*** 角色 Role
+    通过为人工智能分配特定的角色或身份，可以显著影响回应的质量、风格和相关性。原理：大模型是根据给定的上下文预测最可能出现的下一个词元，指定一个角色时，实际上是在改变「可能性」的含义：
+    + 激活相关知识：角色会激活模型已学习关联中的特定区域。说“你是一名医生”会从训练数据中激活医学术语、诊断推理模式和临床沟通风格
+    + 统计条件作用：大型语言模型从数百万由真正专家撰写的文档中学习。分配一个角色时，模型会调整其概率分布，以匹配它从该类型作者那里看到的模式
+    + 减少歧义：没有角色时，模型会在所有可能的回应者之间取平均值。有了角色后，它会缩小到特定的子集，使回应更具针对性和一致性
+    + 上下文锚定：该角色在整个对话过程中创建一个持久的上下文锚点。后续的每一个回应都会受到这个初始框架的影响
+
+    基本的角色模式：
+    + The Expert Pattern 专家模式，指定专业领域和工作年限，即可获得权威、深入的回复。适用于技术问题、分析和专业建议：
+      #+begin_example
+        You are an expert ${field} with ${years:10} years of experience in ${specialty}.
+
+        ${task}
+
+
+        你是一名拥有 ${years:10} 年 ${specialty} 经验的 ${field} 专家。
+
+        ${task}
+      #+end_example
+
+    + The Professional Pattern 职业模式，通过指定职位头衔和组织类型，将该角色置于现实世界背景中。这会为回应增添机构知识和专业规范：
+      #+begin_example
+        You are a ${profession} working at ${organization}.
+
+        ${task}
+
+
+        你是一名在 ${organization} 工作的 ${profession}。
+
+        ${task}
+      #+end_example
+
+    + The Teacher Pattern 教师模式，非常适合学习和解释。指定受众水平可以确保回应与学习者的背景相匹配，无论是初学者还是高级从业者：
+      #+begin_example
+        You are a ${subject} teacher who specializes in explaining complex concepts to ${audience}.
+
+        ${task}
+
+
+        你是一名 ${subject} 教师，擅长向 ${audience} 解释复杂的概念。
+
+        ${task}
+      #+end_example
+
+    高级角色构建：
+    + Compound Roles 复合角色，结合多个身份，以获得融合不同视角的回应
+    + Situational Roles 情境角色，将角色置于特定场景中，以塑造内容和语气：
+      #+begin_example
+        You are a senior developer conducting a code review for a junior team member. You want to be helpful and educational, not critical. You explain not just what to fix, but why.
+
+        Code to review: ${code}
+
+
+        你是一名资深开发人员，正在为一名初级团队成员进行代码审查。你希望提供帮助并具有教育意义，而不是进行批评。你不仅要解释需要修复什么，还要说明原因。
+
+        待审查代码：${code}
+      #+end_example
+    + Perspective Roles 视角角色，从特定利益相关者的角度获取反馈。风投的视角对可行性和可扩展性的评估与客户或工程师的视角不同：
+      #+begin_example
+        You are a venture capitalist evaluating startup pitches. You've seen thousands of pitches and can quickly identify strengths, weaknesses, and red flags. Be direct but constructive.
+
+        Pitch: ${pitch}
+
+
+        你是一名风险投资家，负责评估初创公司的融资 pitch。你已经看过成千上万的 pitch，能够快速识别其中的优势、劣势和危险信号。请直言不讳但富有建设性。
+
+        Pitch：${pitch}
+      #+end_example
+
+*** 结构化输出 Structured Output
+    实际的生产应用中结构化的输出非常作用，包括 function call 的能力就依赖这一点实现。
+
+*** 强调 Emphasis with Uppercase Directives
+    大写单词对模型而言是强烈的信号，用于强调关键约束或要求。要少用才能达到最大效果，过度使用会削弱其有效性。常见大写指令：
+    #+begin_quote
+    NEVER, ALWAYS, IMPORTANT, DO NOT, MUST, ONLY
+    #+end_quote
+
+*** 思维链 Chain of Thought
+    思维链（CoT）提示是一种通过要求模型逐步展示其工作过程，从而显著提高人工智能在复杂推理任务上表现的技术。
+
+    简单触发短语：
+    |-------------------------------------------+--------------------------------|
+    | 英                                        | 中                             |
+    |-------------------------------------------+--------------------------------|
+    | "Let's think step by step."               | “让我们一步一步来思考。”       |
+    | "Think through this carefully."           | “仔细考虑一下这个问题。”       |
+    | "Work through this problem methodically." | “有条理地解决这个问题。”       |
+    | "Show your reasoning at each step."       | “在每一步都展示你的推理过程。” |
+    | "Explain your thought process."           | “解释你的思考过程。”           |
+    |-------------------------------------------+--------------------------------|
+
+    明确的步骤请求：
+    #+begin_quote
+    Solve this problem:
+
+    A car rental costs $40 per day plus $0.25 per mile. If someone rents a car for 3 days and drives 200 miles, what is the total cost?
+
+    Before giving your final answer:
+    1. Identify what information is given
+    2. Determine what we need to find
+    3. Plan your approach
+    4. Execute each step, showing work
+    5. Verify your answer
+    #+end_quote
+
+    BREAK 框架：B-Begion, R-Reason, E-Execute, A-Answer, K-Know
+    #+begin_quote
+    Solve this problem using BREAK:
+
+    B - Begin by restating the problem
+    R - Reason about what approach to use
+    E - Execute the solution step by step
+    A - Answer clearly
+    K - Know by verifying/checking
+
+    Problem: A rectangle's length is twice its width. If the perimeter is 36 cm, what is the area?
+    #+end_quote
+
+*** 少样本学习 Few-Shot Learning
+    通过少量的样本，可以向模型提供下面这些信息：
+    + Format 格式，应该怎样组织输出格式
+    + Style 风格，语气、长度、词汇等
+    + Logic 逻辑，应遵循的推理模式
+    + Edge cases 边界 Cases，如何处理特殊情况
+
+** 提示词高级策略
+   + Prompt Chaining 通过将复杂的问题分解为多个步骤，每个步骤编写单独的提示词来出来，每个步骤的输出会作为下一个步骤的输入
+   + Prompt Injection Defense 提示词注入是指用户试图通过在输入中嵌入自己的命令来覆盖你的指令。关键的防御措施是将用户输入视为数据，而非指令
+

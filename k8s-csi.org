@@ -45,3 +45,12 @@ k8s csi 规范定义了 CSI Identity、CSI Controller 和 CSI Node 三组接口�
 + [[https://github.com/container-storage-interface/spec/blob/master/spec.md][spec/spec.md at master · container-storage-interface/spec]]
 + [[https://blog.hdls.me/16255765577465.html][浅析 CSI 工作原理 - 海的澜色]]
 
+* sidecar
+  K8S CSI 生态提供了一组 sidecar 组件，比如 external-provisioner 负责监听 PVC 资源调用 Controller Service 来创建 PV。通常 CSI 需要实现的是 Node 和 Controller Service。
+
+  参考：
+  + [[https://kubernetes.io/blog/2019/01/15/container-storage-interface-ga/#how-to-write-a-csi-driver][How to write a CSI Driver?]]
+  + [[https://blog.hdls.me/16255765577465.html][浅析 CSI 工作原理 - 海的澜色]]
+  + [[https://kubernetes-csi.github.io/docs/][Introduction - Kubernetes CSI Developer Documentation]]
+
+  

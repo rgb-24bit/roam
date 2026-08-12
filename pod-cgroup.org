@@ -1,0 +1,15 @@
+:PROPERTIES:
+:ID:       3CA4CC3C-82B1-475C-BE56-9F2179F5BA4C
+:END:
+#+TITLE: pod cgroup
+
+* cgroup v1
+  + Pod =/sys/fs/cgroup/{subsystem}/kubepods/{podQos}/{podUID}=
+  + Pod Container =/sys/fs/cgroup/{subsystem}/kubepods/{podQos}/{podUID}/{containerID}=
+
+  每个 Pod 下至少会有两个 Pod Container Cgroup 目录，其中一个是 Pause 容器。其中，Pod Cgroup 下的 Limit 值和统计值是子 Container Cgroup 的和，如果存在某个容器 Limit 未设置，那么 Pod 相应 Cgroup Limit 也不做限制。
+
+  如果存在 init container，那么 Pod Cgroup 的 Limit 值取 init container 和 sum(container) 间的最大值。
+  
+  参考：[[id:4A5E3169-E60E-4C81-AE7E-18D3BDE8B86A][cgroups]]
+

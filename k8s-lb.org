@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       577AAEB6-43E7-4513-BA8C-172904DD828B
+:END:
+#+TITLE: k8s lb
+
+* metallb
+  [[https://github.com/metallb/metallb][metallb/metallb: A network load-balancer implementation for Kubernetes using standard routing protocols]]
+  + arp 模式，配置简单，但可靠性较低，同时性能受限于 leader 节点
+  + bgp 模式，配置复杂，但可靠性较高，可以负载均衡流量到不同节点
+

@@ -20,3 +20,8 @@
 * 定位
   K8S Service 定位更倾向于服务发现，而不是 LB 的角色，没办法在 RS 故障的情况下摘除流量。
 
+* ExternalName
+  可以使用类型为 ExternalName 的 Service 将 Service 映射到 DNS 名称，简单来说就是创建一个 CNAME 记录，做一个转发。
+
+  https://kubernetes.io/zh-cn/docs/concepts/services-networking/service/#externalname
+

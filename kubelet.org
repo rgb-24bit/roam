@@ -29,3 +29,11 @@
     cat /sys/fs/cgroup/pids/kubepods/besteffort/pod8b61d4de-a7ad-11e9-b5b9-246e96ad0900/pids.max 
   #+end_example
 
+* curl kubelet metrics
+  进入有 curl 命令的 pod：
+  #+begin_example
+    curl -k \
+    -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"  \
+    https://ip:10250/metrics/cadvisor
+  #+end_example
+

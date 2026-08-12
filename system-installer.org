@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       4CB6DEDA-B00A-469F-8783-0C891EEBAA02
+:END:
+#+TITLE: system installer
+
+Debian 和 RedHat 系系统安装程序，可通过相应的配置语言来执行。
+
+Debian preseed file 配置文件内容格式类似：
+#+begin_example
+  d-i debian-installer/language string en
+  d-i debian-installer/country string CN
+  d-i debian-installer/locale string en_US.UTF-8
+#+end_example
+
+而 RedHat Kickstart 配置文件内容格式类似 shell 脚本，但是有一些 % 开头的指令，比如：
+#+begin_example
+  %pre --interpreter=/usr/bin/bash
+#+end_example
+

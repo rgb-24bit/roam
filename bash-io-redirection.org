@@ -29,3 +29,29 @@ directs only the standard output to file dirlist, because the *standard error wa
 
 参考：[[https://tldp.org/LDP/abs/html/io-redirection.html][I/O Redirection]]
 
+* 修改 stdout & stderr
+  #+begin_src bash
+    # fd:3 link to stdout, fd:4 link to stderr
+    function io::init_std_fd() {
+      exec 3>&1 4>&2
+    }
+    
+    # stdout redirect to /dev/null
+    function io::stdout_off() {
+      exec 1>/dev/null
+    }
+    
+    # stderr redirect to /dev/null
+    function io::stderr_off() {
+      exec 2>/dev/null
+    }
+    
+    function io::stdout_on() {
+      exec 1>&3
+    }
+    
+    function io::stderr_on() {
+      exec 2>&4
+    }
+  #+end_src
+

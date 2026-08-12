@@ -22,3 +22,56 @@
 + [[https://superuser.com/questions/916516/is-the-amount-of-numa-nodes-always-equal-to-sockets][cpu - Is the amount of NUMA nodes always equal to sockets? - Super User]]
 + [[https://draveness.me/whys-the-design-numa-performance/][为什么 NUMA 会影响程序的延迟 - 面向信仰编程]]
 
+* numactl & numastat
+  可以使用 numactl 命令查看节点 numa 情况：
+  #+begin_example
+    # 查看 NUMA 节点数量、每个节点的 CPU 和内存
+    numactl --hardware
+
+    # 示例输出（双节点系统）
+    available: 2 nodes (0-1)
+    node 0 cpus: 0 1 2 3
+    node 0 size: 32123 MB  # 节点 0 内存（约 32GB）
+    node 0 free: 28546 MB
+    node 1 cpus: 4 5 6 7
+    node 1 size: 32127 MB  # 节点 1 内存（约 32GB）
+    node 1 free: 29102 MB
+    node distances:
+    node   0   1
+      0:  10  20  # 节点 0 访问自身延迟 10（相对值），访问节点 1 延迟 20
+      1:  20  10  # 节点 1 访问自身延迟 10，访问节点 0 延迟20
+  #+end_example
+
+  可以看到，不同节点间的访问延迟是不一样的 node distances。可以进一步使用 numastat 查看每个节点的本地分配（numa_hit）、远程分配（numa_miss）：
+  #+begin_example
+                               node0           node1
+    numa_hit            154377699310    132152825520
+    numa_miss             6920113185       703415051
+    numa_foreign           703415051      6920113185
+    interleave_hit             26625           26765
+    local_node          153714130881    132149649698
+    other_node            7583681609       706590873
+  #+end_example
+
+* Socket & NUMA
+  核心定义与本质：
+  + socket（CPU 插槽）
+    + 物理硬件接口，指主板上用于安装物理 CPU 芯片的插槽。
+    + 每个 socket 对应一颗独立的物理 CPU，数量决定系统可安装的物理 CPU 最大数量（如“2 路服务器”含 2 个 socket）。
+    + 例：2个 socket 的服务器安装 2 颗 8 核 CPU，总核心数 16 核。
+
+  + NUMA node（NUMA 节点）
+    + 逻辑资源单元，基于“内存访问延迟一致性”划分的资源组。
+    + 包含一组 CPU 核心、核心直接连接的“本地内存”及关联 I/O 设备。
+    + 核心目的：优化内存访问效率（同节点内 CPU 访问本地内存延迟低，跨节点访问延迟高）。
+    + 例：双 socket 服务器通常对应 2 个 NUMA node，每个 node 含 1 颗 CPU 的核心和其连接的内存。
+
+  典型关系与实例：
+  + 多数场景：1个 socket（物理 CPU）对应 1 个 NUMA node（如 2 socket 服务器 → 2 NUMA node）。
+  + 特殊场景：1个 socket 对应多个 NUMA node（如 AMD EPYC CPU 内部含多个 Die，每个 Die 为 1 个 node）。
+
+  总结：
+  + socket 是物理插槽，对应硬件层面的物理 CPU，决定 CPU 安装数量；
+  + NUMA node 是逻辑分组，基于内存访问特性绑定CPU和内存，优化访问效率；
+  + 两者通常一一对应，但分属“硬件物理结构”和“逻辑资源管理”层面，作用不同。
+

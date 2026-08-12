@@ -1,0 +1,23 @@
+:PROPERTIES:
+:ID:       E68F2BED-B22A-4A22-A078-07FFEDB29F93
+:END:
+#+TITLE: cpuset & cpu affinity
+
+cpuset 和 cpu affinity 从两方面来限制进程可以运行的 cpu 列表：
++ cpuset 限制进程总的可以运行的 cpu 列表，位于 [[id:4A5E3169-E60E-4C81-AE7E-18D3BDE8B86A][cgroup]] cpuset 子系统下
++ cpu affinity 指定进程可运行的 cpu 列表，可以是 cpu affinity 的子集
+
+一般来说，通过 cgroup 来创建一个组，这个组下面的进程运行在同一个 cpuset 下面，这时进程的 cpu affinity 默认值就是其所在 cpuset 的值。
+对于特定进程，可以使用 taskset 或 sched_setaffinity 系统调用来指定其可运行 cpu 列表，但只能是 cpuset 子集。
+
+在 k8s 中，可以通过 [[id:B7190303-7B2A-49EA-9A00-F923877AF05B][k8s static cpu manager policy]] 为部分 pod 绑核，绑核的 pod 会运行在单独为它分配的 cpuset 中。剩下未绑核的 pod 会运行在剩下的任意 cpu 上。
+
+修改进程 cpuset 后进程的 cpu affinity 值也会自动变为 cpuset 的子集。
+
+可以通过查看 =/proc/$PID/status= 看到进程可以运行的 cpu 列表，可以使用 =taskset -p= 命令查看。
+
+参考：[[id:D65FCB30-A5E1-45F8-B91B-95A56389E35C][cpusets]]、[[id:5A16D839-8F80-4FD8-BEE1-7ECA645015E5][taskset]]
+
+* golang
+  golang 进程启动时，会通过 sched_getaffinity 系统调用来获取其可运行的 cpu 列表，来作为 GMP 模型的参数。对于 k8s 中未绑核的场景，获取到的值不是 limit 值，可能偏大导致线程创建数量不合理。
+

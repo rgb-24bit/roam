@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       D6DCCA53-0CF0-4168-878F-309B095F1B61
+:END:
+#+TITLE: backup tools
+
++ [[https://restic.readthedocs.io/en/stable/010_introduction.html][Introduction — restic 0.18.1 documentation]]
++ [[https://velero.io/docs/v1.17/][Velero Docs - Overview]]
+

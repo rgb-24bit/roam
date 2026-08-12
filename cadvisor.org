@@ -1,0 +1,60 @@
+:PROPERTIES:
+:ID:       F023D1BA-E79E-4EF5-AF1A-70C8B2449323
+:END:
+#+TITLE: cadvisor
+
+* Pod & 容器指标采集
+  1. 通过 rawContainerHandler 采集 Pod Cgroup 信息（指定 rawPrefixWhiteList 包含 kubepods cgroup 前缀），此时 Container 只有 Pod UID，Kubelet 负责根据 Pod UID 获取 Pod Name 信息。无 container 和 image 指标
+  2. 通过 containerdContainerHandler 采集容器 Cgroup 信息，可以通过容器 name 获取到 container、pod、image 信息
+  3. kubelet 综合两个的数据，通过 =/metrics/cadvisor= 接口暴露给 prometheus 采集
+
+  参考：
+  + https://github.com/google/cadvisor/tree/master/container
+  + kubelet /metrics/cadvisor
+    + 注册 collector https://github.com/kubernetes/kubernetes/blob/v1.19.16/pkg/kubelet/server/server.go#L380
+    + 基于 Pod UID 获取 Pod Name 信息 https://github.com/kubernetes/kubernetes/blob/v1.19.16/pkg/kubelet/server/server.go#L1008
+    + 创建 cadvisor，指定 rawPrefixWhiteList https://github.com/kubernetes/kubernetes/blob/v1.19.16/cmd/kubelet/app/server.go#L630
+  + [[id:3CA4CC3C-82B1-475C-BE56-9F2179F5BA4C][pod cgroup]]
+
+** 内存指标和值来源
+   |------------------------------------+----------------------+-----------------------------------------------------------------------------------------------------|
+   | 指标                               | 含义                 | 来源                                                                                                |
+   |------------------------------------+----------------------+-----------------------------------------------------------------------------------------------------|
+   | container_memory_rss               | Pod 或容器内存 RSS   | Pod 或容器所在 cgroupmemory.stat 文件的 rss 字段值                                                  |
+   | container_spec_memory_limit_bytes  | Pod 或容器内存 Limit | Pod 或容器所在 cgroup memory.limit_in_bytes 文件值，大于 1 << 62 时设为 0，表示无 Limit 设置        |
+   | container_memory_working_set_bytes | Pod 或容器内存 WSS   | Pod 或容器所在 cgroupmemory.usage_in_bytes 文件值减去 memory.stat 文件的 total_inactive_file 字段值 |
+   |------------------------------------+----------------------+-----------------------------------------------------------------------------------------------------|
+
+   Pod 内存和容器的内存指标都基于 container_memory_rss 这样的原始指标上报，可以基于指标中 container 和 image 两个 label 值来进行区分：
+   |--------------------------+---------------+----------------|
+   | Label 值                 | Pod/Container | 备注           |
+   |--------------------------+---------------+----------------|
+   | container="", image=""   | Pod           |                |
+   | container="", image!=""  | 容器          | Pause 容器     |
+   | container!="", image!="" | 容器          | 实际运行的容器 |
+   |--------------------------+---------------+----------------|
+
+** Limit 值
+   在 Cgroup 文件系统中，Pod 和容器的 Cgroup 按如下方式组织：
+   #+begin_example
+     /sys/fs/cgroup/memory/kubepods/burstable/pod566b413e-1942-4033-9cf6-f06425f67002/
+     ├── a5f41eb3a50343b5071a371dc76d5572a05e39f362795c66e8963ee44f2ded44
+     │   ├── memory.limit_in_bytes
+     │   ├── memory.stat
+     │   └── memory.usage_in_bytes
+     ├── e568185cbe3f5f8d0b2dbff48ba3a60b218df982897beb3589f4cdaad39b1fab
+     │   ├── memory.limit_in_bytes  # 容器内存限制
+     │   ├── memory.stat            # 容器内存使用统计
+     │   └── memory.usage_in_bytes  # 容器已用内存
+     ├── memory.limit_in_bytes  # pod 内存限制
+     ├── memory.stat            # pod 内存使用统计
+     └── memory.usage_in_bytes  # pod 已用内存
+   #+end_example
+
+   Pod 内存资源使用量可以简单的视为 Pod 下所有容器内存资源使用量的和，比较特殊的是 Limit 值。需要区分以下几个场景：
+   - Pod 存在任意容器未设置 Limit：Pod Limit 值为 0（不限制），对应容器 Limit 值为 0。此时，对应 Pod 和容器内存使用率监控无效
+   - Pod 所有容器都设置了 Limit，无 init container：Pod Limit 值为所有容器 Limit 值的和
+   - Pod 所有容器都设置了 Limit，有 init container：Pod Limit 值为 max(所有容器 Limit 值的和，init container limit 最大值)   
+
+   主要需要注意有容器没设置 Limit 的场景，这个时候监控上 Pod 级别的内存使用率是无效的，因为会除 0 变的无限大。
+

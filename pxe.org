@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       58C2B706-5A39-4BB0-8BDE-B1A178F5D1E0
+:END:
+#+TITLE: pxe
+
+可以使用 PXE 来完成 Linux 系统的装机操作，一个例子：
+#+begin_example
+  BOOT_IMAGE=http://ip:port/vmlinuz initrd=http://ip:port/initrd k1=v1 k2=v2...
+#+end_example
+
+装机阶段，目标节点通过网络获取内核和 initrd，内核初始化好硬件后执行 initrd 内的 init 来完成当前节点的系统安装，比如初始化 /boot 分区，初始化根文件系统，
+获取实际要使用的内核和操作系统等等。
+

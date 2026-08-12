@@ -12,3 +12,19 @@ kubectl top 时使用的指标为 container_memory_working_set_bytes，值为 rs
 参考：
 + https://stackoverflow.com/questions/68289644/relationship-between-container-memory-working-set-bytes-and-process-resident-mem
 + https://xiaorui.cc/archives/7373
+
+* RSS & WSS
+  首先，container_memory_rss 取值来源是 memory.stat 文件的 rss 字段值，这个值不等于常说的 resident set size(RSS)。可以参考 cgroup 文档中的描述：
+  #+begin_quote
+  Only anonymous and swap cache memory is listed as part of 'rss' stat. This should not be confused with the true 'resident set size' or the amount of physical memory used by the cgroup.
+
+  'rss + mapped_file" will give you resident set size of cgroup.
+  (https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt)
+  #+end_quote
+  而 WSS 含义是 Working Set Size，对应进程的工作集内存，和 Linux 内存回收机制有关。
+
+  在 Linux 中，除了应用程序在堆栈上占用的内存外，文件读写时产生的页缓存也会占用一部分内存。对于页缓存来说，Linux 会将其分为 active_file 和 inactive_file 两部分。内存回收时，会尝试将 active_file 中的部分页面 deactive，然后回收 inactive_file 这部分。
+
+  WSS 对应进程当前使用内存减去 inactive_file 后的大小，OOM 触发主要基于 WSS 大小，如果触发内存回收后 WSS 还是超过 Limit 就可能会触发 OOM。  
+
+  参考：[[id:91CC860A-4CA8-41B1-B309-60EC0426098B][linux memory reclaim]]

@@ -81,7 +81,6 @@ saltstack 是一款自动化运维软件，主要为 C/S 架构，分为 Master 
 
   如果 minion 替换了证书，那么需要在每个 master 节点上删除已有的 =/etc/salt/pki/master/minions/[minion_id]= 文件，然后重启 =salt-master= 和 =salt-minion= 让他们重新互信。
 
-
 * Output
   设置输出为 json 格式：
   #+begin_example

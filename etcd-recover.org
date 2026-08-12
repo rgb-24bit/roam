@@ -1,0 +1,104 @@
+:PROPERTIES:
+:ID:       E8FBAF08-2E35-45E6-B745-66F79ACC50C7
+:END:
+#+TITLE: etcd recover
+
+* ETCD Snap & WAL 元信息
+  + ClusterID 集群 ID，避免加入错误的集群，基于初始 member id 计算得到
+  + Member Metadata
+    + Member Name 成员名称，创建时指定
+    + Member ID 基于 Member PeerURL、Node Name、Cluster Token 和时间戳计算得到，通过快照恢复是时间戳是空，确保不同副本计算得到的值一致
+    + Member ClientURL，当 ClientURL 有值时，说明 Member 已经初始化过
+    + Member PeerURL
+
+* 启动模式
+  + 无数据新集群
+    1. 通过 InitialPeerURLs 计算得到成员列表
+    2. 查询集群中自己对应的 Member 是否已经有 ClientURL 属性，如果有说明已经初始化过，不是新集群，退出流程
+    3. 使用计算得到的 ClusterID、Member ID 加入集群
+
+    #+begin_src go
+      func bootstrapNewClusterNoWAL(cfg config.ServerConfig, prt http.RoundTripper) (*bootstrapedCluster, error) {
+        cl, err := membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
+        if err != nil {
+          return nil, err
+        }
+        m := cl.MemberByName(cfg.Name)
+        if isMemberBootstrapped(cfg.Logger, cl, cfg.Name, prt, cfg.BootstrapTimeoutEffective()) {
+          return nil, fmt.Errorf("member %s has already been bootstrapped", m.ID)
+        }
+        return &bootstrapedCluster{
+          remotes: nil,
+          cl:      cl,
+          nodeID:  m.ID,
+        }, nil
+      }      
+    #+end_src
+
+  + 无数据已有集群
+    1. 通过 InitialPeerURLs 得到集群 PeerURL 列表
+    2. 通过 PeerURL 查询已有集群信息
+    3. 根据 PeerURL 查找自身分配的 Member ID
+    4. 使用集群分配的 Member ID 和已有集群 ID 启动服务
+
+    #+begin_src go
+      func bootstrapExistingClusterNoWAL(cfg config.ServerConfig, prt http.RoundTripper) (*bootstrapedCluster, error) {
+        if err := cfg.VerifyJoinExisting(); err != nil {
+          return nil, err
+        }
+        cl, err := membership.NewClusterFromURLsMap(cfg.Logger, cfg.InitialClusterToken, cfg.InitialPeerURLsMap, membership.WithMaxLearners(cfg.ExperimentalMaxLearners))
+        if err != nil {
+          return nil, err
+        }
+        existingCluster, gerr := GetClusterFromRemotePeers(cfg.Logger, getRemotePeerURLs(cl, cfg.Name), prt)
+        if gerr != nil {
+          return nil, fmt.Errorf("cannot fetch cluster info from peer urls: %v", gerr)
+        }
+        if err := membership.ValidateClusterAndAssignIDs(cfg.Logger, cl, existingCluster); err != nil {
+          return nil, fmt.Errorf("error validating peerURLs %s: %v", existingCluster, err)
+        }
+        if !isCompatibleWithCluster(cfg.Logger, cl, cl.MemberByName(cfg.Name).ID, prt, cfg.ReqTimeout()) {
+          return nil, fmt.Errorf("incompatible with current running cluster")
+        }
+        scaleUpLearners := false
+        if err := membership.ValidateMaxLearnerConfig(cfg.ExperimentalMaxLearners, existingCluster.Members(), scaleUpLearners); err != nil {
+          return nil, err
+        }
+        remotes := existingCluster.Members()
+        cl.SetID(types.ID(0), existingCluster.ID())
+        member := cl.MemberByName(cfg.Name)
+        return &bootstrapedCluster{
+          remotes: remotes,
+          cl:      cl,
+          nodeID:  member.ID,
+        }, nil
+      }
+    #+end_src
+
+  + 有数据
+    1. 直接使用 Snap 和 WAL 中保存的集群和 Member 元信息启动服务
+
+* 恢复集群
+  + 节点数据丢失，通过重新加入集群来恢复数据
+    1. 停止故障节点 etcd 服务，删除残留数据
+    2. 修改 ETCD_INITIAL_CLUSTER_STATE 配置为 existing。如果还是 new 的问题：
+       + 集群不移除当前故障 member，故障 etcd 清除数据重启，对应「无数据新集群」启动场景，这时集群中 member 是已经初始化过的，启动会失败
+       + 集群移除当前故障 member，集群中没有故障 etcd 副本的成员信息，加入不了集群
+    3. 通过 member 命令，移除故障副本，然后重新添加副本，生成新的 member id，此时新 member ClientURL 为空。不重新添加 member 直接重启的问题
+       > https://github.com/etcd-io/etcd/issues/13509
+    4. 重启故障节点 etcd 服务，已「无数据已有集群」模式加入集群
+
+  + 节点数据丢失，通过快照恢复集群
+    1. 通过快照恢复数据时，etcdctl/etcdutl 会根据 InitialPeerURLs 计算集群 ID 和 Member 元信息并保存到 snap 和 wal，同时会清空 db 中保存的 member 信息。这就是恢复集群时需要知道初始化成员列表的原因
+       #+begin_quote
+       https://github.com/etcd-io/etcd/blob/release-3.5/etcdutl/snapshot/v3_snapshot.go#L216
+       #+end_quote
+       + 如果直接使用恢复的数据加入已有集群，即使计算得到的 Member ID 和集群 ID 一样，但是快照恢复的数据 raft index 和集群内的记录的不一样，和上面一样会遇到问题
+         > https://github.com/etcd-io/etcd/issues/13509
+       + 如果通过移除 member 和重新添加 member 的方式，此时快照恢复计算得到的 member id 和集群内的 id 不一致
+    2. 所以，如果要通过快照恢复数据，需要覆盖所有副本，重置集群 commit index 状态
+
+* 参考
+  + [[https://etcd.io/docs/v3.5/learning/persistent-storage-files/][etcd persistent storage files | etcd]]
+  + [[https://etcd.io/docs/v3.6/op-guide/recovery/][Disaster recovery | etcd]]
+

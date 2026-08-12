@@ -14,6 +14,33 @@
     ps -eo s,user,cmd | grep ^[RD] | sort | uniq -c | sort -nbr | head -20
   #+end_example
 
+* High System Load with Every Process High CPU Utilization on Linux?
+  可能是触发 CPU 降频了，可以 lscpu 查看 CPU 标称频率和当前实际频率：
+  #+begin_example
+    lscpu
+  #+end_example
+
+  比如：
+  #+begin_example
+    Architecture:          x86_64
+    CPU op-mode(s):        32-bit, 64-bit
+    Byte Order:            Little Endian
+    CPU(s):                96
+    On-line CPU(s) list:   0-95
+    Thread(s) per core:    2
+    Core(s) per socket:    24
+    Socket(s):             2
+    NUMA node(s):          2
+    Vendor ID:             GenuineIntel
+    CPU family:            6
+    Model:                 85
+    Model name:            Intel(R) Xeon(R) Platinum 8260 CPU @ 2.40GHz
+    Stepping:              7
+    CPU MHz:               2983.248
+  #+end_example
+
+  标称为 2.40GHz(2400MHz), 实际为 2983 MHz。
+
 * CPU 平均负载 / CPU 使用率
   + 平均负载是指单位时间内，处在可执行状态和不可中断睡眠状态的进程的平均数。也就是说，它包括了处在执行态，阻塞态和就绪态的进程。主要就是 R、D、S 三个状态。
   + CPU 使用率是指在单位时间内 CPU 处在非空闲态的时间比，反映了 CPU 的繁忙程度

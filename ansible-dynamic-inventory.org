@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       AD4D2D42-3D87-42E4-94D0-BA245E795FD4
+:END:
+#+TITLE: ansible dynamic inventory
+
+* Docs
+  + [[https://docs.ansible.com/projects/ansible/latest/inventory_guide/intro_inventory.html][How to build your inventory — Ansible Community Documentation]]
+  + [[https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_reuse_roles.html][Roles — Ansible Community Documentation]]
+  + [[https://docs.ansible.com/projects/ansible/latest/dev_guide/developing_inventory.html#developing-inventory][Developing dynamic inventory — Ansible Community Documentation]]
+  + [[https://docs.ansible.com/projects/ansible/latest/plugins/inventory.html#plugin-list][Inventory plugins — Ansible Community Documentation]]
+
+* 配置优先级
+  + 变量优先级：令行 -e > Play 变量 > 角色 vars > 主机 / 组变量 > 角色 defaults [[https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence][Understanding variable precedence]]
+  + 配置优先级：环境变量 ANSIBLE_* > 项目内 ansible.cfg > 用户级 ~/.ansible.cfg > 全局 /etc/ansible/ansible.cfg
+    
+  内置变量：[[https://docs.ansible.com/projects/ansible/latest/reference_appendices/special_variables.html#special-variables][Special Variables — Ansible Community Documentation]]
+

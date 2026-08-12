@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       ABB69CD2-B46F-4BB2-9B63-57485254BEA5
+:END:
+#+TITLE: salt jobs
+
+☞ [[https://docs.saltproject.io/en/3006/topics/jobs/index.html][Job Management]]
+#+begin_src sh
+  salt-run jobs.active
+  salt-run jobs.lookup_jid
+  salt-run jobs.list_jobs
+#+end_src
+
+salt-run & salt-call:
+- salt-run 在 master 执行
+- salt-call 在 minion 执行，可以加 --local 选项只在 minion 本地执行任务，结果仅保存在本地
+  #+begin_example
+    salt-call --out=json --local
+  #+end_example
+

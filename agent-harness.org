@@ -1,0 +1,13 @@
+:PROPERTIES:
+:ID:       59BD79ED-05B0-48C2-9B91-930D0B9D24FF
+:END:
+#+TITLE: Agent Harness
+
+AI 现在逐渐有了两条发展脉络：一是以模型本身为主的路线，而是以模型应用为主的路线。不同的产品中，即使使用相同的模型，产品表现上也可能天差地别。
+
+从 Prompt Engineering -> Context Engineering -> Agent Harness (Engineering) 的路线来看，如何有效约束模型提供实际的生产力，已经是一项逐渐成熟专业的技术，是值得新时代每个人学习的。
+
+两者不是完全独立的两部分，了解模型原理有助于指导提示词的编写，模型的微调等。而实际的应用场景又会反过来影响模型的训练，比如 Anthropic 公司的模型在 Agent 场景的使用就更适配。
+
+想法：大模型本身是没有状态的，Agent Harness 就像是在大模型外挂载了一个状态管理的系统。
+

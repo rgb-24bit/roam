@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       456993F7-D93F-4746-8343-A896D0FA0905
+:END:
+#+TITLE: base64
+
+* 隐写
+  + [[https://im.daidr.me/blog/585][base64 数据隐写实现原理分析 | 戴兜的小屋]]
+

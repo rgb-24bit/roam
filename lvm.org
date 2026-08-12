@@ -3,10 +3,72 @@
 :END:
 #+TITLE: LVM
 
-逻辑卷管理（Logical Volume Manager，LVM）是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 内核中的一个硬盘系统工具，LVM 可以在物理硬盘的基础上创建和管理「逻辑卷」，而不是直接使用物理硬盘：
-#+HTML: <img src="https://img.linux.net.cn/data/attachment/album/201406/18/134408sa12dauefffyszfg.jpg">
+* 介绍
+  逻辑卷管理（Logical Volume Manager，LVM）是 [[id:EC899B0E-E274-4D41-9712-E432C287480C][Linux]] 内核中的一个硬盘系统工具，LVM 可以在物理硬盘的基础上创建和管理「逻辑卷」，而不是直接使用物理硬盘：
+  #+HTML: <img src="https://img.linux.net.cn/data/attachment/album/201406/18/134408sa12dauefffyszfg.jpg">
 
-一个或多个物理卷可以用来创建卷组（VG）。然后基于卷组可以创建逻辑卷（LV）。只要在卷组中有可用空间，就可以随心所欲的创建逻辑卷。文件系统就可以在逻辑卷上创建，然后可以在操作系统挂载和访问。
+  一个或多个物理卷可以用来创建卷组（VG）。然后基于卷组可以创建逻辑卷（LV）。只要在卷组中有可用空间，就可以随心所欲的创建逻辑卷。文件系统就可以在逻辑卷上创建，然后可以在操作系统挂载和访问。
 
-参考：[[https://linux.cn/article-3218-1.html][系统运维|Linux LVM 简明教程]]
+  参考：[[https://linux.cn/article-3218-1.html][系统运维|Linux LVM 简明教程]]
+
+* 概念
+  LVM 由如下三层结构组成：
+  |----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | 组件名称 | 英文全称             | 核心作用                                                                                                                                                            |
+  |----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | 物理卷   | Physical Volume (PV) | 底层存储的最小单元，是 LVM 识别的物理设备（如硬盘分区 /dev/sda1、整个硬盘 /dev/sdb）。创建 PV 时会在设备头部写入 LVM 元数据（记录设备类型、大小、所属卷组等信息）。 |
+  | 卷组     | Volume Group (VG)    | 将多个 PV 整合为一个存储池，屏蔽底层 PV 的物理差异。卷组内的空间以 PE 为单位管理。                                                                                  |
+  | 物理扩展 | Physical Extent (PE) | VG 分配空间的最小粒度（默认大小为 4MB，可自定义）                                                                                                                   |
+  | 逻辑卷   | Logical Volume (LV)  | 从 VG 中切割出的虚拟分区，可直接格式化（如 ext4、XFS）并挂载使用                                                                                                    |
+  |----------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+  相关命令：
+  #+begin_src sh
+    # 创建 PV（支持多个设备同时创建）
+    pvcreate /dev/sdb1 /dev/sdc1
+    
+    # 查看 PV 状态（确认是否创建成功）
+    pvs  # 简洁查看
+    pvdisplay  # 详细查看（含元数据、容量等）
+    
+    
+    # 创建 VG，将 /dev/sdb1、/dev/sdc1 加入
+    vgcreate my_vg /dev/sdb1 /dev/sdc1
+    
+    # 查看 VG 状态（确认容量、PE 大小等）
+    vgs  # 简洁查看
+    vgdisplay  # 详细查看（含剩余空间、PE 总数等）
+    
+    
+    # 创建 LV：从 my_vg 分配 200GB 空间，命名为 data_lv
+    lvcreate -L 200G -n data_lv my_vg
+    
+    # 查看 LV 状态（确认路径、大小等）
+    lvs  # 简洁查看
+    lvdisplay  # 详细查看（含挂载点、所属 VG 等）
+    # LV 的设备路径通常为 /dev/[VG名]/[LV名]，即 /dev/my_vg/data_lv
+  #+end_src
+
+* DM
+  LVM2 是基于 DM(Device Mapper) 实现的逻辑卷管理工具，可以使用 dmsetup ls 可查看 LVM 创建的 DM 设备。
+
+  例如，其中 (254:8) 是主次设备号，对应 =/dev/dm-8= 设备：
+  #+begin_example
+    open--local--lvm-local--f9a3ce02--341c--4084--b6c1--f601d7ac9ec7        (254:8)
+  #+end_example
+
+* 操作
+** 扩容
+   #+begin_src sh
+     # 更新 PV 大小，识别新增的分区空间，VG 会自动识别到新的 PV 大小
+     pvresize /dev/sda3
+     
+     # 扩容 LV
+     lvextend -l +100%FREE /dev/vg_data/lv_data
+     
+     # 扩容文件系统
+     resize2fs /dev/vg_data/lv_data  # EXT4文件系统（指定LV路径）
+   #+end_src
+
+   参考：[[https://help.aliyun.com/zh/ecs/user-guide/extend-an-lv-by-using-lvm][通过 LVM 扩容逻辑卷-云服务器 ECS(ECS)-阿里云帮助中心]]
 

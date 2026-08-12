@@ -12,6 +12,64 @@
 * 在容器中的问题
   在容器里面是，PID=1 的 init 进程通常不会去 wait 收养的孤儿进程，如果容器内创建出来了大量的孤儿僵尸进程，那么这些进程可能就没法自然回收。
 
+  解决方法：
+  1. 更换容器里的 1 进程，比如 https://github.com/krallin/tini
+  2. 程序自己回收所有子进程，主要针对进程自己创建的子进程，比如 Golang 通过 exec.Cmd 创建子进程泄露成为僵尸进程的场景
+
+     通过协程回收子进程，参考 [[https://medium.com/@felixge/killing-a-child-process-and-all-of-its-children-in-go-54079af94773][Killing a child process and all of its children in Go | by Felix Geisendörfer | Medium]]
+     #+begin_src go
+       var (
+         pgidSet = skipset.New[int]()
+         once    sync.Once
+       )
+       
+       func ReapCmd(cmd *exec.Cmd) func() {
+         if cmd.SysProcAttr == nil {
+           cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+         } else {
+           cmd.SysProcAttr.Setpgid = true
+         }
+       
+         return func() {
+           if cmd.Process != nil {
+             pgidSet.Add(cmd.Process.Pid)
+           }
+           once.Do(runReapG)
+         }
+       }
+       
+       func runReapG() {
+         go reapG()
+       }
+       
+       func reapG() {
+         ticker := time.NewTicker(time.Minute)
+         defer ticker.Stop()
+       
+         for range ticker.C {
+           for _, pgid := range pgidSet.ToSlice() {
+             for {
+               pid, err := syscall.Wait4(-pgid, nil, syscall.WNOHANG, nil)
+               if err != nil && errors.Is(err, syscall.ECHILD) {
+                 logrus.Warnf("no child process in pgid %d", pgid)
+                 pgidSet.Remove(pgid)
+                 break
+               }
+       
+               if pid == 0 {
+                 logrus.Warnf("contains running child process in pgid %d", pgid)
+                 break
+               }
+       
+               logrus.Warnf("reaped zombie process pgid:%d, pid:%d", pgid, pid)
+             }
+           }
+         }
+       }       
+     #+end_src
+
+     对于通过探针创建出来的僵尸进程这样无法回收。
+
 * 常用命令
   #+begin_example
     ps -eo s,pid,ppid,user,cmd | grep ^[Z]  # 列出僵尸进程

@@ -1,0 +1,10 @@
+:PROPERTIES:
+:ID:       DD6B23A1-07A5-45D4-A4B8-8F5362CFFC39
+:END:
+#+TITLE: find
+
+* 使用
+  #+begin_src sh
+    find dir -xdev  # 不跨文件系统
+  #+end_src
+

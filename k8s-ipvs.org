@@ -9,3 +9,5 @@ k8s iptables 模式下 service ip 通过 iptables 规则转发，这时 service 
 
 对应匹配 service-ip:port 的访问，走 ipvs 转发。不匹配的就打到了 kube-ipvs0 上，而 kube-ipvs0 和 lo 类似，能够 ping 通，访问 kube-ipvs0 ip + port 也约等于 127.0.0.1 + port。
 
+在 1.26 修复了这个问题：https://github.com/kubernetes/kubernetes/pull/108460
+

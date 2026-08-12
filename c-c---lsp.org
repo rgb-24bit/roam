@@ -10,3 +10,6 @@
 
 参考：[[https://github.com/MaskRay/ccls/wiki/Project-Setup][Project Setup · MaskRay/ccls Wiki]]
 
+* bear
+  可以使用 [[https://github.com/rizsotto/Bear][bear]] 工具来生成 compile_commands.json。
+

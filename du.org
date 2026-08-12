@@ -5,6 +5,11 @@
 
 某些情况下，比如 =/run= 目录下会挂载不同的目录、文件系统，可以使用 =--one-file-system= 查看同一个文件系统的文件大小，特别查看 =/run= 目录自身占用的时候可用：
 #+begin_example
-  du -sh --one-file-system /run/*
+  du -xh -d1 /run
+#+end_example
+
+查看系统盘：
+#+begin_example
+  du -xh -d1 /
 #+end_example
 

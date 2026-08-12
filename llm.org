@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       55718BE3-8634-4745-8CA4-45937E41F23C
+:END:
+#+TITLE: llm
+
+* 部署工具
+  + [[https://github.com/ollama/ollama][ollama/ollama: Get up and running with Llama 3.3, DeepSeek-R1, Phi-4, Gemma 3, Mistral Small 3.1 and other large language models.]]
+

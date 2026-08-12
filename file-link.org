@@ -25,3 +25,37 @@
 
 同样，如果进程运行期间创建了很多文件，unlink 后没关闭，就会占用大量磁盘空间。df 的时候磁盘快满了但 du 却看不到大文件。这种情况下可以用 =lsof |grep -i deleted= 存在到打开了大量 deleted 的文件的进程，kill 掉释放空间。
 
+* 恢复被删除后 link 还在的文件
+  1. 找到持有文件句柄的进程和文件描述符
+     + 使用 lsof
+       #+begin_src sh
+         # 格式：lsof | grep "deleted" | grep [文件名关键字/路径关键字]
+         # 示例：查找包含 "test.log" 关键字的已删除文件
+         lsof | grep "deleted" | grep "test.log"
+       #+end_src
+
+       输出例：
+       #+begin_example
+         nginx    1234   root    3w   REG    8,1   102400   123456 /var/log/test.log (deleted)         
+       #+end_example
+
+       对应进程和文件描述符就是 1234 和 3，3w 含义为文件描述符和权限为写（w）
+
+     + 使用 find
+       #+begin_src sh
+         # 搜索所有进程的 FD，筛选包含 "deleted" 的结果
+         find /proc -type l -ls | grep "deleted" | grep [文件名关键字]
+       #+end_src
+
+       输出例：
+       #+begin_example
+         123456 0 lrwx------ 1 root root 64 10月  1 12:34 /proc/1234/fd/3 -> /var/log/test.log (deleted)
+       #+end_example
+
+       这里的 /proc/1234/fd/3 就是目标
+
+  2. 通过 cp 命令恢复文件
+     #+begin_src sh
+       cp /proc/[PID]/fd/[FD] [目标恢复路径]
+     #+end_src
+

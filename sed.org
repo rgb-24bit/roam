@@ -62,3 +62,6 @@ function 表示实际要执行的操作，而 arguments 就是 function 的参�
   sed -n '2,5p' file                 # 打印文件第二到第五行
 #+end_src
 
+* 技巧
+  [[https://unix.stackexchange.com/questions/378990/find-and-replace-with-sed-with-slash-in-find-and-replace-string][find and replace with sed with slash in find and replace string]]
+

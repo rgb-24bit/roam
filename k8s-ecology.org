@@ -1,0 +1,19 @@
+:PROPERTIES:
+:ID:       3CA91C31-9946-4EBD-AEEA-5A1BF06D28EE
+:END:
+#+TITLE: k8s ecology
+
+* 可观测
+  + [[https://github.com/kubernetes/node-problem-detector][kubernetes/node-problem-detector: This is a place for various problem detectors running on the Kubernetes nodes.]]
+  + [[https://github.com/open-telemetry/opentelemetry-collector][open-telemetry/opentelemetry-collector: OpenTelemetry Collector]]
+
+* 调度
+  + [[https://github.com/kubernetes-sigs/scheduler-plugins][kubernetes-sigs/scheduler-plugins: Repository for out-of-tree scheduler plugins based on scheduler framework.]]
+
+* 网络
+  + [[https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/][Using NodeLocal DNSCache in Kubernetes Clusters | Kubernetes]]
+  + [[https://metallb.io/][MetalLB :: MetalLB, bare metal load-balancer for Kubernetes]]
+
+* 集群管理
+  + [[https://github.com/kubernetes-sigs/karpenter][kubernetes-sigs/karpenter: Karpenter is a Kubernetes Node Autoscaler built for flexibility, performance, and simplicity.]]
+

@@ -1,0 +1,45 @@
+:PROPERTIES:
+:ID:       65EA3A4D-9F2E-45B2-BADE-578D73A96CBB
+:END:
+#+TITLE: linux bootstrap
+
+* 固件初始化
+  1. 计算机加电后，首先由固件（BIOS/UEFI） 完成硬件自检和初始化
+  2. 寻找引导设备，比如 BIOS 估计会扫描硬盘的 MBR 分区，加载并执行第一个找到的引导程序（Boot Loader）
+
+* 引导程序
+  引导程序有很多，Linux 常用引导程序为 GRUB2，GRUB2 负责加载内核和初始 RAM 磁盘，并向内核传递启动参数：
+  1. 加载内核（vmlinuz）：从 /boot 目录读取压缩的内核镜像（如 vmlinuz-5.15.0-78-generic），解压后加载到内存
+  2. 加载初始 RAM 磁盘（initrd/initramfs）：读取临时根文件系统（如 initrd.img-5.15.0-78-generic），包含内核启动初期所需的驱动（如硬盘控制器、文件系统驱动），确保内核能找到并挂载真正的根文件系统
+  3. 向内核传递参数（如 root=/dev/sda1 指定根分区、quiet 抑制启动日志、single 进入单用户模式），参数存储在 /etc/default/grub 中
+
+* 内核启动
+  1. 内核解压与初始化
+     + 内核镜像（vmlinuz）是压缩的，首先执行内置的解压程序（如 gzip 解压），释放内核代码到内存
+     + 执行 start_kernel()（内核入口函数），初始化 CPU、内存（建立页表、开启分页）、中断控制器（如 APIC）、时钟等核心硬件
+     + 创建内核线程（如 kthreadd，负责管理其他内核线程）、初始化进程调度器（CFS）、VFS（虚拟文件系统）等子系统
+  2. 挂载初始根文件系统（initrd/initramfs）
+     + 内核先将 initrd（临时根文件系统，通常是 ramdisk 或 cpio 归档）挂载为临时根目录（/）
+     + initrd 中包含 init 程序（或/init 脚本），负责加载根文件系统所需的驱动（如 SATA、NVMe、LVM、加密文件系统驱动）
+  3. 切换到真正的根文件系统
+     + initrd 的 init 程序完成驱动加载后，通过内核命令行参数（root=/dev/sda1 或 UUID）找到真正的根分区（如/dev/sda1）
+     + 执行 pivot_root 系统调用，将根目录从 initrd 切换到真正的根文件系统（如 ext4、xfs），然后卸载 initrd
+  4. 启动第一个用户态进程
+     + 内核完成初始化后，执行 execve()系统调用，启动用户态的第一个进程（/sbin/init），PID 为 1
+     + 自此，内核态初始化结束，系统控制权交给用户态
+
+  简单来说就是加载内核后，内核执行 initrd 下的 init 程序完成真正根文件系统的挂载。initrd 下的 init 也可以做一些硬件、内核配置啥的。
+
+  也就是说：内核是内核，系统是系统。
+
+  也可以不用 initrd，之间指定根文件系统所在磁盘 UUID，然后内核会自己去挂载根文件系统，执行 /sbin/init 进行初始化。
+  
+* 用户空间初始化
+  用户空间初始化由 init 进程（现代系统多为 systemd）负责，启动各类服务、配置网络、挂载其他文件系统，最终进入登录界面。
+
+* 参考
+  + [[https://zhuanlan.zhihu.com/p/1889952053104710221][从内核到可启动镜像：0到1构建你的极简Linux系统 - 知乎]]
+  + [[https://blog.csdn.net/song_lee/article/details/106027410][initramfs 在内核中的作用与实现-CSDN博客]]
+  + [[https://exhen.github.io/tech/2018/09/25/introduction-to-bootloader/#%E4%BA%8C%E7%BA%A7%E5%BC%95%E5%AF%BC%E7%A8%8B%E5%BA%8F][浅谈几种常见的引导方式 – Exhen's Blog]]
+  + [[https://wiki.archlinux.org/title/Kernel_parameters][Kernel parameters - ArchWiki]]
+  + [[https://wiki.archlinux.org/title/GRUB][GRUB - ArchWiki]]

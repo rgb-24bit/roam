@@ -11,7 +11,7 @@
 - [[#handlers][Handlers]]
 - [[#tags][Tags]]
 - [[#roles][Roles]]
-- [[#本地执行][本地执行]]
+- [[#trick][Trick]]
 
 * Ad-Hoc
   命令格式：
@@ -206,7 +206,8 @@
 
   参考：[[https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html][Roles — Ansible Documentation]]
 
-* 本地执行
+* Trick
+  + 本地执行
   #+begin_src sh
     ansible-playbook test.yaml
   #+end_src
@@ -219,4 +220,9 @@
       tasks:
         ...
   #+end_src
+
+  + gather_facts
+    #+begin_src sh
+      ansible all -m setup -a 'gather_subset=!all,!min,architecture'
+    #+end_src
 

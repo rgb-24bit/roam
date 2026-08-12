@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       7D3B5005-632E-4409-93FF-E5A31A6FA5F4
+:END:
+#+TITLE: systemd-detect-virt
+
+判断当前节点是不是虚拟机。
+
+

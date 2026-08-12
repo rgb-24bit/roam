@@ -1,0 +1,37 @@
+:PROPERTIES:
+:ID:       C92C7AF8-5BB7-4F69-82DF-91D38761CEBF
+:END:
+#+TITLE: kernal read
+
+1. 安装依赖工具
+   #+begin_src sh
+     sudo apt install build-essential gcc-multilib flex bison libssl-dev
+   #+end_src
+
+2. 下载内核代码，并使用系统已有配置（可以切换到同一个版本的内核代码，学习会少点麻烦）
+   #+begin_src sh
+     git clone https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+     cd linux/
+     cp /boot/config-$(uname -r) .config
+     make olddefconfig
+   #+end_src
+
+3. 生成 compile_commands.json
+   #+begin_src sh
+     bear -- make -j$(nproc)
+     
+     # 5.10+ 使用如下脚本生成更准确的 compile_commands.json
+     python scripts/clang-tools/gen_compile_commands.py
+   #+end_src
+
+   高版本 gcc 编译老版本内核可能报错 Warning as error，可以使用老版本 gcc 来编译：
+   #+begin_src sh
+     make HOSTCC=gcc-11 CC=gcc-11
+   #+end_src
+
+   参考：[[https://stackoverflow.com/questions/72932779/warnings-while-trying-to-compile-old-linux-kernel-with-gcc-12-1-0][warnings while trying to compile old linux kernel with gcc 12.1.0 - Stack Overflow]]
+
+4. 使用 ccls 阅读内核代码效果更好
+   + 禁用 VS Code C/C++ 插件
+   + 安装 ccls 插件
+
